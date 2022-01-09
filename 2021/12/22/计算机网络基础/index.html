@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html  lang="zh-CN" >
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="theme-color" content="#fff" id="theme-color">
+  <meta name="description" content="混口饭吃">
+  <link rel="icon" href="/img/logo.png">
+  <title>计算机网络基础</title>
+  
+  
+  <meta property="og:title" content="计算机网络基础">
+  
+  
+  <meta property="og:url" content="http://example.com/2021/12/22/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/index.html">
+  
+  
+  <meta property="og:img" content="/img/author.jpg">
+  
+  
+  
+  <meta property="og:type" content="article">
+  <meta property="og:article:published_time" content="2021-12-22">
+  <meta property="og:article:modified_time" content="2021-12-22">
+  <meta property="og:article:author" content="YiHua">
+  
+  
+  <meta property="og:article:tag" content="计算机网络">
+  
+  
+  
+  
+  <script>
+    // control reverse button
+    var reverseDarkList = {
+      dark: 'light',
+      light: 'dark'
+    };
+    var themeColor = {
+      dark: '#1c1c1e',
+      light: '#fff'
+    }
+    // get the data of css prefers-color-scheme
+    var getCssMediaQuery = function() {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    };
+    // reverse current darkmode setting function
+    var reverseDarkModeSetting = function() {
+      var setting = localStorage.getItem('user-color-scheme');
+      if(reverseDarkList[setting]) {
+        setting = reverseDarkList[setting];
+      } else if(setting === null) {
+        setting = reverseDarkList[getCssMediaQuery()];
+      } else {
+        return;
+      }
+      localStorage.setItem('user-color-scheme', setting);
+      return setting;
+    };
+    // apply current darkmode setting
+    var setDarkmode = function(mode) {
+      var setting = mode || localStorage.getItem('user-color-scheme');
+      if(setting === getCssMediaQuery()) {
+        document.documentElement.removeAttribute('data-user-color-scheme');
+        localStorage.removeItem('user-color-scheme');
+        document.getElementById('theme-color').content = themeColor[setting];
+      } else if(reverseDarkList[setting]) {
+        document.documentElement.setAttribute('data-user-color-scheme', setting);
+        document.getElementById('theme-color').content = themeColor[setting];
+      } else {
+        document.documentElement.removeAttribute('data-user-color-scheme');
+        localStorage.removeItem('user-color-scheme');
+        document.getElementById('theme-color').content = themeColor[getCssMediaQuery()];
+      }
+    };
+    setDarkmode();
+  </script>
+  <script>
+    function loadScript(url, cb) {
+      var script = document.createElement('script');
+      script.src = url;
+      if (cb) script.onload = cb;
+      script.async = true;
+      document.body.appendChild(script);
+    }
+  </script>
+  
+  <link rel="preload" href="//at.alicdn.com/t/font_1946621_i1kgafibvw.css" as="style" >
+  <link rel="preload" href="//at.alicdn.com/t/font_1952792_89b4ac4k4up.css" as="style" >
+  
+  <link rel="preload" href="/js/lib/lightbox/baguetteBox.min.js" as="script">
+  <link rel="preload" href="/js/lib/lightbox/baguetteBox.min.css" as="style" >
+  
+  
+  <link rel="preload" href="/js/lib/lozad.min.js" as="script">
+  
+  
+  
+  
+  
+  
+  
+  
+<link rel="stylesheet" href="/css/main.css">
+
+  
+  
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1946621_i1kgafibvw.css">
+
+  
+  
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1952792_89b4ac4k4up.css">
+
+  
+  
+<link rel="stylesheet" href="/js/lib/lightbox/baguetteBox.min.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <div class="wrapper">
+    
+    <nav class="navbar">
+  <div class="navbar-logo">
+    <span class="navbar-logo-main">
+      
+      <img class="navbar-logo-img" src="/img/logo.png" alt="logo">
+      
+      <span class="navbar-logo-dsc">混口饭吃</span>
+    </span>
+  </div>
+  <div class="navbar-menu">
+    
+    <a href="/" class="navbar-menu-item">
+    
+    首页
+    
+    </a>
+    
+    <a href="/archives" class="navbar-menu-item">
+    
+    归档
+    
+    </a>
+    
+    <a href="/tags" class="navbar-menu-item">
+    
+    标签
+    
+    </a>
+    
+    <a href="/categories" class="navbar-menu-item">
+    
+    分类
+    
+    </a>
+    
+    <a href="/about" class="navbar-menu-item">
+    
+    关于
+    
+    </a>
+    
+    <a href="/links" class="navbar-menu-item">
+    
+    友链
+    
+    </a>
+    
+    <a class="navbar-menu-item darknavbar" id="dark"><i class="iconfont icon-weather"></i></a>
+    <a class="navbar-menu-item searchnavbar" id="search"><i class="iconfont icon-search" style="font-size: 1.2rem; font-weight: 400;"></i></a>
+  </div>
+</nav>
+    
+    <div id="local-search" style="display: none;">
+      <input class="navbar-menu-item" id="search-input" placeholder="请输入搜索内容...">
+      <div id="search-content"></div>
+    </div>
+    
+    <div class="section-wrap">
+      <div class="container">
+        <div class="columns">
+          <main class="main-column">
+<article class="card card-content">
+  <header>
+    <h1 class="post-title">
+      计算机网络基础
+    </h1>
+  </header>
+  <div class="post-meta post-show-meta">
+    <time datetime="2021-12-22T13:43:50.770Z">
+      <i class="iconfont icon-calendar" style="margin-right: 2px;"></i>
+      <span>2021-12-22</span>
+    </time>
+    
+    <span class="dot"></span>
+    
+    <a href="/categories/计算机网络/" class="post-meta-link">计算机网络</a>
+    
+    
+    
+    <span class="dot"></span>
+    <span>108 字</span>
+    
+  </div>
+  
+  <div class="post-meta post-show-meta" style="margin-top: -10px;">
+    <div style="display: flex; align-items: center;">
+      <i class="iconfont icon-biaoqian" style="margin-right: 2px; font-size: 1.15rem;"></i>
+      
+      
+        <a href="/tags/计算机网络/" class="post-meta-link">计算机网络</a>
+      
+    </div>
+  </div>
+  
+  </header>
+  <div id="section" class="post-content">
+    <h3 id="一：认识网络和网络设备"><a href="#一：认识网络和网络设备" class="headerlink" title="一：认识网络和网络设备"></a>一：认识网络和网络设备</h3><h5 id="1-计算机网络的组成"><a href="#1-计算机网络的组成" class="headerlink" title="1.计算机网络的组成"></a>1.计算机网络的组成</h5><p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.6/1.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.6/1.png"></p>
+<h5 id="2-传输介质"><a href="#2-传输介质" class="headerlink" title="2.传输介质"></a>2.传输介质</h5><p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.6/2.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.6/2.png"></p>
+<h5 id="3-网络设备"><a href="#3-网络设备" class="headerlink" title="3.网络设备"></a>3.网络设备</h5><p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.6/3.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.6/3.png"></p>
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.6/4.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.6/4.png"></p>
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.6/5.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.6/5.png"></p>
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.6/6.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.6/6.png"></p>
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.6/7.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.6/7.png"></p>
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.6/8.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.6/8.png"></p>
+<h5 id="4-常见的网络"><a href="#4-常见的网络" class="headerlink" title="4.常见的网络"></a>4.常见的网络</h5><p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.6/9.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.6/9.png"></p>
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.6/10.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.6/10.png"></p>
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.6/11.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.6/11.png"></p>
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.6/12.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.6/12.png"></p>
+<h3 id="二-OSI模型和TCP-IP模型"><a href="#二-OSI模型和TCP-IP模型" class="headerlink" title="二:OSI模型和TCP/IP模型"></a>二:OSI模型和TCP/IP模型</h3><h5 id="1-OSI分层思想"><a href="#1-OSI分层思想" class="headerlink" title="1.OSI分层思想"></a>1.OSI分层思想</h5><p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.6/13.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.6/13.png"></p>
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.6/14.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.6/14.png"></p>
+<h5 id="2-每层的作用"><a href="#2-每层的作用" class="headerlink" title="2.每层的作用"></a>2.每层的作用</h5><p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.6/15.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.6/15.png"></p>
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.6/16.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.6/16.png"></p>
+<h5 id="3-数据封装与接封装的过程"><a href="#3-数据封装与接封装的过程" class="headerlink" title="3.数据封装与接封装的过程"></a>3.数据封装与接封装的过程</h5><p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.6/17.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.6/17.png"></p>
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.6/18.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.6/18.png"></p>
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.6/19.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.6/19.png"></p>
+<h5 id="4-TCP-IP协议模型"><a href="#4-TCP-IP协议模型" class="headerlink" title="4.TCP/IP协议模型"></a>4.TCP/IP协议模型</h5><p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.6/20.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.6/20.png"></p>
+<h5 id="5-OSI模型-VS-TCP-IP模型"><a href="#5-OSI模型-VS-TCP-IP模型" class="headerlink" title="5.OSI模型 VS TCP/IP模型"></a>5.OSI模型 VS TCP/IP模型</h5><p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.6/21.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.6/21.png"></p>
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.6/22.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.6/22.png"></p>
+<h5 id="6-TCP-IP协议族的组成"><a href="#6-TCP-IP协议族的组成" class="headerlink" title="6.TCP/IP协议族的组成"></a>6.TCP/IP协议族的组成</h5><p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.6/23.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.6/23.png"></p>
+<h5 id="7-设备与层的对应关系"><a href="#7-设备与层的对应关系" class="headerlink" title="7.设备与层的对应关系"></a>7.设备与层的对应关系</h5><p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.6/24.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.6/24.png"></p>
+<h5 id="8各层间的通信"><a href="#8各层间的通信" class="headerlink" title="8各层间的通信"></a>8各层间的通信</h5><p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.6/25.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.6/25.png"></p>
+
+  </div>
+  <div>
+  
+  <div class="post-note note-warning copyright" style="margin-top: 42px">
+    <p><span style="font-weight: bold;">作者：</span><a target="_blank" rel="nofollow noopener noreferrer" href="http://example.com/about">YiHua</a></p>
+    <p><span style="font-weight: bold;">文章链接：</span><a target="_blank" rel="nofollow noopener noreferrer" href="http://example.com/2021/12/22/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/">http://example.com/2021/12/22/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/</a></p>
+    <p><span style="font-weight: bold;">版权声明：</span>本博客所有文章除特别声明外，均采用<a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">CC BY-NC-SA 4.0 协议</a>。转载请注明出处！</p>
+  </div>
+  
+  </div>
+</article>
+<div class="nav">
+  
+  <div class="nav-item-prev">
+    <a href="/2021/12/23/ARPIPICMP协议分析/" class="nav-link">
+      <i class="iconfont icon-left nav-prev-icon"></i>
+      <div>
+        <div class="nav-label">上一篇</div>
+        
+        <div class="nav-title">ARP/IP/ICMP协议分析 </div>
+        
+      </div>
+    </a>
+  </div>
+  
+  
+  <div class="nav-item-next">
+    <a href="/2021/12/20/windows基本使用及服务安装/" class="nav-link">
+      <div>
+        <div class="nav-label">下一篇</div>
+        
+        <div class="nav-title">windows基本使用及服务安装 </div>
+        
+      </div>
+      <i class="iconfont icon-right nav-next-icon"></i>
+    </a>
+  </div>
+  
+</div>
+
+<div class="card card-content toc-card" id="mobiletoc">
+  <div class="toc-header"><i class="iconfont icon-menu" style="padding-right: 2px;"></i>目录</div>
+<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%EF%BC%9A%E8%AE%A4%E8%AF%86%E7%BD%91%E7%BB%9C%E5%92%8C%E7%BD%91%E7%BB%9C%E8%AE%BE%E5%A4%87"><span class="toc-text">一：认识网络和网络设备</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E7%9A%84%E7%BB%84%E6%88%90"><span class="toc-text">1.计算机网络的组成</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E4%BC%A0%E8%BE%93%E4%BB%8B%E8%B4%A8"><span class="toc-text">2.传输介质</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-%E7%BD%91%E7%BB%9C%E8%AE%BE%E5%A4%87"><span class="toc-text">3.网络设备</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-%E5%B8%B8%E8%A7%81%E7%9A%84%E7%BD%91%E7%BB%9C"><span class="toc-text">4.常见的网络</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8C-OSI%E6%A8%A1%E5%9E%8B%E5%92%8CTCP-IP%E6%A8%A1%E5%9E%8B"><span class="toc-text">二:OSI模型和TCP&#x2F;IP模型</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-OSI%E5%88%86%E5%B1%82%E6%80%9D%E6%83%B3"><span class="toc-text">1.OSI分层思想</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E6%AF%8F%E5%B1%82%E7%9A%84%E4%BD%9C%E7%94%A8"><span class="toc-text">2.每层的作用</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-%E6%95%B0%E6%8D%AE%E5%B0%81%E8%A3%85%E4%B8%8E%E6%8E%A5%E5%B0%81%E8%A3%85%E7%9A%84%E8%BF%87%E7%A8%8B"><span class="toc-text">3.数据封装与接封装的过程</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-TCP-IP%E5%8D%8F%E8%AE%AE%E6%A8%A1%E5%9E%8B"><span class="toc-text">4.TCP&#x2F;IP协议模型</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#5-OSI%E6%A8%A1%E5%9E%8B-VS-TCP-IP%E6%A8%A1%E5%9E%8B"><span class="toc-text">5.OSI模型 VS TCP&#x2F;IP模型</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#6-TCP-IP%E5%8D%8F%E8%AE%AE%E6%97%8F%E7%9A%84%E7%BB%84%E6%88%90"><span class="toc-text">6.TCP&#x2F;IP协议族的组成</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#7-%E8%AE%BE%E5%A4%87%E4%B8%8E%E5%B1%82%E7%9A%84%E5%AF%B9%E5%BA%94%E5%85%B3%E7%B3%BB"><span class="toc-text">7.设备与层的对应关系</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#8%E5%90%84%E5%B1%82%E9%97%B4%E7%9A%84%E9%80%9A%E4%BF%A1"><span class="toc-text">8各层间的通信</span></a></li></ol></li></ol></li></ol>
+</div></main>
+          <aside class="left-column">
+            
+            <div class="card card-author">
+              
+<img src="/img/author.jpg" class="author-img">
+
+<p class="author-name">YiHua</p>
+<p class="author-description">谨言  深思  笃行</p>
+<div class="author-message">
+  <a class="author-posts-count" href="/archives">
+    <span>13</span>
+    <span>文章</span>
+  </a>
+  <a class="author-categories-count" href="/categories">
+    <span>5</span>
+    <span>分类</span>
+  </a>
+  <a class="author-tags-count" href="/tags">
+    <span>5</span>
+    <span>标签</span>
+  </a>
+</div>
+
+            </div>
+            
+            <div class="sticky-tablet">
+  
+  
+  <article class="display-when-two-columns spacer">
+    <div class="card card-content toc-card">
+      <div class="toc-header"><i class="iconfont icon-menu" style="padding-right: 2px;"></i>目录</div>
+<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%EF%BC%9A%E8%AE%A4%E8%AF%86%E7%BD%91%E7%BB%9C%E5%92%8C%E7%BD%91%E7%BB%9C%E8%AE%BE%E5%A4%87"><span class="toc-text">一：认识网络和网络设备</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E7%9A%84%E7%BB%84%E6%88%90"><span class="toc-text">1.计算机网络的组成</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E4%BC%A0%E8%BE%93%E4%BB%8B%E8%B4%A8"><span class="toc-text">2.传输介质</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-%E7%BD%91%E7%BB%9C%E8%AE%BE%E5%A4%87"><span class="toc-text">3.网络设备</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-%E5%B8%B8%E8%A7%81%E7%9A%84%E7%BD%91%E7%BB%9C"><span class="toc-text">4.常见的网络</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8C-OSI%E6%A8%A1%E5%9E%8B%E5%92%8CTCP-IP%E6%A8%A1%E5%9E%8B"><span class="toc-text">二:OSI模型和TCP&#x2F;IP模型</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-OSI%E5%88%86%E5%B1%82%E6%80%9D%E6%83%B3"><span class="toc-text">1.OSI分层思想</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E6%AF%8F%E5%B1%82%E7%9A%84%E4%BD%9C%E7%94%A8"><span class="toc-text">2.每层的作用</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-%E6%95%B0%E6%8D%AE%E5%B0%81%E8%A3%85%E4%B8%8E%E6%8E%A5%E5%B0%81%E8%A3%85%E7%9A%84%E8%BF%87%E7%A8%8B"><span class="toc-text">3.数据封装与接封装的过程</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-TCP-IP%E5%8D%8F%E8%AE%AE%E6%A8%A1%E5%9E%8B"><span class="toc-text">4.TCP&#x2F;IP协议模型</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#5-OSI%E6%A8%A1%E5%9E%8B-VS-TCP-IP%E6%A8%A1%E5%9E%8B"><span class="toc-text">5.OSI模型 VS TCP&#x2F;IP模型</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#6-TCP-IP%E5%8D%8F%E8%AE%AE%E6%97%8F%E7%9A%84%E7%BB%84%E6%88%90"><span class="toc-text">6.TCP&#x2F;IP协议族的组成</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#7-%E8%AE%BE%E5%A4%87%E4%B8%8E%E5%B1%82%E7%9A%84%E5%AF%B9%E5%BA%94%E5%85%B3%E7%B3%BB"><span class="toc-text">7.设备与层的对应关系</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#8%E5%90%84%E5%B1%82%E9%97%B4%E7%9A%84%E9%80%9A%E4%BF%A1"><span class="toc-text">8各层间的通信</span></a></li></ol></li></ol></li></ol>
+    </div>
+  </article>
+  
+  
+  <article class="card card-content categories-widget">
+    <div class="categories-card">
+  <div class="categories-header"><i class="iconfont icon-fenlei" style="padding-right: 2px;"></i>分类</div>
+  <div class="categories-list">
+    
+      <a href="/categories/CentoS-7基础/">
+        <div class="categories-list-item">
+          CentoS-7基础
+          <span class="categories-list-item-badge">4</span>
+        </div>
+      </a>
+    
+      <a href="/categories/计算机网络/">
+        <div class="categories-list-item">
+          计算机网络
+          <span class="categories-list-item-badge">4</span>
+        </div>
+      </a>
+    
+      <a href="/categories/Mysql数据库/">
+        <div class="categories-list-item">
+          Mysql数据库
+          <span class="categories-list-item-badge">1</span>
+        </div>
+      </a>
+    
+      <a href="/categories/php代码基础/">
+        <div class="categories-list-item">
+          php代码基础
+          <span class="categories-list-item-badge">3</span>
+        </div>
+      </a>
+    
+      <a href="/categories/windows-2008-R2/">
+        <div class="categories-list-item">
+          windows-2008-R2
+          <span class="categories-list-item-badge">1</span>
+        </div>
+      </a>
+    
+  </div>
+</div>
+  </article>
+  
+  <article class="card card-content tags-widget">
+    <div class="tags-card">
+  <div class="tags-header"><i class="iconfont icon-biaoqian" style="padding-right: 2px;"></i>热门标签</div>
+  <div class="tags-list">
+    
+    <a href="/tags/Linux/" title="Linux"><div class="tags-list-item">Linux</div></a>
+    
+    <a href="/tags/计算机网络/" title="计算机网络"><div class="tags-list-item">计算机网络</div></a>
+    
+    <a href="/tags/Mysql数据库/" title="Mysql数据库"><div class="tags-list-item">Mysql数据库</div></a>
+    
+    <a href="/tags/php代码基础/" title="php代码基础"><div class="tags-list-item">php代码基础</div></a>
+    
+    <a href="/tags/windows/" title="windows"><div class="tags-list-item">windows</div></a>
+    
+  </div>
+</div>
+  </article>
+  
+  
+</div>
+          </aside>
+          <aside class="right-column">
+            <div class="sticky-widescreen">
+  
+  
+  <article class="card card-content toc-card">
+    <div class="toc-header"><i class="iconfont icon-menu" style="padding-right: 2px;"></i>目录</div>
+<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%EF%BC%9A%E8%AE%A4%E8%AF%86%E7%BD%91%E7%BB%9C%E5%92%8C%E7%BD%91%E7%BB%9C%E8%AE%BE%E5%A4%87"><span class="toc-text">一：认识网络和网络设备</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E7%9A%84%E7%BB%84%E6%88%90"><span class="toc-text">1.计算机网络的组成</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E4%BC%A0%E8%BE%93%E4%BB%8B%E8%B4%A8"><span class="toc-text">2.传输介质</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-%E7%BD%91%E7%BB%9C%E8%AE%BE%E5%A4%87"><span class="toc-text">3.网络设备</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-%E5%B8%B8%E8%A7%81%E7%9A%84%E7%BD%91%E7%BB%9C"><span class="toc-text">4.常见的网络</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8C-OSI%E6%A8%A1%E5%9E%8B%E5%92%8CTCP-IP%E6%A8%A1%E5%9E%8B"><span class="toc-text">二:OSI模型和TCP&#x2F;IP模型</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-OSI%E5%88%86%E5%B1%82%E6%80%9D%E6%83%B3"><span class="toc-text">1.OSI分层思想</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E6%AF%8F%E5%B1%82%E7%9A%84%E4%BD%9C%E7%94%A8"><span class="toc-text">2.每层的作用</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-%E6%95%B0%E6%8D%AE%E5%B0%81%E8%A3%85%E4%B8%8E%E6%8E%A5%E5%B0%81%E8%A3%85%E7%9A%84%E8%BF%87%E7%A8%8B"><span class="toc-text">3.数据封装与接封装的过程</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-TCP-IP%E5%8D%8F%E8%AE%AE%E6%A8%A1%E5%9E%8B"><span class="toc-text">4.TCP&#x2F;IP协议模型</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#5-OSI%E6%A8%A1%E5%9E%8B-VS-TCP-IP%E6%A8%A1%E5%9E%8B"><span class="toc-text">5.OSI模型 VS TCP&#x2F;IP模型</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#6-TCP-IP%E5%8D%8F%E8%AE%AE%E6%97%8F%E7%9A%84%E7%BB%84%E6%88%90"><span class="toc-text">6.TCP&#x2F;IP协议族的组成</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#7-%E8%AE%BE%E5%A4%87%E4%B8%8E%E5%B1%82%E7%9A%84%E5%AF%B9%E5%BA%94%E5%85%B3%E7%B3%BB"><span class="toc-text">7.设备与层的对应关系</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#8%E5%90%84%E5%B1%82%E9%97%B4%E7%9A%84%E9%80%9A%E4%BF%A1"><span class="toc-text">8各层间的通信</span></a></li></ol></li></ol></li></ol>
+  </article>
+  
+  
+  <article class="card card-content">
+    <div class="recent-posts-card">
+  <div class="recent-posts-header"><i class="iconfont icon-wenzhang_huaban" style="padding-right: 2px;"></i>最近文章</div>
+  <div class="recent-posts-list">
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2022-01-08</div>
+        <a href="/2022/01/08/Mysql数据库/"><div class="recent-posts-item-content">Mysql数据库</div></a>
+      </div>
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2022-01-06</div>
+        <a href="/2022/01/06/php基础（三）/"><div class="recent-posts-item-content">php基础（三）</div></a>
+      </div>
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2022-01-05</div>
+        <a href="/2022/01/05/php基础（二）/"><div class="recent-posts-item-content">php基础（二）</div></a>
+      </div>
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2022-01-04</div>
+        <a href="/2022/01/04/php基础（一）/"><div class="recent-posts-item-content">php基础（一）</div></a>
+      </div>
+    
+  </div>
+</div>
+  </article>
+  
+  
+</div>
+          </aside>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <footer class="footer">
+  <div class="footer-container">
+    <div>
+      <div class="footer-dsc">
+        <span>Copyright ©
+          
+          2020 -
+          
+          2022
+        </span>
+        &nbsp;
+        <a href="/" class="footer-link">混口饭吃 </a>
+      </div>
+    </div>
+
+    
+    <div class="footer-dsc">
+      
+      Powered by
+      <a href="https://hexo.io/" class="footer-link" target="_blank" rel="nofollow noopener noreferrer">&nbsp;Hexo </a>
+      
+      
+      <span>&nbsp;|&nbsp;</span>
+      
+      
+      Theme -
+      <a href="https://github.com/theme-kaze" class="footer-link" target="_blank"
+        rel="nofollow noopener noreferrer">&nbsp;Kaze</a>
+      
+    </div>
+    
+    
+    
+    
+</footer>
+  <a role="button" id="scrollbutton" class="basebutton"  aria-label="回到顶部">
+  <i class="iconfont icon-arrowleft button-icon"></i>
+</a>
+<a role="button" id="menubutton" class="basebutton">
+  <i class="iconfont icon-menu button-icon"></i>
+</a>
+<a role="button" id="popbutton" class="basebutton" aria-label="控制中心">
+  <i class="iconfont icon-expand button-icon"></i>
+</a>
+<a role="button" id="darkbutton" class="basebutton darkwidget" aria-label="夜色模式">
+  <i class="iconfont icon-weather button-icon"></i>
+</a>
+<a role="button" id="searchbutton" class="basebutton searchwidget" aria-label="搜索">
+  <i class="iconfont icon-search button-icon"></i>
+</a>
+
+  
+  
+  
+  <script>
+  var addImgLayout = function () {
+    var img = document.querySelectorAll('.post-content img');
+    var i;
+    for (i = 0; i < img.length; i++) {
+      var wrapper = document.createElement('a');
+      wrapper.setAttribute('href', img[i].getAttribute('data-src'));
+      wrapper.setAttribute('aria-label', 'illustration');
+      wrapper.style.cssText = 'width: 100%; display: flex; justify-content: center;';
+      if (img[i].alt) wrapper.dataset.caption = img[i].alt;
+      wrapper.dataset.nolink = true;
+      img[i].before(wrapper);
+      wrapper.append(img[i]);
+      var divWrap = document.createElement('div');
+      divWrap.classList.add('gallery');
+      wrapper.before(divWrap);
+      divWrap.append(wrapper);
+    }
+    baguetteBox.run('.gallery');
+  }
+</script>
+<script>loadScript("/js/lib/lightbox/baguetteBox.min.js", addImgLayout)</script>
+  
+  
+  
+<script src="/js/main.js"></script>
+
+  
+  
+  <script>
+    var addLazyload = function () {
+      var observer = lozad('.lozad', {
+        load: function (el) {
+          el.srcset = el.getAttribute('data-src');
+        },
+        loaded: function (el) {
+          el.classList.add('loaded');
+        }
+      });
+      observer.observe();
+    }
+  </script>
+  <script>loadScript("/js/lib/lozad.min.js", addLazyload)</script>
+  
+  
+</body>
+
+</html>

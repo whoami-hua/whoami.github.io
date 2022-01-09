@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html  lang="zh-CN" >
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="theme-color" content="#fff" id="theme-color">
+  <meta name="description" content="混口饭吃">
+  <link rel="icon" href="/img/logo.png">
+  <title>php基础（二）</title>
+  
+  
+  <meta property="og:title" content="php基础（二）">
+  
+  
+  <meta property="og:url" content="http://example.com/2022/01/05/php%E5%9F%BA%E7%A1%80%EF%BC%88%E4%BA%8C%EF%BC%89/index.html">
+  
+  
+  <meta property="og:img" content="/img/author.jpg">
+  
+  
+  
+  <meta property="og:type" content="article">
+  <meta property="og:article:published_time" content="2022-01-05">
+  <meta property="og:article:modified_time" content="2022-01-05">
+  <meta property="og:article:author" content="YiHua">
+  
+  
+  <meta property="og:article:tag" content="php代码基础">
+  
+  
+  
+  
+  <script>
+    // control reverse button
+    var reverseDarkList = {
+      dark: 'light',
+      light: 'dark'
+    };
+    var themeColor = {
+      dark: '#1c1c1e',
+      light: '#fff'
+    }
+    // get the data of css prefers-color-scheme
+    var getCssMediaQuery = function() {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    };
+    // reverse current darkmode setting function
+    var reverseDarkModeSetting = function() {
+      var setting = localStorage.getItem('user-color-scheme');
+      if(reverseDarkList[setting]) {
+        setting = reverseDarkList[setting];
+      } else if(setting === null) {
+        setting = reverseDarkList[getCssMediaQuery()];
+      } else {
+        return;
+      }
+      localStorage.setItem('user-color-scheme', setting);
+      return setting;
+    };
+    // apply current darkmode setting
+    var setDarkmode = function(mode) {
+      var setting = mode || localStorage.getItem('user-color-scheme');
+      if(setting === getCssMediaQuery()) {
+        document.documentElement.removeAttribute('data-user-color-scheme');
+        localStorage.removeItem('user-color-scheme');
+        document.getElementById('theme-color').content = themeColor[setting];
+      } else if(reverseDarkList[setting]) {
+        document.documentElement.setAttribute('data-user-color-scheme', setting);
+        document.getElementById('theme-color').content = themeColor[setting];
+      } else {
+        document.documentElement.removeAttribute('data-user-color-scheme');
+        localStorage.removeItem('user-color-scheme');
+        document.getElementById('theme-color').content = themeColor[getCssMediaQuery()];
+      }
+    };
+    setDarkmode();
+  </script>
+  <script>
+    function loadScript(url, cb) {
+      var script = document.createElement('script');
+      script.src = url;
+      if (cb) script.onload = cb;
+      script.async = true;
+      document.body.appendChild(script);
+    }
+  </script>
+  
+  <link rel="preload" href="//at.alicdn.com/t/font_1946621_i1kgafibvw.css" as="style" >
+  <link rel="preload" href="//at.alicdn.com/t/font_1952792_89b4ac4k4up.css" as="style" >
+  
+  <link rel="preload" href="/js/lib/lightbox/baguetteBox.min.js" as="script">
+  <link rel="preload" href="/js/lib/lightbox/baguetteBox.min.css" as="style" >
+  
+  
+  <link rel="preload" href="/js/lib/lozad.min.js" as="script">
+  
+  
+  
+  
+  
+  
+  
+  
+<link rel="stylesheet" href="/css/main.css">
+
+  
+  
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1946621_i1kgafibvw.css">
+
+  
+  
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1952792_89b4ac4k4up.css">
+
+  
+  
+<link rel="stylesheet" href="/js/lib/lightbox/baguetteBox.min.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <div class="wrapper">
+    
+    <nav class="navbar">
+  <div class="navbar-logo">
+    <span class="navbar-logo-main">
+      
+      <img class="navbar-logo-img" src="/img/logo.png" alt="logo">
+      
+      <span class="navbar-logo-dsc">混口饭吃</span>
+    </span>
+  </div>
+  <div class="navbar-menu">
+    
+    <a href="/" class="navbar-menu-item">
+    
+    首页
+    
+    </a>
+    
+    <a href="/archives" class="navbar-menu-item">
+    
+    归档
+    
+    </a>
+    
+    <a href="/tags" class="navbar-menu-item">
+    
+    标签
+    
+    </a>
+    
+    <a href="/categories" class="navbar-menu-item">
+    
+    分类
+    
+    </a>
+    
+    <a href="/about" class="navbar-menu-item">
+    
+    关于
+    
+    </a>
+    
+    <a href="/links" class="navbar-menu-item">
+    
+    友链
+    
+    </a>
+    
+    <a class="navbar-menu-item darknavbar" id="dark"><i class="iconfont icon-weather"></i></a>
+    <a class="navbar-menu-item searchnavbar" id="search"><i class="iconfont icon-search" style="font-size: 1.2rem; font-weight: 400;"></i></a>
+  </div>
+</nav>
+    
+    <div id="local-search" style="display: none;">
+      <input class="navbar-menu-item" id="search-input" placeholder="请输入搜索内容...">
+      <div id="search-content"></div>
+    </div>
+    
+    <div class="section-wrap">
+      <div class="container">
+        <div class="columns">
+          <main class="main-column">
+<article class="card card-content">
+  <header>
+    <h1 class="post-title">
+      php基础（二）
+    </h1>
+  </header>
+  <div class="post-meta post-show-meta">
+    <time datetime="2022-01-05T14:07:38.884Z">
+      <i class="iconfont icon-calendar" style="margin-right: 2px;"></i>
+      <span>2022-01-05</span>
+    </time>
+    
+    <span class="dot"></span>
+    
+    <a href="/categories/php代码基础/" class="post-meta-link">php代码基础</a>
+    
+    
+    
+    <span class="dot"></span>
+    <span>1.6k 字</span>
+    
+  </div>
+  
+  <div class="post-meta post-show-meta" style="margin-top: -10px;">
+    <div style="display: flex; align-items: center;">
+      <i class="iconfont icon-biaoqian" style="margin-right: 2px; font-size: 1.15rem;"></i>
+      
+      
+        <a href="/tags/php代码基础/" class="post-meta-link">php代码基础</a>
+      
+    </div>
+  </div>
+  
+  </header>
+  <div id="section" class="post-content">
+    <h1 id="一：String-函数"><a href="#一：String-函数" class="headerlink" title="一：String 函数"></a>一：String 函数</h1><h5 id="1-addcslashes-函数"><a href="#1-addcslashes-函数" class="headerlink" title="1.addcslashes() 函数"></a>1.addcslashes() 函数</h5><p>addslashes() 函数返回在预定义的字符前添加反斜杠的字符串。</p>
+<p>预定义字符是：</p>
+<ul>
+<li>单引号（’）</li>
+<li>双引号（”）</li>
+<li>反斜杠（\）</li>
+<li>NULL</li>
+</ul>
+<p><strong>提示：</strong>该函数可用于为存储在数据库中的字符串以及数据库查询语句准备合适的字符串。</p>
+<p><strong>注释：</strong>默认情况下，PHP 指令 magic_quotes_gpc 为 on，对所有的 GET、POST 和 COOKIE 数据自动运行 addslashes()。不要对已经被 magic_quotes_gpc 转义过的字符串使用 addslashes()，因为这样会导致双层转义。遇到这种情况时可以使用函数 get_magic_quotes_gpc() 进行检测。</p>
+<h5 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h5><pre class="highlight"><span class="line">addcslashes(<span class="keyword">string</span>); 			<span class="comment">// string规定要转义的字符串    </span></span><br></pre>
+
+<h5 id="实例1定义转义的字符"><a href="#实例1定义转义的字符" class="headerlink" title="实例1定义转义的字符"></a>实例1定义转义的字符</h5><pre class="highlight"><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$sum</span> = <span class="string">&quot;Hell&#x27;o World&quot;</span>;</span><br><span class="line"><span class="keyword">echo</span> addcslashes(<span class="variable">$sum</span>)</span><br><span class="line"><span class="meta">?&gt;</span>    </span><br></pre>
+
+<h5 id="2-bin2hex-函数"><a href="#2-bin2hex-函数" class="headerlink" title="2.bin2hex() 函数"></a>2.bin2hex() 函数</h5><p>bin2hex() 函数把 ASCII 字符的字符串转换为十六进制值。字符串可通过使用 pack() 函数再转换回去</p>
+<h5 id="语法-1"><a href="#语法-1" class="headerlink" title="语法"></a>语法</h5><pre class="highlight"><span class="line">bin2hex(<span class="keyword">string</span>)				<span class="comment">//  string规定要转换的字符串</span></span><br></pre>
+
+<h5 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h5><pre class="highlight"><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$str</span> = bin2hex(<span class="string">&quot;Hello World!&quot;</span>);</span><br><span class="line"><span class="keyword">echo</span>(<span class="variable">$str</span>);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre>
+
+<h5 id="3-hex2bin-函数"><a href="#3-hex2bin-函数" class="headerlink" title="3.hex2bin()函数"></a>3.hex2bin()函数</h5><p>hex2bin() 函数把十六进制值的字符串转换为 ASCII 字符。</p>
+<h5 id="实例-1"><a href="#实例-1" class="headerlink" title="实例"></a>实例</h5><pre class="highlight"><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">echo</span> hex2bin(<span class="string">&quot;48656c6c6f20576f726c6421&quot;</span>);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre>
+
+<h5 id="输出"><a href="#输出" class="headerlink" title="输出"></a>输出</h5><pre class="highlight"><span class="line">Hello World!</span><br></pre>
+
+<h5 id="4-chr-函数"><a href="#4-chr-函数" class="headerlink" title="4.chr() 函数"></a>4.chr() 函数</h5><p>chr() 函数从指定 ASCII 值返回字符。</p>
+<p>ASCII 值可被指定为十进制值、八进制值或十六进制值。八进制值被定义为带前置 0，十六进制值被定义为带前置 0x。</p>
+<h5 id="语法-2"><a href="#语法-2" class="headerlink" title="语法"></a>语法</h5><pre class="highlight"><span class="line">chr(ascii)					<span class="comment">//ascii ASCII值</span></span><br></pre>
+
+<h5 id="实例-2"><a href="#实例-2" class="headerlink" title="实例"></a>实例</h5><p>使用八进制值 046 来添加 ASCII 字符：&amp;。</p>
+<pre class="highlight"><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$str</span> = chr(<span class="number">046</span>);           			<span class="comment">//&#x27;0&#x27;指定为8进制 46 = &amp;</span></span><br><span class="line"><span class="keyword">echo</span>(<span class="string">&quot;You <span class="subst">$str</span> me forever!&quot;</span>);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre>
+
+<h5 id="5-explode-函数"><a href="#5-explode-函数" class="headerlink" title="5.explode() 函数"></a>5.explode() 函数</h5><p>explode() 函数使用一个字符串分割另一个字符串，并返回由字符串组成的数组。</p>
+<p><strong>注释：</strong>“separator” 参数不能是一个空字符串。</p>
+<p><strong>注释：</strong>该函数是二进制安全的。</p>
+<h5 id="语法-3"><a href="#语法-3" class="headerlink" title="语法"></a>语法</h5><pre class="highlight"><span class="line">explode(separator,<span class="keyword">string</span>,limit)			<span class="comment">//separator 规定在哪里分割字符串  string 要分割的字符串 </span></span><br><span class="line">    <span class="comment">//limit规定所返回的数组元素的数目</span></span><br></pre>
+
+<h5 id="实例-3"><a href="#实例-3" class="headerlink" title="实例"></a>实例</h5><pre class="highlight"><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$str</span> = <span class="string">&#x27;one,two,three,four&#x27;</span>;</span><br><span class="line"> </span><br><span class="line"><span class="comment">//  返回包含一个元素的数组</span></span><br><span class="line">print_r(explode(<span class="string">&#x27;,&#x27;</span>,<span class="variable">$str</span>,<span class="number">0</span>));</span><br><span class="line"><span class="keyword">print</span> <span class="string">&quot;&lt;br&gt;&quot;</span>;</span><br><span class="line"> </span><br><span class="line"><span class="comment">// 数组元素为 2</span></span><br><span class="line">print_r(explode(<span class="string">&#x27;,&#x27;</span>,<span class="variable">$str</span>,<span class="number">2</span>));</span><br><span class="line"><span class="keyword">print</span> <span class="string">&quot;&lt;br&gt;&quot;</span>;</span><br><span class="line"> </span><br><span class="line"><span class="comment">// 删除最后一个数组元素</span></span><br><span class="line">print_r(explode(<span class="string">&#x27;,&#x27;</span>,<span class="variable">$str</span>,-<span class="number">1</span>));</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre>
+
+<h5 id="6-md5-函数"><a href="#6-md5-函数" class="headerlink" title="6.md5() 函数"></a>6.md5() 函数</h5><p>md5() 函数计算字符串的 MD5 散列。</p>
+<p>md5() 函数不能处理数组，数组都返回 null，<strong>md5(a[])</strong> 结果为 <strong>null</strong>。</p>
+<h5 id="实例-4"><a href="#实例-4" class="headerlink" title="实例"></a>实例</h5><pre class="highlight"><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$str</span> = <span class="string">&quot;Hello&quot;</span>;</span><br><span class="line"><span class="keyword">echo</span> md5(<span class="variable">$str</span>);			<span class="comment">//将字符串加密</span></span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre>
+
+<h5 id="7-md5-file-函数"><a href="#7-md5-file-函数" class="headerlink" title="7.md5_file() 函数"></a>7.md5_file() 函数</h5><p>md5_file() 函数计算文件的 MD5 散列。。</p>
+<h5 id="实例-5"><a href="#实例-5" class="headerlink" title="实例"></a>实例</h5><pre class="highlight"><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$filename</span> = <span class="string">&quot;test.txt&quot;</span>;</span><br><span class="line"><span class="variable">$md5file</span> = md5_file(<span class="variable">$filename</span>);</span><br><span class="line"><span class="keyword">echo</span> <span class="variable">$md5file</span>;			<span class="comment">//将文件加密</span></span><br><span class="line"><span class="meta">?&gt;</span></span><br><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$md5file</span> = md5_file(<span class="string">&quot;test.txt&quot;</span>);		<span class="comment">//在文件中存储 &quot;test.txt&quot; 的 MD5 散列</span></span><br><span class="line">file_put_contents(<span class="string">&quot;md5file.txt&quot;</span>,<span class="variable">$md5file</span>);</span><br><span class="line"><span class="meta">?&gt;</span> </span><br><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$md5file</span> = file_get_contents(<span class="string">&quot;md5file.txt&quot;</span>);	<span class="comment">//检测 &quot;test.txt&quot; 是否已被更改（即 MD5 散列是否已被更改）</span></span><br><span class="line"><span class="keyword">if</span> (md5_file(<span class="string">&quot;test.txt&quot;</span>) == <span class="variable">$md5file</span>)</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">echo</span> <span class="string">&quot;The file is ok.&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">echo</span> <span class="string">&quot;The file has been changed.&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">?&gt;</span>    </span><br></pre>
+
+<h5 id="8-str-split-函数"><a href="#8-str-split-函数" class="headerlink" title="8.str_split() 函数"></a>8.str_split() 函数</h5><p>str_split() 函数把字符串分割到数组中。</p>
+<pre class="highlight"><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">print_r(str_split(<span class="string">&quot;Hello&quot;</span>,<span class="number">3</span>));<span class="comment">//从第三位之后将字符串分割到数组中</span></span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre>
+
+<h5 id="输出-1"><a href="#输出-1" class="headerlink" title="输出"></a>输出</h5><pre class="highlight"><span class="line"><span class="keyword">Array</span> ( [<span class="number">0</span>] =&gt; Hel [<span class="number">1</span>] =&gt; lo )</span><br></pre>
+
+<h5 id="9-str-replace-函数"><a href="#9-str-replace-函数" class="headerlink" title="9.str_replace() 函数"></a>9.str_replace() 函数</h5><p>str_replace() 函数替换字符串中的一些字符（区分大小写）。</p>
+<h5 id="实例-6"><a href="#实例-6" class="headerlink" title="实例"></a>实例</h5><pre class="highlight"><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">echo</span> str_replace(<span class="string">&quot;World&quot;</span>,<span class="string">&quot;pata&quot;</span>,<span class="string">&quot;Hello World&quot;</span>);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre>
+
+<h5 id="输出-2"><a href="#输出-2" class="headerlink" title="输出"></a>输出</h5><pre class="highlight"><span class="line">Hello pata</span><br></pre>
+
+<h5 id="10-str-ireplace-函数"><a href="#10-str-ireplace-函数" class="headerlink" title="10.str_ireplace()函数"></a>10.str_ireplace()函数</h5><p>str_ireplace() 函数替换字符串中的一些字符（不区分大小写）</p>
+<h5 id="实例-7"><a href="#实例-7" class="headerlink" title="实例"></a>实例</h5><pre class="highlight"><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">echo</span> str_ireplace(<span class="string">&quot;WORLD&quot;</span>,<span class="string">&quot;Peter&quot;</span>,<span class="string">&quot;Hello world!&quot;</span>);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre>
+
+<h5 id="输出-3"><a href="#输出-3" class="headerlink" title="输出"></a>输出</h5><pre class="highlight"><span class="line">Hello Pata</span><br></pre>
+
+<h5 id="11-strcmp-函数"><a href="#11-strcmp-函数" class="headerlink" title="11.strcmp()函数"></a>11.strcmp()函数</h5><p>strcmp() 函数比较两个字符串。</p>
+<p><strong>注释：</strong>strcmp() 函数是二进制安全的，且区分大小写。</p>
+<p><strong>提示：</strong>该函数与 <a target="_blank" rel="noopener" href="https://www.runoob.com/php/func-string-strncmp.html">strncmp()</a> 函数类似，不同的是，通过 strncmp() 您可以指定每个字符串用于比较的字符数。</p>
+<h5 id="实例-8"><a href="#实例-8" class="headerlink" title="实例"></a>实例</h5><pre class="highlight"><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">echo</span> strcmp(<span class="string">&quot;Hello world!&quot;</span>,<span class="string">&quot;Hello world!&quot;</span>); <span class="comment">// the two strings are equal</span></span><br><span class="line"><span class="keyword">echo</span> strcmp(<span class="string">&quot;Hello world!&quot;</span>,<span class="string">&quot;Hello&quot;</span>); <span class="comment">// string1 is greater than string2</span></span><br><span class="line"><span class="keyword">echo</span> strcmp(<span class="string">&quot;Hello world!&quot;</span>,<span class="string">&quot;Hello world! Hello!&quot;</span>); <span class="comment">// string1 is less than string2</span></span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre>
+
+<h5 id="输出-4"><a href="#输出-4" class="headerlink" title="输出"></a>输出</h5><pre class="highlight"><span class="line"><span class="number">0</span>				<span class="comment">//值为0则两个字符串相等</span></span><br><span class="line"><span class="number">7</span>				<span class="comment">// &gt;0则string1 大于 string2</span></span><br><span class="line">-<span class="number">7</span>				<span class="comment">// &lt;00则string1 小于 string2</span></span><br></pre>
+
+<h5 id="12-srlen-函数"><a href="#12-srlen-函数" class="headerlink" title="12.srlen()函数"></a>12.srlen()函数</h5><p>strlen() 函数返回字符串的长度，中文字符串的处理使用 mb_strlen() 函数</p>
+<h5 id="实例-9"><a href="#实例-9" class="headerlink" title="实例"></a>实例</h5><pre class="highlight"><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">echo</span> strlen(<span class="string">&quot;Hello&quot;</span>);			<span class="comment">//返回字符串的长度</span></span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre>
+
+<h5 id="13-substr-函数"><a href="#13-substr-函数" class="headerlink" title="13.substr()函数"></a>13.substr()函数</h5><p>substr() 函数返回字符串的一部分。</p>
+<p><strong>注释：</strong>如果 start 参数是负数且 length 小于或等于 start，则 length 为 0。</p>
+<h5 id="实例-10"><a href="#实例-10" class="headerlink" title="实例"></a>实例</h5><pre class="highlight"><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">echo</span> substr(<span class="string">&quot;Hello world&quot;</span>,<span class="number">10</span>).<span class="string">&quot;&lt;br&gt;&quot;</span>;		<span class="comment">//输出 d</span></span><br><span class="line"><span class="keyword">echo</span> substr(<span class="string">&quot;Hello world&quot;</span>,<span class="number">1</span>).<span class="string">&quot;&lt;br&gt;&quot;</span>;		<span class="comment">// ello world</span></span><br><span class="line"><span class="keyword">echo</span> substr(<span class="string">&quot;Hello world&quot;</span>,<span class="number">3</span>).<span class="string">&quot;&lt;br&gt;&quot;</span>;		<span class="comment">// lo world</span></span><br><span class="line"><span class="keyword">echo</span> substr(<span class="string">&quot;Hello world&quot;</span>,<span class="number">7</span>).<span class="string">&quot;&lt;br&gt;&quot;</span>;		<span class="comment">//orld</span></span><br><span class="line"> 											<span class="comment">//空格也算是字符串的一位</span></span><br><span class="line"><span class="keyword">echo</span> substr(<span class="string">&quot;Hello world&quot;</span>,-<span class="number">1</span>).<span class="string">&quot;&lt;br&gt;&quot;</span>;		<span class="comment">//d</span></span><br><span class="line"><span class="keyword">echo</span> substr(<span class="string">&quot;Hello world&quot;</span>,-<span class="number">10</span>).<span class="string">&quot;&lt;br&gt;&quot;</span>;		<span class="comment">//ello world</span></span><br><span class="line"><span class="keyword">echo</span> substr(<span class="string">&quot;Hello world&quot;</span>,-<span class="number">8</span>).<span class="string">&quot;&lt;br&gt;&quot;</span>;		<span class="comment">//lo world</span></span><br><span class="line"><span class="keyword">echo</span> substr(<span class="string">&quot;Hello world&quot;</span>,-<span class="number">4</span>).<span class="string">&quot;&lt;br&gt;&quot;</span>;		<span class="comment">//orld</span></span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre>
+
+<h5 id="14-trim-函数"><a href="#14-trim-函数" class="headerlink" title="14.trim()函数"></a>14.trim()函数</h5><p>trim() 函数移除字符串两侧的空白字符或其他预定义字符。</p>
+<p>相关函数：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://www.runoob.com/php/func-string-ltrim.html">ltrim()</a> - 移除字符串左侧的空白字符或其他预定义字符。</li>
+<li><a target="_blank" rel="noopener" href="https://www.runoob.com/php/func-string-rtrim.html">rtrim()</a> - 移除字符串右侧的空白字符或其他预定义字符。</li>
+</ul>
+<h5 id="实例1移除字符串两侧的字符"><a href="#实例1移除字符串两侧的字符" class="headerlink" title="实例1移除字符串两侧的字符"></a>实例1移除字符串两侧的字符</h5><pre class="highlight"><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$str</span> = <span class="string">&quot;Hello World!&quot;</span>;</span><br><span class="line"><span class="keyword">echo</span> <span class="variable">$str</span> . PHP_EOL;</span><br><span class="line"><span class="keyword">echo</span> trim(<span class="variable">$str</span>,<span class="string">&quot;Hed!&quot;</span>);		<span class="comment">//输出  llo Worl</span></span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre>
+
+<h5 id="实例2移除字符串两侧的空格"><a href="#实例2移除字符串两侧的空格" class="headerlink" title="实例2移除字符串两侧的空格"></a>实例2移除字符串两侧的空格</h5><pre class="highlight"><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$str</span> = <span class="string">&quot; Hello World! &quot;</span>;</span><br><span class="line"><span class="keyword">echo</span> <span class="string">&quot;Without trim: &quot;</span> . <span class="variable">$str</span>;</span><br><span class="line"><span class="keyword">echo</span> <span class="string">&quot;&lt;br&gt;&quot;</span>;</span><br><span class="line"><span class="keyword">echo</span> <span class="string">&quot;With trim: &quot;</span> . trim(<span class="variable">$str</span>);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre>
+
+<h5 id="实例3移除字符串两侧的换行符"><a href="#实例3移除字符串两侧的换行符" class="headerlink" title="实例3移除字符串两侧的换行符"></a>实例3移除字符串两侧的换行符</h5><pre class="highlight"><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$str</span> = <span class="string">&quot;nnnHello World!nnn&quot;</span>;</span><br><span class="line"><span class="keyword">echo</span> <span class="string">&quot;Without trim: &quot;</span> . <span class="variable">$str</span>;</span><br><span class="line"><span class="keyword">echo</span> <span class="string">&quot;&lt;br&gt;&quot;</span>;</span><br><span class="line"><span class="keyword">echo</span> <span class="string">&quot;With trim: &quot;</span> . trim(<span class="variable">$str</span>);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre>
+
+<h5 id="15-htmlspecialchars-函数"><a href="#15-htmlspecialchars-函数" class="headerlink" title="15.htmlspecialchars()函数"></a>15.htmlspecialchars()函数</h5><p>htmlspecialchars() 函数把一些预定义的字符转换为 HTML 实体。</p>
+<p>预定义的字符是：</p>
+<ul>
+<li>&amp; （和号）成为 &amp;</li>
+<li>“ （双引号）成为 &quot;</li>
+<li>‘ （单引号）成为 ‘</li>
+<li>&lt; （小于）成为 &lt;</li>
+<li>&gt; （大于）成为 &gt;</li>
+</ul>
+<h5 id="实例-11"><a href="#实例-11" class="headerlink" title="实例"></a>实例</h5><p>把预定义的字符 “&lt;” （小于）和 “&gt;” （大于）转换为 HTML 实体</p>
+<pre class="highlight"><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$str</span> = <span class="string">&quot;This is some &lt;b&gt;bold&lt;/b&gt; text.&quot;</span>;		</span><br><span class="line"><span class="keyword">echo</span> htmlspecialchars(<span class="variable">$str</span>);				<span class="comment">//输出结果不变</span></span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre>
+
+<p>转换后</p>
+<pre class="highlight"><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">This is some <span class="symbol">&amp;lt;</span>b<span class="symbol">&amp;gt;</span>bold<span class="symbol">&amp;lt;</span>/b<span class="symbol">&amp;gt;</span> text.</span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre>
+
+<h5 id=""><a href="#" class="headerlink" title=""></a></h5>
+  </div>
+  <div>
+  
+  <div class="post-note note-warning copyright" style="margin-top: 42px">
+    <p><span style="font-weight: bold;">作者：</span><a target="_blank" rel="nofollow noopener noreferrer" href="http://example.com/about">YiHua</a></p>
+    <p><span style="font-weight: bold;">文章链接：</span><a target="_blank" rel="nofollow noopener noreferrer" href="http://example.com/2022/01/05/php%E5%9F%BA%E7%A1%80%EF%BC%88%E4%BA%8C%EF%BC%89/">http://example.com/2022/01/05/php%E5%9F%BA%E7%A1%80%EF%BC%88%E4%BA%8C%EF%BC%89/</a></p>
+    <p><span style="font-weight: bold;">版权声明：</span>本博客所有文章除特别声明外，均采用<a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">CC BY-NC-SA 4.0 协议</a>。转载请注明出处！</p>
+  </div>
+  
+  </div>
+</article>
+<div class="nav">
+  
+  <div class="nav-item-prev">
+    <a href="/2022/01/06/php基础（三）/" class="nav-link">
+      <i class="iconfont icon-left nav-prev-icon"></i>
+      <div>
+        <div class="nav-label">上一篇</div>
+        
+        <div class="nav-title">php基础（三） </div>
+        
+      </div>
+    </a>
+  </div>
+  
+  
+  <div class="nav-item-next">
+    <a href="/2022/01/04/php基础（一）/" class="nav-link">
+      <div>
+        <div class="nav-label">下一篇</div>
+        
+        <div class="nav-title">php基础（一） </div>
+        
+      </div>
+      <i class="iconfont icon-right nav-next-icon"></i>
+    </a>
+  </div>
+  
+</div>
+
+<div class="card card-content toc-card" id="mobiletoc">
+  <div class="toc-header"><i class="iconfont icon-menu" style="padding-right: 2px;"></i>目录</div>
+<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%80%EF%BC%9AString-%E5%87%BD%E6%95%B0"><span class="toc-text">一：String 函数</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-addcslashes-%E5%87%BD%E6%95%B0"><span class="toc-text">1.addcslashes() 函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%AF%AD%E6%B3%95"><span class="toc-text">语法</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%9E%E4%BE%8B1%E5%AE%9A%E4%B9%89%E8%BD%AC%E4%B9%89%E7%9A%84%E5%AD%97%E7%AC%A6"><span class="toc-text">实例1定义转义的字符</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-bin2hex-%E5%87%BD%E6%95%B0"><span class="toc-text">2.bin2hex() 函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%AF%AD%E6%B3%95-1"><span class="toc-text">语法</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%9E%E4%BE%8B"><span class="toc-text">实例</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-hex2bin-%E5%87%BD%E6%95%B0"><span class="toc-text">3.hex2bin()函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%9E%E4%BE%8B-1"><span class="toc-text">实例</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%BE%93%E5%87%BA"><span class="toc-text">输出</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-chr-%E5%87%BD%E6%95%B0"><span class="toc-text">4.chr() 函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%AF%AD%E6%B3%95-2"><span class="toc-text">语法</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%9E%E4%BE%8B-2"><span class="toc-text">实例</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#5-explode-%E5%87%BD%E6%95%B0"><span class="toc-text">5.explode() 函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%AF%AD%E6%B3%95-3"><span class="toc-text">语法</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%9E%E4%BE%8B-3"><span class="toc-text">实例</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#6-md5-%E5%87%BD%E6%95%B0"><span class="toc-text">6.md5() 函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%9E%E4%BE%8B-4"><span class="toc-text">实例</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#7-md5-file-%E5%87%BD%E6%95%B0"><span class="toc-text">7.md5_file() 函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%9E%E4%BE%8B-5"><span class="toc-text">实例</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#8-str-split-%E5%87%BD%E6%95%B0"><span class="toc-text">8.str_split() 函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%BE%93%E5%87%BA-1"><span class="toc-text">输出</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#9-str-replace-%E5%87%BD%E6%95%B0"><span class="toc-text">9.str_replace() 函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%9E%E4%BE%8B-6"><span class="toc-text">实例</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%BE%93%E5%87%BA-2"><span class="toc-text">输出</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#10-str-ireplace-%E5%87%BD%E6%95%B0"><span class="toc-text">10.str_ireplace()函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%9E%E4%BE%8B-7"><span class="toc-text">实例</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%BE%93%E5%87%BA-3"><span class="toc-text">输出</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#11-strcmp-%E5%87%BD%E6%95%B0"><span class="toc-text">11.strcmp()函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%9E%E4%BE%8B-8"><span class="toc-text">实例</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%BE%93%E5%87%BA-4"><span class="toc-text">输出</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#12-srlen-%E5%87%BD%E6%95%B0"><span class="toc-text">12.srlen()函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%9E%E4%BE%8B-9"><span class="toc-text">实例</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#13-substr-%E5%87%BD%E6%95%B0"><span class="toc-text">13.substr()函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%9E%E4%BE%8B-10"><span class="toc-text">实例</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#14-trim-%E5%87%BD%E6%95%B0"><span class="toc-text">14.trim()函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%9E%E4%BE%8B1%E7%A7%BB%E9%99%A4%E5%AD%97%E7%AC%A6%E4%B8%B2%E4%B8%A4%E4%BE%A7%E7%9A%84%E5%AD%97%E7%AC%A6"><span class="toc-text">实例1移除字符串两侧的字符</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%9E%E4%BE%8B2%E7%A7%BB%E9%99%A4%E5%AD%97%E7%AC%A6%E4%B8%B2%E4%B8%A4%E4%BE%A7%E7%9A%84%E7%A9%BA%E6%A0%BC"><span class="toc-text">实例2移除字符串两侧的空格</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%9E%E4%BE%8B3%E7%A7%BB%E9%99%A4%E5%AD%97%E7%AC%A6%E4%B8%B2%E4%B8%A4%E4%BE%A7%E7%9A%84%E6%8D%A2%E8%A1%8C%E7%AC%A6"><span class="toc-text">实例3移除字符串两侧的换行符</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#15-htmlspecialchars-%E5%87%BD%E6%95%B0"><span class="toc-text">15.htmlspecialchars()函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%9E%E4%BE%8B-11"><span class="toc-text">实例</span></a></li><li class="toc-item toc-level-5"><a class="toc-link"><span class="toc-text"></span></a></li></ol></li></ol></li></ol></li></ol></li></ol>
+</div></main>
+          <aside class="left-column">
+            
+            <div class="card card-author">
+              
+<img src="/img/author.jpg" class="author-img">
+
+<p class="author-name">YiHua</p>
+<p class="author-description">谨言  深思  笃行</p>
+<div class="author-message">
+  <a class="author-posts-count" href="/archives">
+    <span>13</span>
+    <span>文章</span>
+  </a>
+  <a class="author-categories-count" href="/categories">
+    <span>5</span>
+    <span>分类</span>
+  </a>
+  <a class="author-tags-count" href="/tags">
+    <span>5</span>
+    <span>标签</span>
+  </a>
+</div>
+
+            </div>
+            
+            <div class="sticky-tablet">
+  
+  
+  <article class="display-when-two-columns spacer">
+    <div class="card card-content toc-card">
+      <div class="toc-header"><i class="iconfont icon-menu" style="padding-right: 2px;"></i>目录</div>
+<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%80%EF%BC%9AString-%E5%87%BD%E6%95%B0"><span class="toc-text">一：String 函数</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-addcslashes-%E5%87%BD%E6%95%B0"><span class="toc-text">1.addcslashes() 函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%AF%AD%E6%B3%95"><span class="toc-text">语法</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%9E%E4%BE%8B1%E5%AE%9A%E4%B9%89%E8%BD%AC%E4%B9%89%E7%9A%84%E5%AD%97%E7%AC%A6"><span class="toc-text">实例1定义转义的字符</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-bin2hex-%E5%87%BD%E6%95%B0"><span class="toc-text">2.bin2hex() 函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%AF%AD%E6%B3%95-1"><span class="toc-text">语法</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%9E%E4%BE%8B"><span class="toc-text">实例</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-hex2bin-%E5%87%BD%E6%95%B0"><span class="toc-text">3.hex2bin()函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%9E%E4%BE%8B-1"><span class="toc-text">实例</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%BE%93%E5%87%BA"><span class="toc-text">输出</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-chr-%E5%87%BD%E6%95%B0"><span class="toc-text">4.chr() 函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%AF%AD%E6%B3%95-2"><span class="toc-text">语法</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%9E%E4%BE%8B-2"><span class="toc-text">实例</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#5-explode-%E5%87%BD%E6%95%B0"><span class="toc-text">5.explode() 函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%AF%AD%E6%B3%95-3"><span class="toc-text">语法</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%9E%E4%BE%8B-3"><span class="toc-text">实例</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#6-md5-%E5%87%BD%E6%95%B0"><span class="toc-text">6.md5() 函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%9E%E4%BE%8B-4"><span class="toc-text">实例</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#7-md5-file-%E5%87%BD%E6%95%B0"><span class="toc-text">7.md5_file() 函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%9E%E4%BE%8B-5"><span class="toc-text">实例</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#8-str-split-%E5%87%BD%E6%95%B0"><span class="toc-text">8.str_split() 函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%BE%93%E5%87%BA-1"><span class="toc-text">输出</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#9-str-replace-%E5%87%BD%E6%95%B0"><span class="toc-text">9.str_replace() 函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%9E%E4%BE%8B-6"><span class="toc-text">实例</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%BE%93%E5%87%BA-2"><span class="toc-text">输出</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#10-str-ireplace-%E5%87%BD%E6%95%B0"><span class="toc-text">10.str_ireplace()函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%9E%E4%BE%8B-7"><span class="toc-text">实例</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%BE%93%E5%87%BA-3"><span class="toc-text">输出</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#11-strcmp-%E5%87%BD%E6%95%B0"><span class="toc-text">11.strcmp()函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%9E%E4%BE%8B-8"><span class="toc-text">实例</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%BE%93%E5%87%BA-4"><span class="toc-text">输出</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#12-srlen-%E5%87%BD%E6%95%B0"><span class="toc-text">12.srlen()函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%9E%E4%BE%8B-9"><span class="toc-text">实例</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#13-substr-%E5%87%BD%E6%95%B0"><span class="toc-text">13.substr()函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%9E%E4%BE%8B-10"><span class="toc-text">实例</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#14-trim-%E5%87%BD%E6%95%B0"><span class="toc-text">14.trim()函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%9E%E4%BE%8B1%E7%A7%BB%E9%99%A4%E5%AD%97%E7%AC%A6%E4%B8%B2%E4%B8%A4%E4%BE%A7%E7%9A%84%E5%AD%97%E7%AC%A6"><span class="toc-text">实例1移除字符串两侧的字符</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%9E%E4%BE%8B2%E7%A7%BB%E9%99%A4%E5%AD%97%E7%AC%A6%E4%B8%B2%E4%B8%A4%E4%BE%A7%E7%9A%84%E7%A9%BA%E6%A0%BC"><span class="toc-text">实例2移除字符串两侧的空格</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%9E%E4%BE%8B3%E7%A7%BB%E9%99%A4%E5%AD%97%E7%AC%A6%E4%B8%B2%E4%B8%A4%E4%BE%A7%E7%9A%84%E6%8D%A2%E8%A1%8C%E7%AC%A6"><span class="toc-text">实例3移除字符串两侧的换行符</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#15-htmlspecialchars-%E5%87%BD%E6%95%B0"><span class="toc-text">15.htmlspecialchars()函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%9E%E4%BE%8B-11"><span class="toc-text">实例</span></a></li><li class="toc-item toc-level-5"><a class="toc-link"><span class="toc-text"></span></a></li></ol></li></ol></li></ol></li></ol></li></ol>
+    </div>
+  </article>
+  
+  
+  <article class="card card-content categories-widget">
+    <div class="categories-card">
+  <div class="categories-header"><i class="iconfont icon-fenlei" style="padding-right: 2px;"></i>分类</div>
+  <div class="categories-list">
+    
+      <a href="/categories/CentoS-7基础/">
+        <div class="categories-list-item">
+          CentoS-7基础
+          <span class="categories-list-item-badge">4</span>
+        </div>
+      </a>
+    
+      <a href="/categories/计算机网络/">
+        <div class="categories-list-item">
+          计算机网络
+          <span class="categories-list-item-badge">4</span>
+        </div>
+      </a>
+    
+      <a href="/categories/Mysql数据库/">
+        <div class="categories-list-item">
+          Mysql数据库
+          <span class="categories-list-item-badge">1</span>
+        </div>
+      </a>
+    
+      <a href="/categories/php代码基础/">
+        <div class="categories-list-item">
+          php代码基础
+          <span class="categories-list-item-badge">3</span>
+        </div>
+      </a>
+    
+      <a href="/categories/windows-2008-R2/">
+        <div class="categories-list-item">
+          windows-2008-R2
+          <span class="categories-list-item-badge">1</span>
+        </div>
+      </a>
+    
+  </div>
+</div>
+  </article>
+  
+  <article class="card card-content tags-widget">
+    <div class="tags-card">
+  <div class="tags-header"><i class="iconfont icon-biaoqian" style="padding-right: 2px;"></i>热门标签</div>
+  <div class="tags-list">
+    
+    <a href="/tags/Linux/" title="Linux"><div class="tags-list-item">Linux</div></a>
+    
+    <a href="/tags/计算机网络/" title="计算机网络"><div class="tags-list-item">计算机网络</div></a>
+    
+    <a href="/tags/Mysql数据库/" title="Mysql数据库"><div class="tags-list-item">Mysql数据库</div></a>
+    
+    <a href="/tags/php代码基础/" title="php代码基础"><div class="tags-list-item">php代码基础</div></a>
+    
+    <a href="/tags/windows/" title="windows"><div class="tags-list-item">windows</div></a>
+    
+  </div>
+</div>
+  </article>
+  
+  
+</div>
+          </aside>
+          <aside class="right-column">
+            <div class="sticky-widescreen">
+  
+  
+  <article class="card card-content toc-card">
+    <div class="toc-header"><i class="iconfont icon-menu" style="padding-right: 2px;"></i>目录</div>
+<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%80%EF%BC%9AString-%E5%87%BD%E6%95%B0"><span class="toc-text">一：String 函数</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-addcslashes-%E5%87%BD%E6%95%B0"><span class="toc-text">1.addcslashes() 函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%AF%AD%E6%B3%95"><span class="toc-text">语法</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%9E%E4%BE%8B1%E5%AE%9A%E4%B9%89%E8%BD%AC%E4%B9%89%E7%9A%84%E5%AD%97%E7%AC%A6"><span class="toc-text">实例1定义转义的字符</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-bin2hex-%E5%87%BD%E6%95%B0"><span class="toc-text">2.bin2hex() 函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%AF%AD%E6%B3%95-1"><span class="toc-text">语法</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%9E%E4%BE%8B"><span class="toc-text">实例</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-hex2bin-%E5%87%BD%E6%95%B0"><span class="toc-text">3.hex2bin()函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%9E%E4%BE%8B-1"><span class="toc-text">实例</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%BE%93%E5%87%BA"><span class="toc-text">输出</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-chr-%E5%87%BD%E6%95%B0"><span class="toc-text">4.chr() 函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%AF%AD%E6%B3%95-2"><span class="toc-text">语法</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%9E%E4%BE%8B-2"><span class="toc-text">实例</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#5-explode-%E5%87%BD%E6%95%B0"><span class="toc-text">5.explode() 函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%AF%AD%E6%B3%95-3"><span class="toc-text">语法</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%9E%E4%BE%8B-3"><span class="toc-text">实例</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#6-md5-%E5%87%BD%E6%95%B0"><span class="toc-text">6.md5() 函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%9E%E4%BE%8B-4"><span class="toc-text">实例</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#7-md5-file-%E5%87%BD%E6%95%B0"><span class="toc-text">7.md5_file() 函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%9E%E4%BE%8B-5"><span class="toc-text">实例</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#8-str-split-%E5%87%BD%E6%95%B0"><span class="toc-text">8.str_split() 函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%BE%93%E5%87%BA-1"><span class="toc-text">输出</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#9-str-replace-%E5%87%BD%E6%95%B0"><span class="toc-text">9.str_replace() 函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%9E%E4%BE%8B-6"><span class="toc-text">实例</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%BE%93%E5%87%BA-2"><span class="toc-text">输出</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#10-str-ireplace-%E5%87%BD%E6%95%B0"><span class="toc-text">10.str_ireplace()函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%9E%E4%BE%8B-7"><span class="toc-text">实例</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%BE%93%E5%87%BA-3"><span class="toc-text">输出</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#11-strcmp-%E5%87%BD%E6%95%B0"><span class="toc-text">11.strcmp()函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%9E%E4%BE%8B-8"><span class="toc-text">实例</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%BE%93%E5%87%BA-4"><span class="toc-text">输出</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#12-srlen-%E5%87%BD%E6%95%B0"><span class="toc-text">12.srlen()函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%9E%E4%BE%8B-9"><span class="toc-text">实例</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#13-substr-%E5%87%BD%E6%95%B0"><span class="toc-text">13.substr()函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%9E%E4%BE%8B-10"><span class="toc-text">实例</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#14-trim-%E5%87%BD%E6%95%B0"><span class="toc-text">14.trim()函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%9E%E4%BE%8B1%E7%A7%BB%E9%99%A4%E5%AD%97%E7%AC%A6%E4%B8%B2%E4%B8%A4%E4%BE%A7%E7%9A%84%E5%AD%97%E7%AC%A6"><span class="toc-text">实例1移除字符串两侧的字符</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%9E%E4%BE%8B2%E7%A7%BB%E9%99%A4%E5%AD%97%E7%AC%A6%E4%B8%B2%E4%B8%A4%E4%BE%A7%E7%9A%84%E7%A9%BA%E6%A0%BC"><span class="toc-text">实例2移除字符串两侧的空格</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%9E%E4%BE%8B3%E7%A7%BB%E9%99%A4%E5%AD%97%E7%AC%A6%E4%B8%B2%E4%B8%A4%E4%BE%A7%E7%9A%84%E6%8D%A2%E8%A1%8C%E7%AC%A6"><span class="toc-text">实例3移除字符串两侧的换行符</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#15-htmlspecialchars-%E5%87%BD%E6%95%B0"><span class="toc-text">15.htmlspecialchars()函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%9E%E4%BE%8B-11"><span class="toc-text">实例</span></a></li><li class="toc-item toc-level-5"><a class="toc-link"><span class="toc-text"></span></a></li></ol></li></ol></li></ol></li></ol></li></ol>
+  </article>
+  
+  
+  <article class="card card-content">
+    <div class="recent-posts-card">
+  <div class="recent-posts-header"><i class="iconfont icon-wenzhang_huaban" style="padding-right: 2px;"></i>最近文章</div>
+  <div class="recent-posts-list">
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2022-01-08</div>
+        <a href="/2022/01/08/Mysql数据库/"><div class="recent-posts-item-content">Mysql数据库</div></a>
+      </div>
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2022-01-06</div>
+        <a href="/2022/01/06/php基础（三）/"><div class="recent-posts-item-content">php基础（三）</div></a>
+      </div>
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2022-01-05</div>
+        <a href="/2022/01/05/php基础（二）/"><div class="recent-posts-item-content">php基础（二）</div></a>
+      </div>
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2022-01-04</div>
+        <a href="/2022/01/04/php基础（一）/"><div class="recent-posts-item-content">php基础（一）</div></a>
+      </div>
+    
+  </div>
+</div>
+  </article>
+  
+  
+</div>
+          </aside>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <footer class="footer">
+  <div class="footer-container">
+    <div>
+      <div class="footer-dsc">
+        <span>Copyright ©
+          
+          2020 -
+          
+          2022
+        </span>
+        &nbsp;
+        <a href="/" class="footer-link">混口饭吃 </a>
+      </div>
+    </div>
+
+    
+    <div class="footer-dsc">
+      
+      Powered by
+      <a href="https://hexo.io/" class="footer-link" target="_blank" rel="nofollow noopener noreferrer">&nbsp;Hexo </a>
+      
+      
+      <span>&nbsp;|&nbsp;</span>
+      
+      
+      Theme -
+      <a href="https://github.com/theme-kaze" class="footer-link" target="_blank"
+        rel="nofollow noopener noreferrer">&nbsp;Kaze</a>
+      
+    </div>
+    
+    
+    
+    
+</footer>
+  <a role="button" id="scrollbutton" class="basebutton"  aria-label="回到顶部">
+  <i class="iconfont icon-arrowleft button-icon"></i>
+</a>
+<a role="button" id="menubutton" class="basebutton">
+  <i class="iconfont icon-menu button-icon"></i>
+</a>
+<a role="button" id="popbutton" class="basebutton" aria-label="控制中心">
+  <i class="iconfont icon-expand button-icon"></i>
+</a>
+<a role="button" id="darkbutton" class="basebutton darkwidget" aria-label="夜色模式">
+  <i class="iconfont icon-weather button-icon"></i>
+</a>
+<a role="button" id="searchbutton" class="basebutton searchwidget" aria-label="搜索">
+  <i class="iconfont icon-search button-icon"></i>
+</a>
+
+  
+  
+  
+  <script>
+  var addImgLayout = function () {
+    var img = document.querySelectorAll('.post-content img');
+    var i;
+    for (i = 0; i < img.length; i++) {
+      var wrapper = document.createElement('a');
+      wrapper.setAttribute('href', img[i].getAttribute('data-src'));
+      wrapper.setAttribute('aria-label', 'illustration');
+      wrapper.style.cssText = 'width: 100%; display: flex; justify-content: center;';
+      if (img[i].alt) wrapper.dataset.caption = img[i].alt;
+      wrapper.dataset.nolink = true;
+      img[i].before(wrapper);
+      wrapper.append(img[i]);
+      var divWrap = document.createElement('div');
+      divWrap.classList.add('gallery');
+      wrapper.before(divWrap);
+      divWrap.append(wrapper);
+    }
+    baguetteBox.run('.gallery');
+  }
+</script>
+<script>loadScript("/js/lib/lightbox/baguetteBox.min.js", addImgLayout)</script>
+  
+  
+  
+<script src="/js/main.js"></script>
+
+  
+  
+  <script>
+    var addLazyload = function () {
+      var observer = lozad('.lozad', {
+        load: function (el) {
+          el.srcset = el.getAttribute('data-src');
+        },
+        loaded: function (el) {
+          el.classList.add('loaded');
+        }
+      });
+      observer.observe();
+    }
+  </script>
+  <script>loadScript("/js/lib/lozad.min.js", addLazyload)</script>
+  
+  
+</body>
+
+</html>

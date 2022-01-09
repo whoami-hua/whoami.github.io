@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html  lang="zh-CN" >
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="theme-color" content="#fff" id="theme-color">
+  <meta name="description" content="混口饭吃">
+  <link rel="icon" href="/img/logo.png">
+  <title>TCP/UDP/DNS/DHCP协议分析</title>
+  
+  
+  <meta property="og:title" content="TCP/UDP/DNS/DHCP协议分析">
+  
+  
+  <meta property="og:url" content="http://example.com/2021/12/25/TCPUDPDNSDHCP%E5%8D%8F%E8%AE%AE%E5%88%86%E6%9E%90/index.html">
+  
+  
+  <meta property="og:img" content="/img/author.jpg">
+  
+  
+  
+  <meta property="og:type" content="article">
+  <meta property="og:article:published_time" content="2021-12-25">
+  <meta property="og:article:modified_time" content="2021-12-25">
+  <meta property="og:article:author" content="YiHua">
+  
+  
+  <meta property="og:article:tag" content="计算机网络">
+  
+  
+  
+  
+  <script>
+    // control reverse button
+    var reverseDarkList = {
+      dark: 'light',
+      light: 'dark'
+    };
+    var themeColor = {
+      dark: '#1c1c1e',
+      light: '#fff'
+    }
+    // get the data of css prefers-color-scheme
+    var getCssMediaQuery = function() {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    };
+    // reverse current darkmode setting function
+    var reverseDarkModeSetting = function() {
+      var setting = localStorage.getItem('user-color-scheme');
+      if(reverseDarkList[setting]) {
+        setting = reverseDarkList[setting];
+      } else if(setting === null) {
+        setting = reverseDarkList[getCssMediaQuery()];
+      } else {
+        return;
+      }
+      localStorage.setItem('user-color-scheme', setting);
+      return setting;
+    };
+    // apply current darkmode setting
+    var setDarkmode = function(mode) {
+      var setting = mode || localStorage.getItem('user-color-scheme');
+      if(setting === getCssMediaQuery()) {
+        document.documentElement.removeAttribute('data-user-color-scheme');
+        localStorage.removeItem('user-color-scheme');
+        document.getElementById('theme-color').content = themeColor[setting];
+      } else if(reverseDarkList[setting]) {
+        document.documentElement.setAttribute('data-user-color-scheme', setting);
+        document.getElementById('theme-color').content = themeColor[setting];
+      } else {
+        document.documentElement.removeAttribute('data-user-color-scheme');
+        localStorage.removeItem('user-color-scheme');
+        document.getElementById('theme-color').content = themeColor[getCssMediaQuery()];
+      }
+    };
+    setDarkmode();
+  </script>
+  <script>
+    function loadScript(url, cb) {
+      var script = document.createElement('script');
+      script.src = url;
+      if (cb) script.onload = cb;
+      script.async = true;
+      document.body.appendChild(script);
+    }
+  </script>
+  
+  <link rel="preload" href="//at.alicdn.com/t/font_1946621_i1kgafibvw.css" as="style" >
+  <link rel="preload" href="//at.alicdn.com/t/font_1952792_89b4ac4k4up.css" as="style" >
+  
+  <link rel="preload" href="/js/lib/lightbox/baguetteBox.min.js" as="script">
+  <link rel="preload" href="/js/lib/lightbox/baguetteBox.min.css" as="style" >
+  
+  
+  <link rel="preload" href="/js/lib/lozad.min.js" as="script">
+  
+  
+  
+  
+  
+  
+  
+  
+<link rel="stylesheet" href="/css/main.css">
+
+  
+  
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1946621_i1kgafibvw.css">
+
+  
+  
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1952792_89b4ac4k4up.css">
+
+  
+  
+<link rel="stylesheet" href="/js/lib/lightbox/baguetteBox.min.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <div class="wrapper">
+    
+    <nav class="navbar">
+  <div class="navbar-logo">
+    <span class="navbar-logo-main">
+      
+      <img class="navbar-logo-img" src="/img/logo.png" alt="logo">
+      
+      <span class="navbar-logo-dsc">混口饭吃</span>
+    </span>
+  </div>
+  <div class="navbar-menu">
+    
+    <a href="/" class="navbar-menu-item">
+    
+    首页
+    
+    </a>
+    
+    <a href="/archives" class="navbar-menu-item">
+    
+    归档
+    
+    </a>
+    
+    <a href="/tags" class="navbar-menu-item">
+    
+    标签
+    
+    </a>
+    
+    <a href="/categories" class="navbar-menu-item">
+    
+    分类
+    
+    </a>
+    
+    <a href="/about" class="navbar-menu-item">
+    
+    关于
+    
+    </a>
+    
+    <a href="/links" class="navbar-menu-item">
+    
+    友链
+    
+    </a>
+    
+    <a class="navbar-menu-item darknavbar" id="dark"><i class="iconfont icon-weather"></i></a>
+    <a class="navbar-menu-item searchnavbar" id="search"><i class="iconfont icon-search" style="font-size: 1.2rem; font-weight: 400;"></i></a>
+  </div>
+</nav>
+    
+    <div id="local-search" style="display: none;">
+      <input class="navbar-menu-item" id="search-input" placeholder="请输入搜索内容...">
+      <div id="search-content"></div>
+    </div>
+    
+    <div class="section-wrap">
+      <div class="container">
+        <div class="columns">
+          <main class="main-column">
+<article class="card card-content">
+  <header>
+    <h1 class="post-title">
+      TCP/UDP/DNS/DHCP协议分析
+    </h1>
+  </header>
+  <div class="post-meta post-show-meta">
+    <time datetime="2021-12-25T08:32:15.308Z">
+      <i class="iconfont icon-calendar" style="margin-right: 2px;"></i>
+      <span>2021-12-25</span>
+    </time>
+    
+    <span class="dot"></span>
+    
+    <a href="/categories/计算机网络/" class="post-meta-link">计算机网络</a>
+    
+    
+    
+    <span class="dot"></span>
+    <span>776 字</span>
+    
+  </div>
+  
+  <div class="post-meta post-show-meta" style="margin-top: -10px;">
+    <div style="display: flex; align-items: center;">
+      <i class="iconfont icon-biaoqian" style="margin-right: 2px; font-size: 1.15rem;"></i>
+      
+      
+        <a href="/tags/计算机网络/" class="post-meta-link">计算机网络</a>
+      
+    </div>
+  </div>
+  
+  </header>
+  <div id="section" class="post-content">
+    <h3 id="一：TCP协议分析"><a href="#一：TCP协议分析" class="headerlink" title="一：TCP协议分析"></a>一：TCP协议分析</h3><h5 id="1-概念"><a href="#1-概念" class="headerlink" title="1.概念"></a>1.概念</h5><p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/2.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/2.png"></p>
+<h5 id="2-TCP数据格段格式"><a href="#2-TCP数据格段格式" class="headerlink" title="2.TCP数据格段格式"></a>2.TCP数据格段格式</h5><p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/3.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/3.png"></p>
+<h5 id="3-TCP数据段分析"><a href="#3-TCP数据段分析" class="headerlink" title="3.TCP数据段分析"></a>3.TCP数据段分析</h5><p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/4.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/4.png"></p>
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/5.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/5.png"></p>
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/6.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/6.png"></p>
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/7.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/7.png"></p>
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/8.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/8.png"></p>
+<h5 id="4-每个协议所占的端口"><a href="#4-每个协议所占的端口" class="headerlink" title="4.每个协议所占的端口"></a>4.每个协议所占的端口</h5><p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/9.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/9.png"></p>
+<h4 id="5-TCP的连接建立（三次握手和四次挥手）"><a href="#5-TCP的连接建立（三次握手和四次挥手）" class="headerlink" title="5.TCP的连接建立（三次握手和四次挥手）"></a>5.TCP的连接建立（三次握手和四次挥手）</h4><h5 id="1-三次握手"><a href="#1-三次握手" class="headerlink" title="1.三次握手"></a>1.三次握手</h5><h6 id="第一次握手"><a href="#第一次握手" class="headerlink" title="第一次握手"></a>第一次握手</h6><p>A的TCP向B发出连接请求报文段，其首部中的同步位 SYN=1，并选择序号seq=x， 表明传送数据时的第一个数据字节序号为x+1</p>
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/10.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/10.png"></p>
+<p>第一次握手报文分析</p>
+<p>由62525发起请求与9090建立连接。连接其首部中的同步位 SYN=1，并选择序号seq=0， 表明传送数据时的第一个数据字节序号为0+1</p>
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/13.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/13.png"></p>
+<h6 id="第二次握手"><a href="#第二次握手" class="headerlink" title="第二次握手"></a>第二次握手</h6><p>B 的 TCP 收到连接请求报文段后，如果同意，则发回确认 B 在确认报文段中，应使SYN=1，使ACK=1，其确认号是ack=x+1，自己选择的序号seq=y</p>
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/11.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/11.png"></p>
+<p>第二次握手报文分析</p>
+<p>由9090响应62525的请求。9090 的 TCP 收到连接请求报文段后，如果同意，则发回确认 62525 在确认报文段中，应使SYN=1，使ACK=1，其确认号是ack=0+1，自己选择的序号seq=0</p>
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/14.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/14.png"></p>
+<h6 id="第三次握手"><a href="#第三次握手" class="headerlink" title="第三次握手"></a>第三次握手</h6><p>. A 收到此报文段后，向B给出确认，其ACK=1，确认号 ack=y+1 A 的 TCP 通知上层应用进程，连接已经建立</p>
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/12.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/12.png"></p>
+<p>第三次握手报文分析</p>
+<p>62525 收到此报文段后，向9090给出确认，其ACK=1，确认号 ack=0+1 A 的 TCP 通知上层应用进程，连接已经建立.</p>
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/15.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/15.png"></p>
+<p>建立连接完成</p>
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/22.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/22.png"></p>
+<h5 id="2-四次挥手"><a href="#2-四次挥手" class="headerlink" title="2.四次挥手"></a>2.四次挥手</h5><h6 id="第一次挥手"><a href="#第一次挥手" class="headerlink" title="第一次挥手"></a>第一次挥手</h6><p>数据传输结束后，通信的双方都可释放连接 现在，A的应用进程先向其TCP发出连接释放报文，并停止再发送数据，主动关闭TCP连接 A把连接释放报文段首部的FIN=1，其序号seq=u，等待B的确认</p>
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/16.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/16.png"></p>
+<h6 id="第二次挥手"><a href="#第二次挥手" class="headerlink" title="第二次挥手"></a>第二次挥手</h6><p>1.服务器回复客户端，确认号ack=u+1； </p>
+<p>2.这个报文段自己的序号为seq=v，此时，TCP服务器进程通知高层应用进程； </p>
+<p>3.从客户端到服务器这个方向的连接就释放了； </p>
+<p>4.但TCP连接处于半关闭状态，FIN=0，代表服务器若要继续发送数据，客户端仍需要接收。</p>
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/17.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/17.png"></p>
+<p>第三次挥手</p>
+<p>1.若服务器已经没有要发给客户端的数据了，其应用进程就通知TCP释放连接； </p>
+<p>2.服务器的seq=v；ack=u+1；FIN=1； </p>
+<p>3.相当于服务器完成了数据传送，告知客户端我也完事了，FIN=1</p>
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/18.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/18.png"></p>
+<h6 id="第三次挥手"><a href="#第三次挥手" class="headerlink" title="第三次挥手"></a>第三次挥手</h6><p>1.客户端向服务器发送确认报：ACK=1； </p>
+<p>FIN=0； </p>
+<p>seq=u+1； </p>
+<p>ack=v+1； </p>
+<p>2.这代表着四次挥手全部完成，TCP连接进入关闭状态</p>
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/19.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/19.png"></p>
+<h5 id="6-可靠的传输原理"><a href="#6-可靠的传输原理" class="headerlink" title="6.可靠的传输原理"></a>6.可靠的传输原理</h5><p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/20.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/20.png"></p>
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/21.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/21.png"></p>
+<h3 id="二-UDP协议分析"><a href="#二-UDP协议分析" class="headerlink" title="二:UDP协议分析"></a>二:UDP协议分析</h3><h5 id="1-概念-1"><a href="#1-概念-1" class="headerlink" title="1.概念"></a>1.概念</h5><p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/23.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/23.png"></p>
+<h5 id="2-报头格式"><a href="#2-报头格式" class="headerlink" title="2.报头格式"></a>2.报头格式</h5><p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/24.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/24.png"></p>
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/25.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/25.png"></p>
+<h3 id="三：TCP与CDP的区别"><a href="#三：TCP与CDP的区别" class="headerlink" title="三：TCP与CDP的区别"></a>三：TCP与CDP的区别</h3><p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/26.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/26.png"></p>
+<h3 id="四：DNS协议"><a href="#四：DNS协议" class="headerlink" title="四：DNS协议"></a>四：DNS协议</h3><h5 id="1-概念-2"><a href="#1-概念-2" class="headerlink" title="1.概念"></a>1.概念</h5><p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/27.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/27.png"></p>
+<h5 id="2-域名组成"><a href="#2-域名组成" class="headerlink" title="2.域名组成"></a>2.域名组成</h5><p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/28.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/28.png"></p>
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/29.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/29.png"></p>
+<h5 id="3-DNS解析"><a href="#3-DNS解析" class="headerlink" title="3.DNS解析"></a>3.DNS解析</h5><p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/30.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/30.png"></p>
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/31.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/31.png"></p>
+<h5 id="4-字段含义"><a href="#4-字段含义" class="headerlink" title="4.字段含义"></a>4.字段含义</h5><p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/32.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/32.png"></p>
+<h3 id="五：DHCP协议"><a href="#五：DHCP协议" class="headerlink" title="五：DHCP协议"></a>五：DHCP协议</h3><h5 id="1-概念-3"><a href="#1-概念-3" class="headerlink" title="1.概念"></a>1.概念</h5><p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/33.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/33.png"></p>
+<h5 id="2-字段含义"><a href="#2-字段含义" class="headerlink" title="2.字段含义"></a>2.字段含义</h5><p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/34.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/34.png"></p>
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/35.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/35.png"></p>
+<h5 id="3-DHCP工作原理"><a href="#3-DHCP工作原理" class="headerlink" title="3.DHCP工作原理"></a>3.DHCP工作原理</h5><p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/36.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/36.png"></p>
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/37.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.8/37.png"></p>
+
+  </div>
+  <div>
+  
+  <div class="post-note note-warning copyright" style="margin-top: 42px">
+    <p><span style="font-weight: bold;">作者：</span><a target="_blank" rel="nofollow noopener noreferrer" href="http://example.com/about">YiHua</a></p>
+    <p><span style="font-weight: bold;">文章链接：</span><a target="_blank" rel="nofollow noopener noreferrer" href="http://example.com/2021/12/25/TCPUDPDNSDHCP%E5%8D%8F%E8%AE%AE%E5%88%86%E6%9E%90/">http://example.com/2021/12/25/TCPUDPDNSDHCP%E5%8D%8F%E8%AE%AE%E5%88%86%E6%9E%90/</a></p>
+    <p><span style="font-weight: bold;">版权声明：</span>本博客所有文章除特别声明外，均采用<a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">CC BY-NC-SA 4.0 协议</a>。转载请注明出处！</p>
+  </div>
+  
+  </div>
+</article>
+<div class="nav">
+  
+  <div class="nav-item-prev">
+    <a href="/2021/12/25/交换机路由应用/" class="nav-link">
+      <i class="iconfont icon-left nav-prev-icon"></i>
+      <div>
+        <div class="nav-label">上一篇</div>
+        
+        <div class="nav-title">交换机/路由应用 </div>
+        
+      </div>
+    </a>
+  </div>
+  
+  
+  <div class="nav-item-next">
+    <a href="/2021/12/23/ARPIPICMP协议分析/" class="nav-link">
+      <div>
+        <div class="nav-label">下一篇</div>
+        
+        <div class="nav-title">ARP/IP/ICMP协议分析 </div>
+        
+      </div>
+      <i class="iconfont icon-right nav-next-icon"></i>
+    </a>
+  </div>
+  
+</div>
+
+<div class="card card-content toc-card" id="mobiletoc">
+  <div class="toc-header"><i class="iconfont icon-menu" style="padding-right: 2px;"></i>目录</div>
+<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%EF%BC%9ATCP%E5%8D%8F%E8%AE%AE%E5%88%86%E6%9E%90"><span class="toc-text">一：TCP协议分析</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E6%A6%82%E5%BF%B5"><span class="toc-text">1.概念</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-TCP%E6%95%B0%E6%8D%AE%E6%A0%BC%E6%AE%B5%E6%A0%BC%E5%BC%8F"><span class="toc-text">2.TCP数据格段格式</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-TCP%E6%95%B0%E6%8D%AE%E6%AE%B5%E5%88%86%E6%9E%90"><span class="toc-text">3.TCP数据段分析</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-%E6%AF%8F%E4%B8%AA%E5%8D%8F%E8%AE%AE%E6%89%80%E5%8D%A0%E7%9A%84%E7%AB%AF%E5%8F%A3"><span class="toc-text">4.每个协议所占的端口</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-TCP%E7%9A%84%E8%BF%9E%E6%8E%A5%E5%BB%BA%E7%AB%8B%EF%BC%88%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B%E5%92%8C%E5%9B%9B%E6%AC%A1%E6%8C%A5%E6%89%8B%EF%BC%89"><span class="toc-text">5.TCP的连接建立（三次握手和四次挥手）</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B"><span class="toc-text">1.三次握手</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E6%AC%A1%E6%8F%A1%E6%89%8B"><span class="toc-text">第一次握手</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E6%AC%A1%E6%8F%A1%E6%89%8B"><span class="toc-text">第二次握手</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E7%AC%AC%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B"><span class="toc-text">第三次握手</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E5%9B%9B%E6%AC%A1%E6%8C%A5%E6%89%8B"><span class="toc-text">2.四次挥手</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E6%AC%A1%E6%8C%A5%E6%89%8B"><span class="toc-text">第一次挥手</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E6%AC%A1%E6%8C%A5%E6%89%8B"><span class="toc-text">第二次挥手</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E7%AC%AC%E4%B8%89%E6%AC%A1%E6%8C%A5%E6%89%8B"><span class="toc-text">第三次挥手</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#6-%E5%8F%AF%E9%9D%A0%E7%9A%84%E4%BC%A0%E8%BE%93%E5%8E%9F%E7%90%86"><span class="toc-text">6.可靠的传输原理</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8C-UDP%E5%8D%8F%E8%AE%AE%E5%88%86%E6%9E%90"><span class="toc-text">二:UDP协议分析</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E6%A6%82%E5%BF%B5-1"><span class="toc-text">1.概念</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E6%8A%A5%E5%A4%B4%E6%A0%BC%E5%BC%8F"><span class="toc-text">2.报头格式</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%89%EF%BC%9ATCP%E4%B8%8ECDP%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="toc-text">三：TCP与CDP的区别</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9B%9B%EF%BC%9ADNS%E5%8D%8F%E8%AE%AE"><span class="toc-text">四：DNS协议</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E6%A6%82%E5%BF%B5-2"><span class="toc-text">1.概念</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E5%9F%9F%E5%90%8D%E7%BB%84%E6%88%90"><span class="toc-text">2.域名组成</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-DNS%E8%A7%A3%E6%9E%90"><span class="toc-text">3.DNS解析</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-%E5%AD%97%E6%AE%B5%E5%90%AB%E4%B9%89"><span class="toc-text">4.字段含义</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%94%EF%BC%9ADHCP%E5%8D%8F%E8%AE%AE"><span class="toc-text">五：DHCP协议</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E6%A6%82%E5%BF%B5-3"><span class="toc-text">1.概念</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E5%AD%97%E6%AE%B5%E5%90%AB%E4%B9%89"><span class="toc-text">2.字段含义</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-DHCP%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86"><span class="toc-text">3.DHCP工作原理</span></a></li></ol></li></ol></li></ol>
+</div></main>
+          <aside class="left-column">
+            
+            <div class="card card-author">
+              
+<img src="/img/author.jpg" class="author-img">
+
+<p class="author-name">YiHua</p>
+<p class="author-description">谨言  深思  笃行</p>
+<div class="author-message">
+  <a class="author-posts-count" href="/archives">
+    <span>13</span>
+    <span>文章</span>
+  </a>
+  <a class="author-categories-count" href="/categories">
+    <span>5</span>
+    <span>分类</span>
+  </a>
+  <a class="author-tags-count" href="/tags">
+    <span>5</span>
+    <span>标签</span>
+  </a>
+</div>
+
+            </div>
+            
+            <div class="sticky-tablet">
+  
+  
+  <article class="display-when-two-columns spacer">
+    <div class="card card-content toc-card">
+      <div class="toc-header"><i class="iconfont icon-menu" style="padding-right: 2px;"></i>目录</div>
+<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%EF%BC%9ATCP%E5%8D%8F%E8%AE%AE%E5%88%86%E6%9E%90"><span class="toc-text">一：TCP协议分析</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E6%A6%82%E5%BF%B5"><span class="toc-text">1.概念</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-TCP%E6%95%B0%E6%8D%AE%E6%A0%BC%E6%AE%B5%E6%A0%BC%E5%BC%8F"><span class="toc-text">2.TCP数据格段格式</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-TCP%E6%95%B0%E6%8D%AE%E6%AE%B5%E5%88%86%E6%9E%90"><span class="toc-text">3.TCP数据段分析</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-%E6%AF%8F%E4%B8%AA%E5%8D%8F%E8%AE%AE%E6%89%80%E5%8D%A0%E7%9A%84%E7%AB%AF%E5%8F%A3"><span class="toc-text">4.每个协议所占的端口</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-TCP%E7%9A%84%E8%BF%9E%E6%8E%A5%E5%BB%BA%E7%AB%8B%EF%BC%88%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B%E5%92%8C%E5%9B%9B%E6%AC%A1%E6%8C%A5%E6%89%8B%EF%BC%89"><span class="toc-text">5.TCP的连接建立（三次握手和四次挥手）</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B"><span class="toc-text">1.三次握手</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E6%AC%A1%E6%8F%A1%E6%89%8B"><span class="toc-text">第一次握手</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E6%AC%A1%E6%8F%A1%E6%89%8B"><span class="toc-text">第二次握手</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E7%AC%AC%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B"><span class="toc-text">第三次握手</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E5%9B%9B%E6%AC%A1%E6%8C%A5%E6%89%8B"><span class="toc-text">2.四次挥手</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E6%AC%A1%E6%8C%A5%E6%89%8B"><span class="toc-text">第一次挥手</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E6%AC%A1%E6%8C%A5%E6%89%8B"><span class="toc-text">第二次挥手</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E7%AC%AC%E4%B8%89%E6%AC%A1%E6%8C%A5%E6%89%8B"><span class="toc-text">第三次挥手</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#6-%E5%8F%AF%E9%9D%A0%E7%9A%84%E4%BC%A0%E8%BE%93%E5%8E%9F%E7%90%86"><span class="toc-text">6.可靠的传输原理</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8C-UDP%E5%8D%8F%E8%AE%AE%E5%88%86%E6%9E%90"><span class="toc-text">二:UDP协议分析</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E6%A6%82%E5%BF%B5-1"><span class="toc-text">1.概念</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E6%8A%A5%E5%A4%B4%E6%A0%BC%E5%BC%8F"><span class="toc-text">2.报头格式</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%89%EF%BC%9ATCP%E4%B8%8ECDP%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="toc-text">三：TCP与CDP的区别</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9B%9B%EF%BC%9ADNS%E5%8D%8F%E8%AE%AE"><span class="toc-text">四：DNS协议</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E6%A6%82%E5%BF%B5-2"><span class="toc-text">1.概念</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E5%9F%9F%E5%90%8D%E7%BB%84%E6%88%90"><span class="toc-text">2.域名组成</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-DNS%E8%A7%A3%E6%9E%90"><span class="toc-text">3.DNS解析</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-%E5%AD%97%E6%AE%B5%E5%90%AB%E4%B9%89"><span class="toc-text">4.字段含义</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%94%EF%BC%9ADHCP%E5%8D%8F%E8%AE%AE"><span class="toc-text">五：DHCP协议</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E6%A6%82%E5%BF%B5-3"><span class="toc-text">1.概念</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E5%AD%97%E6%AE%B5%E5%90%AB%E4%B9%89"><span class="toc-text">2.字段含义</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-DHCP%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86"><span class="toc-text">3.DHCP工作原理</span></a></li></ol></li></ol></li></ol>
+    </div>
+  </article>
+  
+  
+  <article class="card card-content categories-widget">
+    <div class="categories-card">
+  <div class="categories-header"><i class="iconfont icon-fenlei" style="padding-right: 2px;"></i>分类</div>
+  <div class="categories-list">
+    
+      <a href="/categories/CentoS-7基础/">
+        <div class="categories-list-item">
+          CentoS-7基础
+          <span class="categories-list-item-badge">4</span>
+        </div>
+      </a>
+    
+      <a href="/categories/计算机网络/">
+        <div class="categories-list-item">
+          计算机网络
+          <span class="categories-list-item-badge">4</span>
+        </div>
+      </a>
+    
+      <a href="/categories/Mysql数据库/">
+        <div class="categories-list-item">
+          Mysql数据库
+          <span class="categories-list-item-badge">1</span>
+        </div>
+      </a>
+    
+      <a href="/categories/php代码基础/">
+        <div class="categories-list-item">
+          php代码基础
+          <span class="categories-list-item-badge">3</span>
+        </div>
+      </a>
+    
+      <a href="/categories/windows-2008-R2/">
+        <div class="categories-list-item">
+          windows-2008-R2
+          <span class="categories-list-item-badge">1</span>
+        </div>
+      </a>
+    
+  </div>
+</div>
+  </article>
+  
+  <article class="card card-content tags-widget">
+    <div class="tags-card">
+  <div class="tags-header"><i class="iconfont icon-biaoqian" style="padding-right: 2px;"></i>热门标签</div>
+  <div class="tags-list">
+    
+    <a href="/tags/Linux/" title="Linux"><div class="tags-list-item">Linux</div></a>
+    
+    <a href="/tags/计算机网络/" title="计算机网络"><div class="tags-list-item">计算机网络</div></a>
+    
+    <a href="/tags/Mysql数据库/" title="Mysql数据库"><div class="tags-list-item">Mysql数据库</div></a>
+    
+    <a href="/tags/php代码基础/" title="php代码基础"><div class="tags-list-item">php代码基础</div></a>
+    
+    <a href="/tags/windows/" title="windows"><div class="tags-list-item">windows</div></a>
+    
+  </div>
+</div>
+  </article>
+  
+  
+</div>
+          </aside>
+          <aside class="right-column">
+            <div class="sticky-widescreen">
+  
+  
+  <article class="card card-content toc-card">
+    <div class="toc-header"><i class="iconfont icon-menu" style="padding-right: 2px;"></i>目录</div>
+<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%EF%BC%9ATCP%E5%8D%8F%E8%AE%AE%E5%88%86%E6%9E%90"><span class="toc-text">一：TCP协议分析</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E6%A6%82%E5%BF%B5"><span class="toc-text">1.概念</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-TCP%E6%95%B0%E6%8D%AE%E6%A0%BC%E6%AE%B5%E6%A0%BC%E5%BC%8F"><span class="toc-text">2.TCP数据格段格式</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-TCP%E6%95%B0%E6%8D%AE%E6%AE%B5%E5%88%86%E6%9E%90"><span class="toc-text">3.TCP数据段分析</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-%E6%AF%8F%E4%B8%AA%E5%8D%8F%E8%AE%AE%E6%89%80%E5%8D%A0%E7%9A%84%E7%AB%AF%E5%8F%A3"><span class="toc-text">4.每个协议所占的端口</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-TCP%E7%9A%84%E8%BF%9E%E6%8E%A5%E5%BB%BA%E7%AB%8B%EF%BC%88%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B%E5%92%8C%E5%9B%9B%E6%AC%A1%E6%8C%A5%E6%89%8B%EF%BC%89"><span class="toc-text">5.TCP的连接建立（三次握手和四次挥手）</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B"><span class="toc-text">1.三次握手</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E6%AC%A1%E6%8F%A1%E6%89%8B"><span class="toc-text">第一次握手</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E6%AC%A1%E6%8F%A1%E6%89%8B"><span class="toc-text">第二次握手</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E7%AC%AC%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B"><span class="toc-text">第三次握手</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E5%9B%9B%E6%AC%A1%E6%8C%A5%E6%89%8B"><span class="toc-text">2.四次挥手</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E6%AC%A1%E6%8C%A5%E6%89%8B"><span class="toc-text">第一次挥手</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E6%AC%A1%E6%8C%A5%E6%89%8B"><span class="toc-text">第二次挥手</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E7%AC%AC%E4%B8%89%E6%AC%A1%E6%8C%A5%E6%89%8B"><span class="toc-text">第三次挥手</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#6-%E5%8F%AF%E9%9D%A0%E7%9A%84%E4%BC%A0%E8%BE%93%E5%8E%9F%E7%90%86"><span class="toc-text">6.可靠的传输原理</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8C-UDP%E5%8D%8F%E8%AE%AE%E5%88%86%E6%9E%90"><span class="toc-text">二:UDP协议分析</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E6%A6%82%E5%BF%B5-1"><span class="toc-text">1.概念</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E6%8A%A5%E5%A4%B4%E6%A0%BC%E5%BC%8F"><span class="toc-text">2.报头格式</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%89%EF%BC%9ATCP%E4%B8%8ECDP%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="toc-text">三：TCP与CDP的区别</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9B%9B%EF%BC%9ADNS%E5%8D%8F%E8%AE%AE"><span class="toc-text">四：DNS协议</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E6%A6%82%E5%BF%B5-2"><span class="toc-text">1.概念</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E5%9F%9F%E5%90%8D%E7%BB%84%E6%88%90"><span class="toc-text">2.域名组成</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-DNS%E8%A7%A3%E6%9E%90"><span class="toc-text">3.DNS解析</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-%E5%AD%97%E6%AE%B5%E5%90%AB%E4%B9%89"><span class="toc-text">4.字段含义</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%94%EF%BC%9ADHCP%E5%8D%8F%E8%AE%AE"><span class="toc-text">五：DHCP协议</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E6%A6%82%E5%BF%B5-3"><span class="toc-text">1.概念</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E5%AD%97%E6%AE%B5%E5%90%AB%E4%B9%89"><span class="toc-text">2.字段含义</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-DHCP%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86"><span class="toc-text">3.DHCP工作原理</span></a></li></ol></li></ol></li></ol>
+  </article>
+  
+  
+  <article class="card card-content">
+    <div class="recent-posts-card">
+  <div class="recent-posts-header"><i class="iconfont icon-wenzhang_huaban" style="padding-right: 2px;"></i>最近文章</div>
+  <div class="recent-posts-list">
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2022-01-08</div>
+        <a href="/2022/01/08/Mysql数据库/"><div class="recent-posts-item-content">Mysql数据库</div></a>
+      </div>
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2022-01-06</div>
+        <a href="/2022/01/06/php基础（三）/"><div class="recent-posts-item-content">php基础（三）</div></a>
+      </div>
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2022-01-05</div>
+        <a href="/2022/01/05/php基础（二）/"><div class="recent-posts-item-content">php基础（二）</div></a>
+      </div>
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2022-01-04</div>
+        <a href="/2022/01/04/php基础（一）/"><div class="recent-posts-item-content">php基础（一）</div></a>
+      </div>
+    
+  </div>
+</div>
+  </article>
+  
+  
+</div>
+          </aside>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <footer class="footer">
+  <div class="footer-container">
+    <div>
+      <div class="footer-dsc">
+        <span>Copyright ©
+          
+          2020 -
+          
+          2022
+        </span>
+        &nbsp;
+        <a href="/" class="footer-link">混口饭吃 </a>
+      </div>
+    </div>
+
+    
+    <div class="footer-dsc">
+      
+      Powered by
+      <a href="https://hexo.io/" class="footer-link" target="_blank" rel="nofollow noopener noreferrer">&nbsp;Hexo </a>
+      
+      
+      <span>&nbsp;|&nbsp;</span>
+      
+      
+      Theme -
+      <a href="https://github.com/theme-kaze" class="footer-link" target="_blank"
+        rel="nofollow noopener noreferrer">&nbsp;Kaze</a>
+      
+    </div>
+    
+    
+    
+    
+</footer>
+  <a role="button" id="scrollbutton" class="basebutton"  aria-label="回到顶部">
+  <i class="iconfont icon-arrowleft button-icon"></i>
+</a>
+<a role="button" id="menubutton" class="basebutton">
+  <i class="iconfont icon-menu button-icon"></i>
+</a>
+<a role="button" id="popbutton" class="basebutton" aria-label="控制中心">
+  <i class="iconfont icon-expand button-icon"></i>
+</a>
+<a role="button" id="darkbutton" class="basebutton darkwidget" aria-label="夜色模式">
+  <i class="iconfont icon-weather button-icon"></i>
+</a>
+<a role="button" id="searchbutton" class="basebutton searchwidget" aria-label="搜索">
+  <i class="iconfont icon-search button-icon"></i>
+</a>
+
+  
+  
+  
+  <script>
+  var addImgLayout = function () {
+    var img = document.querySelectorAll('.post-content img');
+    var i;
+    for (i = 0; i < img.length; i++) {
+      var wrapper = document.createElement('a');
+      wrapper.setAttribute('href', img[i].getAttribute('data-src'));
+      wrapper.setAttribute('aria-label', 'illustration');
+      wrapper.style.cssText = 'width: 100%; display: flex; justify-content: center;';
+      if (img[i].alt) wrapper.dataset.caption = img[i].alt;
+      wrapper.dataset.nolink = true;
+      img[i].before(wrapper);
+      wrapper.append(img[i]);
+      var divWrap = document.createElement('div');
+      divWrap.classList.add('gallery');
+      wrapper.before(divWrap);
+      divWrap.append(wrapper);
+    }
+    baguetteBox.run('.gallery');
+  }
+</script>
+<script>loadScript("/js/lib/lightbox/baguetteBox.min.js", addImgLayout)</script>
+  
+  
+  
+<script src="/js/main.js"></script>
+
+  
+  
+  <script>
+    var addLazyload = function () {
+      var observer = lozad('.lozad', {
+        load: function (el) {
+          el.srcset = el.getAttribute('data-src');
+        },
+        loaded: function (el) {
+          el.classList.add('loaded');
+        }
+      });
+      observer.observe();
+    }
+  </script>
+  <script>loadScript("/js/lib/lozad.min.js", addLazyload)</script>
+  
+  
+</body>
+
+</html>

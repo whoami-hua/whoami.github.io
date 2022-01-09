@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html  lang="zh-CN" >
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="theme-color" content="#fff" id="theme-color">
+  <meta name="description" content="混口饭吃">
+  <link rel="icon" href="/img/logo.png">
+  <title>day1liunx基础</title>
+  
+  
+  <meta property="og:title" content="day1liunx基础">
+  
+  
+  <meta property="og:url" content="http://example.com/2021/12/19/day1liunx%E5%9F%BA%E7%A1%80/index.html">
+  
+  
+  <meta property="og:img" content="/img/author.jpg">
+  
+  
+  
+  <meta property="og:type" content="article">
+  <meta property="og:article:published_time" content="2021-12-19">
+  <meta property="og:article:modified_time" content="2021-12-25">
+  <meta property="og:article:author" content="YiHua">
+  
+  
+  <meta property="og:article:tag" content="Linux">
+  
+  
+  
+  
+  <script>
+    // control reverse button
+    var reverseDarkList = {
+      dark: 'light',
+      light: 'dark'
+    };
+    var themeColor = {
+      dark: '#1c1c1e',
+      light: '#fff'
+    }
+    // get the data of css prefers-color-scheme
+    var getCssMediaQuery = function() {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    };
+    // reverse current darkmode setting function
+    var reverseDarkModeSetting = function() {
+      var setting = localStorage.getItem('user-color-scheme');
+      if(reverseDarkList[setting]) {
+        setting = reverseDarkList[setting];
+      } else if(setting === null) {
+        setting = reverseDarkList[getCssMediaQuery()];
+      } else {
+        return;
+      }
+      localStorage.setItem('user-color-scheme', setting);
+      return setting;
+    };
+    // apply current darkmode setting
+    var setDarkmode = function(mode) {
+      var setting = mode || localStorage.getItem('user-color-scheme');
+      if(setting === getCssMediaQuery()) {
+        document.documentElement.removeAttribute('data-user-color-scheme');
+        localStorage.removeItem('user-color-scheme');
+        document.getElementById('theme-color').content = themeColor[setting];
+      } else if(reverseDarkList[setting]) {
+        document.documentElement.setAttribute('data-user-color-scheme', setting);
+        document.getElementById('theme-color').content = themeColor[setting];
+      } else {
+        document.documentElement.removeAttribute('data-user-color-scheme');
+        localStorage.removeItem('user-color-scheme');
+        document.getElementById('theme-color').content = themeColor[getCssMediaQuery()];
+      }
+    };
+    setDarkmode();
+  </script>
+  <script>
+    function loadScript(url, cb) {
+      var script = document.createElement('script');
+      script.src = url;
+      if (cb) script.onload = cb;
+      script.async = true;
+      document.body.appendChild(script);
+    }
+  </script>
+  
+  <link rel="preload" href="//at.alicdn.com/t/font_1946621_i1kgafibvw.css" as="style" >
+  <link rel="preload" href="//at.alicdn.com/t/font_1952792_89b4ac4k4up.css" as="style" >
+  
+  <link rel="preload" href="/js/lib/lightbox/baguetteBox.min.js" as="script">
+  <link rel="preload" href="/js/lib/lightbox/baguetteBox.min.css" as="style" >
+  
+  
+  <link rel="preload" href="/js/lib/lozad.min.js" as="script">
+  
+  
+  
+  
+  
+  
+  
+  
+<link rel="stylesheet" href="/css/main.css">
+
+  
+  
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1946621_i1kgafibvw.css">
+
+  
+  
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1952792_89b4ac4k4up.css">
+
+  
+  
+<link rel="stylesheet" href="/js/lib/lightbox/baguetteBox.min.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <div class="wrapper">
+    
+    <nav class="navbar">
+  <div class="navbar-logo">
+    <span class="navbar-logo-main">
+      
+      <img class="navbar-logo-img" src="/img/logo.png" alt="logo">
+      
+      <span class="navbar-logo-dsc">混口饭吃</span>
+    </span>
+  </div>
+  <div class="navbar-menu">
+    
+    <a href="/" class="navbar-menu-item">
+    
+    首页
+    
+    </a>
+    
+    <a href="/archives" class="navbar-menu-item">
+    
+    归档
+    
+    </a>
+    
+    <a href="/tags" class="navbar-menu-item">
+    
+    标签
+    
+    </a>
+    
+    <a href="/categories" class="navbar-menu-item">
+    
+    分类
+    
+    </a>
+    
+    <a href="/about" class="navbar-menu-item">
+    
+    关于
+    
+    </a>
+    
+    <a href="/links" class="navbar-menu-item">
+    
+    友链
+    
+    </a>
+    
+    <a class="navbar-menu-item darknavbar" id="dark"><i class="iconfont icon-weather"></i></a>
+    <a class="navbar-menu-item searchnavbar" id="search"><i class="iconfont icon-search" style="font-size: 1.2rem; font-weight: 400;"></i></a>
+  </div>
+</nav>
+    
+    <div id="local-search" style="display: none;">
+      <input class="navbar-menu-item" id="search-input" placeholder="请输入搜索内容...">
+      <div id="search-content"></div>
+    </div>
+    
+    <div class="section-wrap">
+      <div class="container">
+        <div class="columns">
+          <main class="main-column">
+<article class="card card-content">
+  <header>
+    <h1 class="post-title">
+      day1liunx基础
+    </h1>
+  </header>
+  <div class="post-meta post-show-meta">
+    <time datetime="2021-12-19T08:21:22.413Z">
+      <i class="iconfont icon-calendar" style="margin-right: 2px;"></i>
+      <span>2021-12-19</span>
+    </time>
+    
+    <span class="dot"></span>
+    
+    <a href="/categories/CentoS-7基础/" class="post-meta-link">CentoS 7基础</a>
+    
+    
+    
+    <span class="dot"></span>
+    <span>861 字</span>
+    
+  </div>
+  
+  <div class="post-meta post-show-meta" style="margin-top: -10px;">
+    <div style="display: flex; align-items: center;">
+      <i class="iconfont icon-biaoqian" style="margin-right: 2px; font-size: 1.15rem;"></i>
+      
+      
+        <a href="/tags/Linux/" class="post-meta-link">Linux</a>
+      
+    </div>
+  </div>
+  
+  </header>
+  <div id="section" class="post-content">
+    <h3 id="一：liunx常用命令"><a href="#一：liunx常用命令" class="headerlink" title="一：liunx常用命令"></a>一：liunx常用命令</h3><h5 id="1-关机命令"><a href="#1-关机命令" class="headerlink" title="1.关机命令"></a>1.关机命令</h5><table>
+<thead>
+<tr>
+<th align="center">命令</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">poweroff</td>
+<td align="center">立刻关机</td>
+</tr>
+<tr>
+<td align="center">halt</td>
+<td align="center">立刻关机（需要root权限）</td>
+</tr>
+<tr>
+<td align="center">shutdown -h now</td>
+<td align="center">立刻关机</td>
+</tr>
+<tr>
+<td align="center">init 0</td>
+<td align="center">关机</td>
+</tr>
+</tbody></table>
+<h5 id="2-重启命令"><a href="#2-重启命令" class="headerlink" title="2.重启命令"></a>2.重启命令</h5><table>
+<thead>
+<tr>
+<th align="center">命令</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">init 6</td>
+<td align="center">重新启动</td>
+</tr>
+<tr>
+<td align="center">reboot</td>
+<td align="center">立刻重启</td>
+</tr>
+<tr>
+<td align="center">shutdown -r now</td>
+<td align="center">立刻重启</td>
+</tr>
+</tbody></table>
+<h5 id="3-查看文件夹下的文件"><a href="#3-查看文件夹下的文件" class="headerlink" title="3.查看文件夹下的文件"></a>3.查看文件夹下的文件</h5><table>
+<thead>
+<tr>
+<th align="center">命令</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">ls</td>
+<td align="center">查看文件夹下的文件</td>
+</tr>
+<tr>
+<td align="center">ls -l</td>
+<td align="center">查看文件夹下的文件的详细信息</td>
+</tr>
+<tr>
+<td align="center">ls -lR</td>
+<td align="center">递归查看文件夹下的文件的详细信息</td>
+</tr>
+<tr>
+<td align="center">ls -a</td>
+<td align="center">查看隐藏文件</td>
+</tr>
+</tbody></table>
+<h5 id="4-创建文件夹及删除文件夹"><a href="#4-创建文件夹及删除文件夹" class="headerlink" title="4.创建文件夹及删除文件夹"></a>4.创建文件夹及删除文件夹</h5><table>
+<thead>
+<tr>
+<th align="center">命令</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">mkdir</td>
+<td align="center">新建文件夹</td>
+</tr>
+<tr>
+<td align="center">mkdir -p</td>
+<td align="center">递归创建文件夹</td>
+</tr>
+<tr>
+<td align="center">mkdir .</td>
+<td align="center">创建隐藏文件夹</td>
+</tr>
+<tr>
+<td align="center">rm</td>
+<td align="center">删除文件或文件夹</td>
+</tr>
+<tr>
+<td align="center">rm -rf</td>
+<td align="center">递归删除文件或文件夹</td>
+</tr>
+</tbody></table>
+<h5 id="5-新建文件"><a href="#5-新建文件" class="headerlink" title="5.新建文件"></a>5.新建文件</h5><table>
+<thead>
+<tr>
+<th align="center">命令</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">touch</td>
+<td align="center">新建文件夹</td>
+</tr>
+<tr>
+<td align="center">touch -t</td>
+<td align="center">修改文件的时间</td>
+</tr>
+<tr>
+<td align="center">vim</td>
+<td align="center">新建并编辑文件</td>
+</tr>
+</tbody></table>
+<h5 id="6-复制"><a href="#6-复制" class="headerlink" title="6.复制"></a>6.复制</h5><table>
+<thead>
+<tr>
+<th align="center">命令</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">cp 源文件 目标文件</td>
+<td align="center">复制文件</td>
+</tr>
+<tr>
+<td align="center">cp -r</td>
+<td align="center">递归复制</td>
+</tr>
+</tbody></table>
+<h5 id="7-剪切移动重命名"><a href="#7-剪切移动重命名" class="headerlink" title="7.剪切移动重命名"></a>7.剪切移动重命名</h5><table>
+<thead>
+<tr>
+<th align="center">命令</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">mv 源文件 目标文件</td>
+<td align="center">移动文件（重命名）</td>
+</tr>
+</tbody></table>
+<h5 id="8-查看"><a href="#8-查看" class="headerlink" title="8.查看"></a>8.查看</h5><table>
+<thead>
+<tr>
+<th align="center">命令</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">cat/grep/tail/head</td>
+<td align="center">查看</td>
+</tr>
+<tr>
+<td align="center">more</td>
+<td align="center">分页查看</td>
+</tr>
+</tbody></table>
+<h5 id="9-辅助命令"><a href="#9-辅助命令" class="headerlink" title="9.辅助命令"></a>9.辅助命令</h5><table>
+<thead>
+<tr>
+<th align="center">命令</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">Tcb</td>
+<td align="center">自动补齐</td>
+</tr>
+<tr>
+<td align="center">Ctrl+L</td>
+<td align="center">清屏</td>
+</tr>
+<tr>
+<td align="center">Ctrl+K</td>
+<td align="center">清空至行首</td>
+</tr>
+<tr>
+<td align="center">Ctrl+U</td>
+<td align="center">清空至行尾</td>
+</tr>
+<tr>
+<td align="center">Ctrl+C</td>
+<td align="center">中断执行命令</td>
+</tr>
+</tbody></table>
+<h5 id="10-打包与解包"><a href="#10-打包与解包" class="headerlink" title="10.打包与解包"></a>10.打包与解包</h5><table>
+<thead>
+<tr>
+<th align="center">命令</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">tar -cvf</td>
+<td align="center">打包</td>
+</tr>
+<tr>
+<td align="center">tar -xvf</td>
+<td align="center">解包</td>
+</tr>
+</tbody></table>
+<h5 id="11-压缩命令"><a href="#11-压缩命令" class="headerlink" title="11.压缩命令"></a>11.压缩命令</h5><table>
+<thead>
+<tr>
+<th align="center">命令</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">tar -zcvf</td>
+<td align="center">打包（gz)</td>
+</tr>
+<tr>
+<td align="center">tar -zxvf</td>
+<td align="center">解包（gz）</td>
+</tr>
+<tr>
+<td align="center">zip</td>
+<td align="center">打包（zip)</td>
+</tr>
+<tr>
+<td align="center">unzip</td>
+<td align="center">解包(zip)</td>
+</tr>
+</tbody></table>
+<h5 id="12-防火墙命令"><a href="#12-防火墙命令" class="headerlink" title="12.防火墙命令"></a>12.防火墙命令</h5><table>
+<thead>
+<tr>
+<th align="center">命令</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">firewall-cmd –reload</td>
+<td align="center">防火墙重新加载配置</td>
+</tr>
+<tr>
+<td align="center">firewall-cmd –state</td>
+<td align="center">查看防火墙状态</td>
+</tr>
+<tr>
+<td align="center">firewall-cmd –zone=public –list-ports</td>
+<td align="center">查看防火墙开放那些端口</td>
+</tr>
+<tr>
+<td align="center">firewall-cmd –zone=public –list-service</td>
+<td align="center">查看接受那些连接附服务</td>
+</tr>
+<tr>
+<td align="center">firewall-cmd –zone=public –add-port=80/tcp –permanent</td>
+<td align="center">添加80端口为永久开放</td>
+</tr>
+<tr>
+<td align="center">firewall-cmd –zone=public –add-service=http –permanent</td>
+<td align="center">永久添加http连接服务</td>
+</tr>
+<tr>
+<td align="center">systemctl stop firewalld</td>
+<td align="center">关闭防火墙</td>
+</tr>
+<tr>
+<td align="center">systemctl start firewalld</td>
+<td align="center">开启防火墙</td>
+</tr>
+</tbody></table>
+<h5 id="14-网络类命令"><a href="#14-网络类命令" class="headerlink" title="14.网络类命令"></a>14.网络类命令</h5><table>
+<thead>
+<tr>
+<th align="center">命令</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">ip a</td>
+<td align="center">查看ip地址</td>
+</tr>
+<tr>
+<td align="center">ip route</td>
+<td align="center">查看路由信息</td>
+</tr>
+<tr>
+<td align="center">ss -antlp</td>
+<td align="center">查看开放那些端口</td>
+</tr>
+<tr>
+<td align="center">nslookup</td>
+<td align="center">域名解析为ip</td>
+</tr>
+<tr>
+<td align="center">traceroute</td>
+<td align="center">路由跟踪</td>
+</tr>
+<tr>
+<td align="center">netstat -antlp</td>
+<td align="center">查看运行的端口</td>
+</tr>
+</tbody></table>
+<h5 id="15-服务类命令"><a href="#15-服务类命令" class="headerlink" title="15.服务类命令"></a>15.服务类命令</h5><table>
+<thead>
+<tr>
+<th align="center">命令</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">ps -aux</td>
+<td align="center">查看进程</td>
+</tr>
+<tr>
+<td align="center">ps -A | grep</td>
+<td align="center">查看指定进程</td>
+</tr>
+<tr>
+<td align="center">top</td>
+<td align="center">查看cpu</td>
+</tr>
+<tr>
+<td align="center">kill -9</td>
+<td align="center">结束进程</td>
+</tr>
+<tr>
+<td align="center">w</td>
+<td align="center">查看登录信息</td>
+</tr>
+<tr>
+<td align="center">who</td>
+<td align="center">查看登录信息</td>
+</tr>
+</tbody></table>
+<h5 id="16特殊操作"><a href="#16特殊操作" class="headerlink" title="16特殊操作"></a>16特殊操作</h5><table>
+<thead>
+<tr>
+<th align="center">命令</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">screen -S name1</td>
+<td align="center">创建新窗口</td>
+</tr>
+<tr>
+<td align="center">screen -ls</td>
+<td align="center">列出所有后台的会话</td>
+</tr>
+<tr>
+<td align="center">chattr +i</td>
+<td align="center">文件添加保护</td>
+</tr>
+</tbody></table>
+<h3 id="vim编辑器的使用"><a href="#vim编辑器的使用" class="headerlink" title="vim编辑器的使用"></a>vim编辑器的使用</h3><h5 id="1-vim工作模式"><a href="#1-vim工作模式" class="headerlink" title="1.vim工作模式"></a>1.vim工作模式</h5><p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.2/1.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.2/1.png"></p>
+<h5 id="2-命令模式"><a href="#2-命令模式" class="headerlink" title="2.命令模式"></a>2.命令模式</h5><table>
+<thead>
+<tr>
+<th align="center">命令</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">i</td>
+<td align="center">光标所在处左侧输入</td>
+</tr>
+<tr>
+<td align="center">I</td>
+<td align="center">光标跳转行开头</td>
+</tr>
+<tr>
+<td align="center">o</td>
+<td align="center">光标所在的下一行处输入新的一行</td>
+</tr>
+<tr>
+<td align="center">O</td>
+<td align="center">光标所在的上一行处输入新的一行</td>
+</tr>
+<tr>
+<td align="center">a</td>
+<td align="center">光标所在处右侧输入</td>
+</tr>
+<tr>
+<td align="center">A</td>
+<td align="center">光标跳转行尾</td>
+</tr>
+<tr>
+<td align="center">wq</td>
+<td align="center">保存并退出</td>
+</tr>
+<tr>
+<td align="center">q</td>
+<td align="center">退出不保存</td>
+</tr>
+<tr>
+<td align="center">/$</td>
+<td align="center">搜索</td>
+</tr>
+<tr>
+<td align="center">：n,ns/n/n/g(n为参数）</td>
+<td align="center">替换第几行里的字符</td>
+</tr>
+</tbody></table>
+<h5 id="3-输入模式"><a href="#3-输入模式" class="headerlink" title="3.输入模式"></a>3.输入模式</h5><table>
+<thead>
+<tr>
+<th align="center">命令</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">o</td>
+<td align="center">移动到这一行的最前面字符处</td>
+</tr>
+<tr>
+<td align="center">$</td>
+<td align="center">移动到这一行的最后面字符处</td>
+</tr>
+<tr>
+<td align="center">n</td>
+<td align="center">重复前一个搜寻的动作</td>
+</tr>
+<tr>
+<td align="center">N</td>
+<td align="center">重复前一个搜寻的动作</td>
+</tr>
+<tr>
+<td align="center">x</td>
+<td align="center">为向后剪切一个字符</td>
+</tr>
+<tr>
+<td align="center">dd</td>
+<td align="center">剪切游标所在的那一整行</td>
+</tr>
+<tr>
+<td align="center">ndd</td>
+<td align="center">多行剪切</td>
+</tr>
+<tr>
+<td align="center">u</td>
+<td align="center">一直撤销</td>
+</tr>
+<tr>
+<td align="center">p</td>
+<td align="center">粘贴</td>
+</tr>
+</tbody></table>
+<h3 id="liunx文件系统目录结构"><a href="#liunx文件系统目录结构" class="headerlink" title="liunx文件系统目录结构"></a>liunx文件系统目录结构</h3><p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.2/2.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.2/2.png"></p>
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.2/3.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.2/3.png"></p>
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.2/4.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.2/4.png"></p>
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.2/5.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.2/5.png"></p>
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.2/6.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.2/6.png"></p>
+
+  </div>
+  <div>
+  
+  <div class="post-note note-warning copyright" style="margin-top: 42px">
+    <p><span style="font-weight: bold;">作者：</span><a target="_blank" rel="nofollow noopener noreferrer" href="http://example.com/about">YiHua</a></p>
+    <p><span style="font-weight: bold;">文章链接：</span><a target="_blank" rel="nofollow noopener noreferrer" href="http://example.com/2021/12/19/day1liunx%E5%9F%BA%E7%A1%80/">http://example.com/2021/12/19/day1liunx%E5%9F%BA%E7%A1%80/</a></p>
+    <p><span style="font-weight: bold;">版权声明：</span>本博客所有文章除特别声明外，均采用<a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">CC BY-NC-SA 4.0 协议</a>。转载请注明出处！</p>
+  </div>
+  
+  </div>
+</article>
+<div class="nav">
+  
+  <div class="nav-item-prev">
+    <a href="/2021/12/19/Liunx用户和权限/" class="nav-link">
+      <i class="iconfont icon-left nav-prev-icon"></i>
+      <div>
+        <div class="nav-label">上一篇</div>
+        
+        <div class="nav-title">Liunx用户和权限 </div>
+        
+      </div>
+    </a>
+  </div>
+  
+  
+  <div class="nav-item-next">
+    <a href="/2021/12/17/hexo博客搭建/" class="nav-link">
+      <div>
+        <div class="nav-label">下一篇</div>
+        
+        <div class="nav-title">搭建hexo博客 </div>
+        
+      </div>
+      <i class="iconfont icon-right nav-next-icon"></i>
+    </a>
+  </div>
+  
+</div>
+
+<div class="card card-content toc-card" id="mobiletoc">
+  <div class="toc-header"><i class="iconfont icon-menu" style="padding-right: 2px;"></i>目录</div>
+<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%EF%BC%9Aliunx%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4"><span class="toc-text">一：liunx常用命令</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E5%85%B3%E6%9C%BA%E5%91%BD%E4%BB%A4"><span class="toc-text">1.关机命令</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E9%87%8D%E5%90%AF%E5%91%BD%E4%BB%A4"><span class="toc-text">2.重启命令</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-%E6%9F%A5%E7%9C%8B%E6%96%87%E4%BB%B6%E5%A4%B9%E4%B8%8B%E7%9A%84%E6%96%87%E4%BB%B6"><span class="toc-text">3.查看文件夹下的文件</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-%E5%88%9B%E5%BB%BA%E6%96%87%E4%BB%B6%E5%A4%B9%E5%8F%8A%E5%88%A0%E9%99%A4%E6%96%87%E4%BB%B6%E5%A4%B9"><span class="toc-text">4.创建文件夹及删除文件夹</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#5-%E6%96%B0%E5%BB%BA%E6%96%87%E4%BB%B6"><span class="toc-text">5.新建文件</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#6-%E5%A4%8D%E5%88%B6"><span class="toc-text">6.复制</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#7-%E5%89%AA%E5%88%87%E7%A7%BB%E5%8A%A8%E9%87%8D%E5%91%BD%E5%90%8D"><span class="toc-text">7.剪切移动重命名</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#8-%E6%9F%A5%E7%9C%8B"><span class="toc-text">8.查看</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#9-%E8%BE%85%E5%8A%A9%E5%91%BD%E4%BB%A4"><span class="toc-text">9.辅助命令</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#10-%E6%89%93%E5%8C%85%E4%B8%8E%E8%A7%A3%E5%8C%85"><span class="toc-text">10.打包与解包</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#11-%E5%8E%8B%E7%BC%A9%E5%91%BD%E4%BB%A4"><span class="toc-text">11.压缩命令</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#12-%E9%98%B2%E7%81%AB%E5%A2%99%E5%91%BD%E4%BB%A4"><span class="toc-text">12.防火墙命令</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#14-%E7%BD%91%E7%BB%9C%E7%B1%BB%E5%91%BD%E4%BB%A4"><span class="toc-text">14.网络类命令</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#15-%E6%9C%8D%E5%8A%A1%E7%B1%BB%E5%91%BD%E4%BB%A4"><span class="toc-text">15.服务类命令</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#16%E7%89%B9%E6%AE%8A%E6%93%8D%E4%BD%9C"><span class="toc-text">16特殊操作</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#vim%E7%BC%96%E8%BE%91%E5%99%A8%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="toc-text">vim编辑器的使用</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-vim%E5%B7%A5%E4%BD%9C%E6%A8%A1%E5%BC%8F"><span class="toc-text">1.vim工作模式</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8F"><span class="toc-text">2.命令模式</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-%E8%BE%93%E5%85%A5%E6%A8%A1%E5%BC%8F"><span class="toc-text">3.输入模式</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#liunx%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84"><span class="toc-text">liunx文件系统目录结构</span></a></li></ol>
+</div></main>
+          <aside class="left-column">
+            
+            <div class="card card-author">
+              
+<img src="/img/author.jpg" class="author-img">
+
+<p class="author-name">YiHua</p>
+<p class="author-description">谨言  深思  笃行</p>
+<div class="author-message">
+  <a class="author-posts-count" href="/archives">
+    <span>13</span>
+    <span>文章</span>
+  </a>
+  <a class="author-categories-count" href="/categories">
+    <span>5</span>
+    <span>分类</span>
+  </a>
+  <a class="author-tags-count" href="/tags">
+    <span>5</span>
+    <span>标签</span>
+  </a>
+</div>
+
+            </div>
+            
+            <div class="sticky-tablet">
+  
+  
+  <article class="display-when-two-columns spacer">
+    <div class="card card-content toc-card">
+      <div class="toc-header"><i class="iconfont icon-menu" style="padding-right: 2px;"></i>目录</div>
+<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%EF%BC%9Aliunx%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4"><span class="toc-text">一：liunx常用命令</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E5%85%B3%E6%9C%BA%E5%91%BD%E4%BB%A4"><span class="toc-text">1.关机命令</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E9%87%8D%E5%90%AF%E5%91%BD%E4%BB%A4"><span class="toc-text">2.重启命令</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-%E6%9F%A5%E7%9C%8B%E6%96%87%E4%BB%B6%E5%A4%B9%E4%B8%8B%E7%9A%84%E6%96%87%E4%BB%B6"><span class="toc-text">3.查看文件夹下的文件</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-%E5%88%9B%E5%BB%BA%E6%96%87%E4%BB%B6%E5%A4%B9%E5%8F%8A%E5%88%A0%E9%99%A4%E6%96%87%E4%BB%B6%E5%A4%B9"><span class="toc-text">4.创建文件夹及删除文件夹</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#5-%E6%96%B0%E5%BB%BA%E6%96%87%E4%BB%B6"><span class="toc-text">5.新建文件</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#6-%E5%A4%8D%E5%88%B6"><span class="toc-text">6.复制</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#7-%E5%89%AA%E5%88%87%E7%A7%BB%E5%8A%A8%E9%87%8D%E5%91%BD%E5%90%8D"><span class="toc-text">7.剪切移动重命名</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#8-%E6%9F%A5%E7%9C%8B"><span class="toc-text">8.查看</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#9-%E8%BE%85%E5%8A%A9%E5%91%BD%E4%BB%A4"><span class="toc-text">9.辅助命令</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#10-%E6%89%93%E5%8C%85%E4%B8%8E%E8%A7%A3%E5%8C%85"><span class="toc-text">10.打包与解包</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#11-%E5%8E%8B%E7%BC%A9%E5%91%BD%E4%BB%A4"><span class="toc-text">11.压缩命令</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#12-%E9%98%B2%E7%81%AB%E5%A2%99%E5%91%BD%E4%BB%A4"><span class="toc-text">12.防火墙命令</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#14-%E7%BD%91%E7%BB%9C%E7%B1%BB%E5%91%BD%E4%BB%A4"><span class="toc-text">14.网络类命令</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#15-%E6%9C%8D%E5%8A%A1%E7%B1%BB%E5%91%BD%E4%BB%A4"><span class="toc-text">15.服务类命令</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#16%E7%89%B9%E6%AE%8A%E6%93%8D%E4%BD%9C"><span class="toc-text">16特殊操作</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#vim%E7%BC%96%E8%BE%91%E5%99%A8%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="toc-text">vim编辑器的使用</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-vim%E5%B7%A5%E4%BD%9C%E6%A8%A1%E5%BC%8F"><span class="toc-text">1.vim工作模式</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8F"><span class="toc-text">2.命令模式</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-%E8%BE%93%E5%85%A5%E6%A8%A1%E5%BC%8F"><span class="toc-text">3.输入模式</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#liunx%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84"><span class="toc-text">liunx文件系统目录结构</span></a></li></ol>
+    </div>
+  </article>
+  
+  
+  <article class="card card-content categories-widget">
+    <div class="categories-card">
+  <div class="categories-header"><i class="iconfont icon-fenlei" style="padding-right: 2px;"></i>分类</div>
+  <div class="categories-list">
+    
+      <a href="/categories/CentoS-7基础/">
+        <div class="categories-list-item">
+          CentoS-7基础
+          <span class="categories-list-item-badge">4</span>
+        </div>
+      </a>
+    
+      <a href="/categories/计算机网络/">
+        <div class="categories-list-item">
+          计算机网络
+          <span class="categories-list-item-badge">4</span>
+        </div>
+      </a>
+    
+      <a href="/categories/Mysql数据库/">
+        <div class="categories-list-item">
+          Mysql数据库
+          <span class="categories-list-item-badge">1</span>
+        </div>
+      </a>
+    
+      <a href="/categories/php代码基础/">
+        <div class="categories-list-item">
+          php代码基础
+          <span class="categories-list-item-badge">3</span>
+        </div>
+      </a>
+    
+      <a href="/categories/windows-2008-R2/">
+        <div class="categories-list-item">
+          windows-2008-R2
+          <span class="categories-list-item-badge">1</span>
+        </div>
+      </a>
+    
+  </div>
+</div>
+  </article>
+  
+  <article class="card card-content tags-widget">
+    <div class="tags-card">
+  <div class="tags-header"><i class="iconfont icon-biaoqian" style="padding-right: 2px;"></i>热门标签</div>
+  <div class="tags-list">
+    
+    <a href="/tags/Linux/" title="Linux"><div class="tags-list-item">Linux</div></a>
+    
+    <a href="/tags/计算机网络/" title="计算机网络"><div class="tags-list-item">计算机网络</div></a>
+    
+    <a href="/tags/Mysql数据库/" title="Mysql数据库"><div class="tags-list-item">Mysql数据库</div></a>
+    
+    <a href="/tags/php代码基础/" title="php代码基础"><div class="tags-list-item">php代码基础</div></a>
+    
+    <a href="/tags/windows/" title="windows"><div class="tags-list-item">windows</div></a>
+    
+  </div>
+</div>
+  </article>
+  
+  
+</div>
+          </aside>
+          <aside class="right-column">
+            <div class="sticky-widescreen">
+  
+  
+  <article class="card card-content toc-card">
+    <div class="toc-header"><i class="iconfont icon-menu" style="padding-right: 2px;"></i>目录</div>
+<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%EF%BC%9Aliunx%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4"><span class="toc-text">一：liunx常用命令</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E5%85%B3%E6%9C%BA%E5%91%BD%E4%BB%A4"><span class="toc-text">1.关机命令</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E9%87%8D%E5%90%AF%E5%91%BD%E4%BB%A4"><span class="toc-text">2.重启命令</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-%E6%9F%A5%E7%9C%8B%E6%96%87%E4%BB%B6%E5%A4%B9%E4%B8%8B%E7%9A%84%E6%96%87%E4%BB%B6"><span class="toc-text">3.查看文件夹下的文件</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-%E5%88%9B%E5%BB%BA%E6%96%87%E4%BB%B6%E5%A4%B9%E5%8F%8A%E5%88%A0%E9%99%A4%E6%96%87%E4%BB%B6%E5%A4%B9"><span class="toc-text">4.创建文件夹及删除文件夹</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#5-%E6%96%B0%E5%BB%BA%E6%96%87%E4%BB%B6"><span class="toc-text">5.新建文件</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#6-%E5%A4%8D%E5%88%B6"><span class="toc-text">6.复制</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#7-%E5%89%AA%E5%88%87%E7%A7%BB%E5%8A%A8%E9%87%8D%E5%91%BD%E5%90%8D"><span class="toc-text">7.剪切移动重命名</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#8-%E6%9F%A5%E7%9C%8B"><span class="toc-text">8.查看</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#9-%E8%BE%85%E5%8A%A9%E5%91%BD%E4%BB%A4"><span class="toc-text">9.辅助命令</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#10-%E6%89%93%E5%8C%85%E4%B8%8E%E8%A7%A3%E5%8C%85"><span class="toc-text">10.打包与解包</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#11-%E5%8E%8B%E7%BC%A9%E5%91%BD%E4%BB%A4"><span class="toc-text">11.压缩命令</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#12-%E9%98%B2%E7%81%AB%E5%A2%99%E5%91%BD%E4%BB%A4"><span class="toc-text">12.防火墙命令</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#14-%E7%BD%91%E7%BB%9C%E7%B1%BB%E5%91%BD%E4%BB%A4"><span class="toc-text">14.网络类命令</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#15-%E6%9C%8D%E5%8A%A1%E7%B1%BB%E5%91%BD%E4%BB%A4"><span class="toc-text">15.服务类命令</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#16%E7%89%B9%E6%AE%8A%E6%93%8D%E4%BD%9C"><span class="toc-text">16特殊操作</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#vim%E7%BC%96%E8%BE%91%E5%99%A8%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="toc-text">vim编辑器的使用</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-vim%E5%B7%A5%E4%BD%9C%E6%A8%A1%E5%BC%8F"><span class="toc-text">1.vim工作模式</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8F"><span class="toc-text">2.命令模式</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-%E8%BE%93%E5%85%A5%E6%A8%A1%E5%BC%8F"><span class="toc-text">3.输入模式</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#liunx%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84"><span class="toc-text">liunx文件系统目录结构</span></a></li></ol>
+  </article>
+  
+  
+  <article class="card card-content">
+    <div class="recent-posts-card">
+  <div class="recent-posts-header"><i class="iconfont icon-wenzhang_huaban" style="padding-right: 2px;"></i>最近文章</div>
+  <div class="recent-posts-list">
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2022-01-08</div>
+        <a href="/2022/01/08/Mysql数据库/"><div class="recent-posts-item-content">Mysql数据库</div></a>
+      </div>
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2022-01-06</div>
+        <a href="/2022/01/06/php基础（三）/"><div class="recent-posts-item-content">php基础（三）</div></a>
+      </div>
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2022-01-05</div>
+        <a href="/2022/01/05/php基础（二）/"><div class="recent-posts-item-content">php基础（二）</div></a>
+      </div>
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2022-01-04</div>
+        <a href="/2022/01/04/php基础（一）/"><div class="recent-posts-item-content">php基础（一）</div></a>
+      </div>
+    
+  </div>
+</div>
+  </article>
+  
+  
+</div>
+          </aside>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <footer class="footer">
+  <div class="footer-container">
+    <div>
+      <div class="footer-dsc">
+        <span>Copyright ©
+          
+          2020 -
+          
+          2022
+        </span>
+        &nbsp;
+        <a href="/" class="footer-link">混口饭吃 </a>
+      </div>
+    </div>
+
+    
+    <div class="footer-dsc">
+      
+      Powered by
+      <a href="https://hexo.io/" class="footer-link" target="_blank" rel="nofollow noopener noreferrer">&nbsp;Hexo </a>
+      
+      
+      <span>&nbsp;|&nbsp;</span>
+      
+      
+      Theme -
+      <a href="https://github.com/theme-kaze" class="footer-link" target="_blank"
+        rel="nofollow noopener noreferrer">&nbsp;Kaze</a>
+      
+    </div>
+    
+    
+    
+    
+</footer>
+  <a role="button" id="scrollbutton" class="basebutton"  aria-label="回到顶部">
+  <i class="iconfont icon-arrowleft button-icon"></i>
+</a>
+<a role="button" id="menubutton" class="basebutton">
+  <i class="iconfont icon-menu button-icon"></i>
+</a>
+<a role="button" id="popbutton" class="basebutton" aria-label="控制中心">
+  <i class="iconfont icon-expand button-icon"></i>
+</a>
+<a role="button" id="darkbutton" class="basebutton darkwidget" aria-label="夜色模式">
+  <i class="iconfont icon-weather button-icon"></i>
+</a>
+<a role="button" id="searchbutton" class="basebutton searchwidget" aria-label="搜索">
+  <i class="iconfont icon-search button-icon"></i>
+</a>
+
+  
+  
+  
+  <script>
+  var addImgLayout = function () {
+    var img = document.querySelectorAll('.post-content img');
+    var i;
+    for (i = 0; i < img.length; i++) {
+      var wrapper = document.createElement('a');
+      wrapper.setAttribute('href', img[i].getAttribute('data-src'));
+      wrapper.setAttribute('aria-label', 'illustration');
+      wrapper.style.cssText = 'width: 100%; display: flex; justify-content: center;';
+      if (img[i].alt) wrapper.dataset.caption = img[i].alt;
+      wrapper.dataset.nolink = true;
+      img[i].before(wrapper);
+      wrapper.append(img[i]);
+      var divWrap = document.createElement('div');
+      divWrap.classList.add('gallery');
+      wrapper.before(divWrap);
+      divWrap.append(wrapper);
+    }
+    baguetteBox.run('.gallery');
+  }
+</script>
+<script>loadScript("/js/lib/lightbox/baguetteBox.min.js", addImgLayout)</script>
+  
+  
+  
+<script src="/js/main.js"></script>
+
+  
+  
+  <script>
+    var addLazyload = function () {
+      var observer = lozad('.lozad', {
+        load: function (el) {
+          el.srcset = el.getAttribute('data-src');
+        },
+        loaded: function (el) {
+          el.classList.add('loaded');
+        }
+      });
+      observer.observe();
+    }
+  </script>
+  <script>loadScript("/js/lib/lozad.min.js", addLazyload)</script>
+  
+  
+</body>
+
+</html>

@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html  lang="zh-CN" >
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="theme-color" content="#fff" id="theme-color">
+  <meta name="description" content="混口饭吃">
+  <link rel="icon" href="/img/logo.png">
+  <title>Mysql数据库</title>
+  
+  
+  <meta property="og:title" content="Mysql数据库">
+  
+  
+  <meta property="og:url" content="http://example.com/2022/01/08/Mysql%E6%95%B0%E6%8D%AE%E5%BA%93/index.html">
+  
+  
+  <meta property="og:img" content="/img/author.jpg">
+  
+  
+  
+  <meta property="og:type" content="article">
+  <meta property="og:article:published_time" content="2022-01-08">
+  <meta property="og:article:modified_time" content="2022-01-08">
+  <meta property="og:article:author" content="YiHua">
+  
+  
+  <meta property="og:article:tag" content="Mysql数据库">
+  
+  
+  
+  
+  <script>
+    // control reverse button
+    var reverseDarkList = {
+      dark: 'light',
+      light: 'dark'
+    };
+    var themeColor = {
+      dark: '#1c1c1e',
+      light: '#fff'
+    }
+    // get the data of css prefers-color-scheme
+    var getCssMediaQuery = function() {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    };
+    // reverse current darkmode setting function
+    var reverseDarkModeSetting = function() {
+      var setting = localStorage.getItem('user-color-scheme');
+      if(reverseDarkList[setting]) {
+        setting = reverseDarkList[setting];
+      } else if(setting === null) {
+        setting = reverseDarkList[getCssMediaQuery()];
+      } else {
+        return;
+      }
+      localStorage.setItem('user-color-scheme', setting);
+      return setting;
+    };
+    // apply current darkmode setting
+    var setDarkmode = function(mode) {
+      var setting = mode || localStorage.getItem('user-color-scheme');
+      if(setting === getCssMediaQuery()) {
+        document.documentElement.removeAttribute('data-user-color-scheme');
+        localStorage.removeItem('user-color-scheme');
+        document.getElementById('theme-color').content = themeColor[setting];
+      } else if(reverseDarkList[setting]) {
+        document.documentElement.setAttribute('data-user-color-scheme', setting);
+        document.getElementById('theme-color').content = themeColor[setting];
+      } else {
+        document.documentElement.removeAttribute('data-user-color-scheme');
+        localStorage.removeItem('user-color-scheme');
+        document.getElementById('theme-color').content = themeColor[getCssMediaQuery()];
+      }
+    };
+    setDarkmode();
+  </script>
+  <script>
+    function loadScript(url, cb) {
+      var script = document.createElement('script');
+      script.src = url;
+      if (cb) script.onload = cb;
+      script.async = true;
+      document.body.appendChild(script);
+    }
+  </script>
+  
+  <link rel="preload" href="//at.alicdn.com/t/font_1946621_i1kgafibvw.css" as="style" >
+  <link rel="preload" href="//at.alicdn.com/t/font_1952792_89b4ac4k4up.css" as="style" >
+  
+  <link rel="preload" href="/js/lib/lightbox/baguetteBox.min.js" as="script">
+  <link rel="preload" href="/js/lib/lightbox/baguetteBox.min.css" as="style" >
+  
+  
+  <link rel="preload" href="/js/lib/lozad.min.js" as="script">
+  
+  
+  
+  
+  
+  
+  
+  
+<link rel="stylesheet" href="/css/main.css">
+
+  
+  
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1946621_i1kgafibvw.css">
+
+  
+  
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1952792_89b4ac4k4up.css">
+
+  
+  
+<link rel="stylesheet" href="/js/lib/lightbox/baguetteBox.min.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <div class="wrapper">
+    
+    <nav class="navbar">
+  <div class="navbar-logo">
+    <span class="navbar-logo-main">
+      
+      <img class="navbar-logo-img" src="/img/logo.png" alt="logo">
+      
+      <span class="navbar-logo-dsc">混口饭吃</span>
+    </span>
+  </div>
+  <div class="navbar-menu">
+    
+    <a href="/" class="navbar-menu-item">
+    
+    首页
+    
+    </a>
+    
+    <a href="/archives" class="navbar-menu-item">
+    
+    归档
+    
+    </a>
+    
+    <a href="/tags" class="navbar-menu-item">
+    
+    标签
+    
+    </a>
+    
+    <a href="/categories" class="navbar-menu-item">
+    
+    分类
+    
+    </a>
+    
+    <a href="/about" class="navbar-menu-item">
+    
+    关于
+    
+    </a>
+    
+    <a href="/links" class="navbar-menu-item">
+    
+    友链
+    
+    </a>
+    
+    <a class="navbar-menu-item darknavbar" id="dark"><i class="iconfont icon-weather"></i></a>
+    <a class="navbar-menu-item searchnavbar" id="search"><i class="iconfont icon-search" style="font-size: 1.2rem; font-weight: 400;"></i></a>
+  </div>
+</nav>
+    
+    <div id="local-search" style="display: none;">
+      <input class="navbar-menu-item" id="search-input" placeholder="请输入搜索内容...">
+      <div id="search-content"></div>
+    </div>
+    
+    <div class="section-wrap">
+      <div class="container">
+        <div class="columns">
+          <main class="main-column">
+<article class="card card-content">
+  <header>
+    <h1 class="post-title">
+      Mysql数据库
+    </h1>
+  </header>
+  <div class="post-meta post-show-meta">
+    <time datetime="2022-01-08T07:29:04.958Z">
+      <i class="iconfont icon-calendar" style="margin-right: 2px;"></i>
+      <span>2022-01-08</span>
+    </time>
+    
+    <span class="dot"></span>
+    
+    <a href="/categories/Mysql数据库/" class="post-meta-link">Mysql数据库</a>
+    
+    
+    
+    <span class="dot"></span>
+    <span>411 字</span>
+    
+  </div>
+  
+  <div class="post-meta post-show-meta" style="margin-top: -10px;">
+    <div style="display: flex; align-items: center;">
+      <i class="iconfont icon-biaoqian" style="margin-right: 2px; font-size: 1.15rem;"></i>
+      
+      
+        <a href="/tags/Mysql数据库/" class="post-meta-link">Mysql数据库</a>
+      
+    </div>
+  </div>
+  
+  </header>
+  <div id="section" class="post-content">
+    <h3 id="一：Mysql数据库详解"><a href="#一：Mysql数据库详解" class="headerlink" title="一：Mysql数据库详解"></a>一：Mysql数据库详解</h3><h5 id="1-登录命令"><a href="#1-登录命令" class="headerlink" title="1.登录命令"></a>1.登录命令</h5><p>使用-h参数时连接方式为:TCP/IP</p>
+<p>如果没有 -h 参数，默认会使用 UNIX socket 方式</p>
+<pre class="highlight"><span class="line">mysql-hhost_name-u user_name–ppassword</span><br></pre>
+
+<h5 id="2-Mysql程序常用命令"><a href="#2-Mysql程序常用命令" class="headerlink" title="2.Mysql程序常用命令"></a>2.Mysql程序常用命令</h5><pre class="highlight"><span class="line">show databases 		<span class="comment">//显示所有数据库</span></span><br><span class="line"><span class="keyword">use</span> <span class="title">dbname</span>			//选择默认的数据库</span><br><span class="line"><span class="title">show</span> <span class="title">tables</span>    		//显示默认数据库中所有表</span><br><span class="line">\<span class="title">c</span>					//放弃正在输入的命令</span><br><span class="line">\<span class="title">h</span>					//显示命令清单</span><br><span class="line">\<span class="title">q</span>					//退出<span class="title">mysql</span>程序</span><br><span class="line">\<span class="title">s</span>					//查看<span class="title">mysql</span>服务器的状态    </span><br></pre>
+
+<h5 id="3-数据类型种类"><a href="#3-数据类型种类" class="headerlink" title="3.数据类型种类"></a>3.数据类型种类</h5><p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.11/1.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.11/1.png"></p>
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.11/2.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.11/2.png"></p>
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.11/3.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.11/3.png"></p>
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.11/4.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.11/4.png"></p>
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.11/5.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.11/5.png"></p>
+<h5 id="4-常用sql语句"><a href="#4-常用sql语句" class="headerlink" title="4.常用sql语句"></a>4.常用sql语句</h5><h6 id="1-创建数据库-删除数据库"><a href="#1-创建数据库-删除数据库" class="headerlink" title="1.创建数据库/删除数据库"></a>1.创建数据库/删除数据库</h6><pre class="highlight"><span class="line">create database name   			<span class="comment">//创建数据库</span></span><br><span class="line">drop database name 				<span class="comment">//删除数据库    </span></span><br></pre>
+
+<h6 id="2-建立-删除-查看表操作"><a href="#2-建立-删除-查看表操作" class="headerlink" title="2.建立/删除/查看表操作"></a>2.建立/删除/查看表操作</h6><pre class="highlight"><span class="line">create table liuyan(id <span class="keyword">int</span> auto_increment primary key,title varchar(<span class="number">255</span>),content text)</span><br><span class="line"><span class="comment">//创建数据表并指定字段</span></span><br><span class="line">auto_increment             <span class="comment">//自增</span></span><br><span class="line">primary key  				<span class="comment">//主键 默认不能为空</span></span><br><span class="line">drop table name				<span class="comment">//删除表</span></span><br></pre>
+
+<h6 id="3-更改表结构的操作"><a href="#3-更改表结构的操作" class="headerlink" title="3.更改表结构的操作"></a>3.更改表结构的操作</h6><pre class="highlight"><span class="line">alter table name rename <span class="keyword">as</span> name				<span class="comment">//修改liuyan为liuyanban</span></span><br><span class="line">alter table name add time time				<span class="comment">//(first/after 字段名)默认最后</span></span><br><span class="line">alter table name add primary key (time)		<span class="comment">//定义字段为主键</span></span><br><span class="line">alter table name modify time text				<span class="comment">//修改数据类型</span></span><br><span class="line">alter table name change time user varchar(<span class="number">255</span>)		<span class="comment">//修改字段名及数据类型</span></span><br><span class="line">alter table name drop time							<span class="comment">//删除字段</span></span><br></pre>
+
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.11/7.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.11/7.png"></p>
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.11/8.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.11/8.png"></p>
+<h6 id="4-插入数据操作"><a href="#4-插入数据操作" class="headerlink" title="4.插入数据操作"></a>4.插入数据操作</h6><pre class="highlight"><span class="line">insert into 表名(colname1,colname2) values(<span class="string">&#x27;value1&#x27;</span>,<span class="string">&#x27;value2&#x27;</span>) <span class="comment">//插入单行数据</span></span><br><span class="line">insert into 表名(title,content) values(<span class="string">&#x27;title test1&#x27;</span>,<span class="string">&#x27;content test1&#x27;</span>),(<span class="string">&#x27;title test1&#x27;</span>,<span class="string">&#x27;content test1&#x27;</span>)				<span class="comment">//插入多行数据</span></span><br></pre>
+
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.11/9.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.11/9.png"></p>
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.11/10.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.11/10.png"></p>
+<h6 id="5-更新数据"><a href="#5-更新数据" class="headerlink" title="5.更新数据"></a>5.更新数据</h6><pre class="highlight"><span class="line">update tbname set cloname=<span class="string">&#x27;value&#x27;</span> where id=<span class="number">1</span>;</span><br></pre>
+
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.11/11.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.11/11.png"></p>
+<h6 id="6-删除数据"><a href="#6-删除数据" class="headerlink" title="6.删除数据"></a>6.删除数据</h6><pre class="highlight"><span class="line">delete <span class="keyword">from</span> liuyan where id =<span class="number">1</span>;</span><br></pre>
+
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.11/12.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.11/12.png"></p>
+<h3 id="二：PHP操作Mysql"><a href="#二：PHP操作Mysql" class="headerlink" title="二：PHP操作Mysql"></a>二：PHP操作Mysql</h3><h5 id="1-PHP访问MySQL数据库的流程"><a href="#1-PHP访问MySQL数据库的流程" class="headerlink" title="1.PHP访问MySQL数据库的流程"></a>1.PHP访问MySQL数据库的流程</h5><p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.11/13.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.11/13.png"></p>
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.11/14.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.11/14.png"></p>
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.11/15.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.11/15.png"></p>
+<h5 id="2-数据库相关函数介绍"><a href="#2-数据库相关函数介绍" class="headerlink" title="2.数据库相关函数介绍"></a>2.数据库相关函数介绍</h5><p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.11/16.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.11/16.png"></p>
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.11/17.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.11/17.png"></p>
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.11/18.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.11/18.png"></p>
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.11/19.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.11/19.png"></p>
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.11/20.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.11/20.png"></p>
+<h3 id="三：PHP文件包含"><a href="#三：PHP文件包含" class="headerlink" title="三：PHP文件包含"></a>三：PHP文件包含</h3><h5 id="1-概念"><a href="#1-概念" class="headerlink" title="1.概念"></a>1.概念</h5><p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.11/21.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.11/21.png"></p>
+<h5 id="2-相关函数"><a href="#2-相关函数" class="headerlink" title="2.相关函数"></a>2.相关函数</h5><p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.11/22.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.11/22.png"></p>
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.11/23.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.11/23.png"></p>
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.11/24.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.11/24.png"></p>
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.11/25.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.11/25.png"></p>
+<p><img  srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.11/26.png" class="lozad post-image"src="https://md-tupian.oss-cn-beijing.aliyuncs.com/md.11/26.png"></p>
+
+  </div>
+  <div>
+  
+  <div class="post-note note-warning copyright" style="margin-top: 42px">
+    <p><span style="font-weight: bold;">作者：</span><a target="_blank" rel="nofollow noopener noreferrer" href="http://example.com/about">YiHua</a></p>
+    <p><span style="font-weight: bold;">文章链接：</span><a target="_blank" rel="nofollow noopener noreferrer" href="http://example.com/2022/01/08/Mysql%E6%95%B0%E6%8D%AE%E5%BA%93/">http://example.com/2022/01/08/Mysql%E6%95%B0%E6%8D%AE%E5%BA%93/</a></p>
+    <p><span style="font-weight: bold;">版权声明：</span>本博客所有文章除特别声明外，均采用<a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">CC BY-NC-SA 4.0 协议</a>。转载请注明出处！</p>
+  </div>
+  
+  </div>
+</article>
+<div class="nav">
+  
+  
+  <div class="nav-item-next">
+    <a href="/2022/01/06/php基础（三）/" class="nav-link">
+      <div>
+        <div class="nav-label">下一篇</div>
+        
+        <div class="nav-title">php基础（三） </div>
+        
+      </div>
+      <i class="iconfont icon-right nav-next-icon"></i>
+    </a>
+  </div>
+  
+</div>
+
+<div class="card card-content toc-card" id="mobiletoc">
+  <div class="toc-header"><i class="iconfont icon-menu" style="padding-right: 2px;"></i>目录</div>
+<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%EF%BC%9AMysql%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AF%A6%E8%A7%A3"><span class="toc-text">一：Mysql数据库详解</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E7%99%BB%E5%BD%95%E5%91%BD%E4%BB%A4"><span class="toc-text">1.登录命令</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-Mysql%E7%A8%8B%E5%BA%8F%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4"><span class="toc-text">2.Mysql程序常用命令</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E7%A7%8D%E7%B1%BB"><span class="toc-text">3.数据类型种类</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-%E5%B8%B8%E7%94%A8sql%E8%AF%AD%E5%8F%A5"><span class="toc-text">4.常用sql语句</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#1-%E5%88%9B%E5%BB%BA%E6%95%B0%E6%8D%AE%E5%BA%93-%E5%88%A0%E9%99%A4%E6%95%B0%E6%8D%AE%E5%BA%93"><span class="toc-text">1.创建数据库&#x2F;删除数据库</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#2-%E5%BB%BA%E7%AB%8B-%E5%88%A0%E9%99%A4-%E6%9F%A5%E7%9C%8B%E8%A1%A8%E6%93%8D%E4%BD%9C"><span class="toc-text">2.建立&#x2F;删除&#x2F;查看表操作</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#3-%E6%9B%B4%E6%94%B9%E8%A1%A8%E7%BB%93%E6%9E%84%E7%9A%84%E6%93%8D%E4%BD%9C"><span class="toc-text">3.更改表结构的操作</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#4-%E6%8F%92%E5%85%A5%E6%95%B0%E6%8D%AE%E6%93%8D%E4%BD%9C"><span class="toc-text">4.插入数据操作</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#5-%E6%9B%B4%E6%96%B0%E6%95%B0%E6%8D%AE"><span class="toc-text">5.更新数据</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#6-%E5%88%A0%E9%99%A4%E6%95%B0%E6%8D%AE"><span class="toc-text">6.删除数据</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8C%EF%BC%9APHP%E6%93%8D%E4%BD%9CMysql"><span class="toc-text">二：PHP操作Mysql</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-PHP%E8%AE%BF%E9%97%AEMySQL%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9A%84%E6%B5%81%E7%A8%8B"><span class="toc-text">1.PHP访问MySQL数据库的流程</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9B%B8%E5%85%B3%E5%87%BD%E6%95%B0%E4%BB%8B%E7%BB%8D"><span class="toc-text">2.数据库相关函数介绍</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%89%EF%BC%9APHP%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB"><span class="toc-text">三：PHP文件包含</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E6%A6%82%E5%BF%B5"><span class="toc-text">1.概念</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E7%9B%B8%E5%85%B3%E5%87%BD%E6%95%B0"><span class="toc-text">2.相关函数</span></a></li></ol></li></ol></li></ol>
+</div></main>
+          <aside class="left-column">
+            
+            <div class="card card-author">
+              
+<img src="/img/author.jpg" class="author-img">
+
+<p class="author-name">YiHua</p>
+<p class="author-description">谨言  深思  笃行</p>
+<div class="author-message">
+  <a class="author-posts-count" href="/archives">
+    <span>13</span>
+    <span>文章</span>
+  </a>
+  <a class="author-categories-count" href="/categories">
+    <span>5</span>
+    <span>分类</span>
+  </a>
+  <a class="author-tags-count" href="/tags">
+    <span>5</span>
+    <span>标签</span>
+  </a>
+</div>
+
+            </div>
+            
+            <div class="sticky-tablet">
+  
+  
+  <article class="display-when-two-columns spacer">
+    <div class="card card-content toc-card">
+      <div class="toc-header"><i class="iconfont icon-menu" style="padding-right: 2px;"></i>目录</div>
+<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%EF%BC%9AMysql%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AF%A6%E8%A7%A3"><span class="toc-text">一：Mysql数据库详解</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E7%99%BB%E5%BD%95%E5%91%BD%E4%BB%A4"><span class="toc-text">1.登录命令</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-Mysql%E7%A8%8B%E5%BA%8F%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4"><span class="toc-text">2.Mysql程序常用命令</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E7%A7%8D%E7%B1%BB"><span class="toc-text">3.数据类型种类</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-%E5%B8%B8%E7%94%A8sql%E8%AF%AD%E5%8F%A5"><span class="toc-text">4.常用sql语句</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#1-%E5%88%9B%E5%BB%BA%E6%95%B0%E6%8D%AE%E5%BA%93-%E5%88%A0%E9%99%A4%E6%95%B0%E6%8D%AE%E5%BA%93"><span class="toc-text">1.创建数据库&#x2F;删除数据库</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#2-%E5%BB%BA%E7%AB%8B-%E5%88%A0%E9%99%A4-%E6%9F%A5%E7%9C%8B%E8%A1%A8%E6%93%8D%E4%BD%9C"><span class="toc-text">2.建立&#x2F;删除&#x2F;查看表操作</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#3-%E6%9B%B4%E6%94%B9%E8%A1%A8%E7%BB%93%E6%9E%84%E7%9A%84%E6%93%8D%E4%BD%9C"><span class="toc-text">3.更改表结构的操作</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#4-%E6%8F%92%E5%85%A5%E6%95%B0%E6%8D%AE%E6%93%8D%E4%BD%9C"><span class="toc-text">4.插入数据操作</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#5-%E6%9B%B4%E6%96%B0%E6%95%B0%E6%8D%AE"><span class="toc-text">5.更新数据</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#6-%E5%88%A0%E9%99%A4%E6%95%B0%E6%8D%AE"><span class="toc-text">6.删除数据</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8C%EF%BC%9APHP%E6%93%8D%E4%BD%9CMysql"><span class="toc-text">二：PHP操作Mysql</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-PHP%E8%AE%BF%E9%97%AEMySQL%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9A%84%E6%B5%81%E7%A8%8B"><span class="toc-text">1.PHP访问MySQL数据库的流程</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9B%B8%E5%85%B3%E5%87%BD%E6%95%B0%E4%BB%8B%E7%BB%8D"><span class="toc-text">2.数据库相关函数介绍</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%89%EF%BC%9APHP%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB"><span class="toc-text">三：PHP文件包含</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E6%A6%82%E5%BF%B5"><span class="toc-text">1.概念</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E7%9B%B8%E5%85%B3%E5%87%BD%E6%95%B0"><span class="toc-text">2.相关函数</span></a></li></ol></li></ol></li></ol>
+    </div>
+  </article>
+  
+  
+  <article class="card card-content categories-widget">
+    <div class="categories-card">
+  <div class="categories-header"><i class="iconfont icon-fenlei" style="padding-right: 2px;"></i>分类</div>
+  <div class="categories-list">
+    
+      <a href="/categories/CentoS-7基础/">
+        <div class="categories-list-item">
+          CentoS-7基础
+          <span class="categories-list-item-badge">4</span>
+        </div>
+      </a>
+    
+      <a href="/categories/计算机网络/">
+        <div class="categories-list-item">
+          计算机网络
+          <span class="categories-list-item-badge">4</span>
+        </div>
+      </a>
+    
+      <a href="/categories/Mysql数据库/">
+        <div class="categories-list-item">
+          Mysql数据库
+          <span class="categories-list-item-badge">1</span>
+        </div>
+      </a>
+    
+      <a href="/categories/php代码基础/">
+        <div class="categories-list-item">
+          php代码基础
+          <span class="categories-list-item-badge">3</span>
+        </div>
+      </a>
+    
+      <a href="/categories/windows-2008-R2/">
+        <div class="categories-list-item">
+          windows-2008-R2
+          <span class="categories-list-item-badge">1</span>
+        </div>
+      </a>
+    
+  </div>
+</div>
+  </article>
+  
+  <article class="card card-content tags-widget">
+    <div class="tags-card">
+  <div class="tags-header"><i class="iconfont icon-biaoqian" style="padding-right: 2px;"></i>热门标签</div>
+  <div class="tags-list">
+    
+    <a href="/tags/Linux/" title="Linux"><div class="tags-list-item">Linux</div></a>
+    
+    <a href="/tags/计算机网络/" title="计算机网络"><div class="tags-list-item">计算机网络</div></a>
+    
+    <a href="/tags/Mysql数据库/" title="Mysql数据库"><div class="tags-list-item">Mysql数据库</div></a>
+    
+    <a href="/tags/php代码基础/" title="php代码基础"><div class="tags-list-item">php代码基础</div></a>
+    
+    <a href="/tags/windows/" title="windows"><div class="tags-list-item">windows</div></a>
+    
+  </div>
+</div>
+  </article>
+  
+  
+</div>
+          </aside>
+          <aside class="right-column">
+            <div class="sticky-widescreen">
+  
+  
+  <article class="card card-content toc-card">
+    <div class="toc-header"><i class="iconfont icon-menu" style="padding-right: 2px;"></i>目录</div>
+<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%EF%BC%9AMysql%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AF%A6%E8%A7%A3"><span class="toc-text">一：Mysql数据库详解</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E7%99%BB%E5%BD%95%E5%91%BD%E4%BB%A4"><span class="toc-text">1.登录命令</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-Mysql%E7%A8%8B%E5%BA%8F%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4"><span class="toc-text">2.Mysql程序常用命令</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E7%A7%8D%E7%B1%BB"><span class="toc-text">3.数据类型种类</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-%E5%B8%B8%E7%94%A8sql%E8%AF%AD%E5%8F%A5"><span class="toc-text">4.常用sql语句</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#1-%E5%88%9B%E5%BB%BA%E6%95%B0%E6%8D%AE%E5%BA%93-%E5%88%A0%E9%99%A4%E6%95%B0%E6%8D%AE%E5%BA%93"><span class="toc-text">1.创建数据库&#x2F;删除数据库</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#2-%E5%BB%BA%E7%AB%8B-%E5%88%A0%E9%99%A4-%E6%9F%A5%E7%9C%8B%E8%A1%A8%E6%93%8D%E4%BD%9C"><span class="toc-text">2.建立&#x2F;删除&#x2F;查看表操作</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#3-%E6%9B%B4%E6%94%B9%E8%A1%A8%E7%BB%93%E6%9E%84%E7%9A%84%E6%93%8D%E4%BD%9C"><span class="toc-text">3.更改表结构的操作</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#4-%E6%8F%92%E5%85%A5%E6%95%B0%E6%8D%AE%E6%93%8D%E4%BD%9C"><span class="toc-text">4.插入数据操作</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#5-%E6%9B%B4%E6%96%B0%E6%95%B0%E6%8D%AE"><span class="toc-text">5.更新数据</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#6-%E5%88%A0%E9%99%A4%E6%95%B0%E6%8D%AE"><span class="toc-text">6.删除数据</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8C%EF%BC%9APHP%E6%93%8D%E4%BD%9CMysql"><span class="toc-text">二：PHP操作Mysql</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-PHP%E8%AE%BF%E9%97%AEMySQL%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9A%84%E6%B5%81%E7%A8%8B"><span class="toc-text">1.PHP访问MySQL数据库的流程</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9B%B8%E5%85%B3%E5%87%BD%E6%95%B0%E4%BB%8B%E7%BB%8D"><span class="toc-text">2.数据库相关函数介绍</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%89%EF%BC%9APHP%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB"><span class="toc-text">三：PHP文件包含</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E6%A6%82%E5%BF%B5"><span class="toc-text">1.概念</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E7%9B%B8%E5%85%B3%E5%87%BD%E6%95%B0"><span class="toc-text">2.相关函数</span></a></li></ol></li></ol></li></ol>
+  </article>
+  
+  
+  <article class="card card-content">
+    <div class="recent-posts-card">
+  <div class="recent-posts-header"><i class="iconfont icon-wenzhang_huaban" style="padding-right: 2px;"></i>最近文章</div>
+  <div class="recent-posts-list">
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2022-01-08</div>
+        <a href="/2022/01/08/Mysql数据库/"><div class="recent-posts-item-content">Mysql数据库</div></a>
+      </div>
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2022-01-06</div>
+        <a href="/2022/01/06/php基础（三）/"><div class="recent-posts-item-content">php基础（三）</div></a>
+      </div>
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2022-01-05</div>
+        <a href="/2022/01/05/php基础（二）/"><div class="recent-posts-item-content">php基础（二）</div></a>
+      </div>
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2022-01-04</div>
+        <a href="/2022/01/04/php基础（一）/"><div class="recent-posts-item-content">php基础（一）</div></a>
+      </div>
+    
+  </div>
+</div>
+  </article>
+  
+  
+</div>
+          </aside>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <footer class="footer">
+  <div class="footer-container">
+    <div>
+      <div class="footer-dsc">
+        <span>Copyright ©
+          
+          2020 -
+          
+          2022
+        </span>
+        &nbsp;
+        <a href="/" class="footer-link">混口饭吃 </a>
+      </div>
+    </div>
+
+    
+    <div class="footer-dsc">
+      
+      Powered by
+      <a href="https://hexo.io/" class="footer-link" target="_blank" rel="nofollow noopener noreferrer">&nbsp;Hexo </a>
+      
+      
+      <span>&nbsp;|&nbsp;</span>
+      
+      
+      Theme -
+      <a href="https://github.com/theme-kaze" class="footer-link" target="_blank"
+        rel="nofollow noopener noreferrer">&nbsp;Kaze</a>
+      
+    </div>
+    
+    
+    
+    
+</footer>
+  <a role="button" id="scrollbutton" class="basebutton"  aria-label="回到顶部">
+  <i class="iconfont icon-arrowleft button-icon"></i>
+</a>
+<a role="button" id="menubutton" class="basebutton">
+  <i class="iconfont icon-menu button-icon"></i>
+</a>
+<a role="button" id="popbutton" class="basebutton" aria-label="控制中心">
+  <i class="iconfont icon-expand button-icon"></i>
+</a>
+<a role="button" id="darkbutton" class="basebutton darkwidget" aria-label="夜色模式">
+  <i class="iconfont icon-weather button-icon"></i>
+</a>
+<a role="button" id="searchbutton" class="basebutton searchwidget" aria-label="搜索">
+  <i class="iconfont icon-search button-icon"></i>
+</a>
+
+  
+  
+  
+  <script>
+  var addImgLayout = function () {
+    var img = document.querySelectorAll('.post-content img');
+    var i;
+    for (i = 0; i < img.length; i++) {
+      var wrapper = document.createElement('a');
+      wrapper.setAttribute('href', img[i].getAttribute('data-src'));
+      wrapper.setAttribute('aria-label', 'illustration');
+      wrapper.style.cssText = 'width: 100%; display: flex; justify-content: center;';
+      if (img[i].alt) wrapper.dataset.caption = img[i].alt;
+      wrapper.dataset.nolink = true;
+      img[i].before(wrapper);
+      wrapper.append(img[i]);
+      var divWrap = document.createElement('div');
+      divWrap.classList.add('gallery');
+      wrapper.before(divWrap);
+      divWrap.append(wrapper);
+    }
+    baguetteBox.run('.gallery');
+  }
+</script>
+<script>loadScript("/js/lib/lightbox/baguetteBox.min.js", addImgLayout)</script>
+  
+  
+  
+<script src="/js/main.js"></script>
+
+  
+  
+  <script>
+    var addLazyload = function () {
+      var observer = lozad('.lozad', {
+        load: function (el) {
+          el.srcset = el.getAttribute('data-src');
+        },
+        loaded: function (el) {
+          el.classList.add('loaded');
+        }
+      });
+      observer.observe();
+    }
+  </script>
+  <script>loadScript("/js/lib/lozad.min.js", addLazyload)</script>
+  
+  
+</body>
+
+</html>

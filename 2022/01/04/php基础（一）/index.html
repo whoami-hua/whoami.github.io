@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html  lang="zh-CN" >
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="theme-color" content="#fff" id="theme-color">
+  <meta name="description" content="混口饭吃">
+  <link rel="icon" href="/img/logo.png">
+  <title>php基础（一）</title>
+  
+  
+  <meta property="og:title" content="php基础（一）">
+  
+  
+  <meta property="og:url" content="http://example.com/2022/01/04/php%E5%9F%BA%E7%A1%80%EF%BC%88%E4%B8%80%EF%BC%89/index.html">
+  
+  
+  <meta property="og:img" content="/img/author.jpg">
+  
+  
+  
+  <meta property="og:type" content="article">
+  <meta property="og:article:published_time" content="2022-01-04">
+  <meta property="og:article:modified_time" content="2022-01-05">
+  <meta property="og:article:author" content="YiHua">
+  
+  
+  <meta property="og:article:tag" content="php代码基础">
+  
+  
+  
+  
+  <script>
+    // control reverse button
+    var reverseDarkList = {
+      dark: 'light',
+      light: 'dark'
+    };
+    var themeColor = {
+      dark: '#1c1c1e',
+      light: '#fff'
+    }
+    // get the data of css prefers-color-scheme
+    var getCssMediaQuery = function() {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    };
+    // reverse current darkmode setting function
+    var reverseDarkModeSetting = function() {
+      var setting = localStorage.getItem('user-color-scheme');
+      if(reverseDarkList[setting]) {
+        setting = reverseDarkList[setting];
+      } else if(setting === null) {
+        setting = reverseDarkList[getCssMediaQuery()];
+      } else {
+        return;
+      }
+      localStorage.setItem('user-color-scheme', setting);
+      return setting;
+    };
+    // apply current darkmode setting
+    var setDarkmode = function(mode) {
+      var setting = mode || localStorage.getItem('user-color-scheme');
+      if(setting === getCssMediaQuery()) {
+        document.documentElement.removeAttribute('data-user-color-scheme');
+        localStorage.removeItem('user-color-scheme');
+        document.getElementById('theme-color').content = themeColor[setting];
+      } else if(reverseDarkList[setting]) {
+        document.documentElement.setAttribute('data-user-color-scheme', setting);
+        document.getElementById('theme-color').content = themeColor[setting];
+      } else {
+        document.documentElement.removeAttribute('data-user-color-scheme');
+        localStorage.removeItem('user-color-scheme');
+        document.getElementById('theme-color').content = themeColor[getCssMediaQuery()];
+      }
+    };
+    setDarkmode();
+  </script>
+  <script>
+    function loadScript(url, cb) {
+      var script = document.createElement('script');
+      script.src = url;
+      if (cb) script.onload = cb;
+      script.async = true;
+      document.body.appendChild(script);
+    }
+  </script>
+  
+  <link rel="preload" href="//at.alicdn.com/t/font_1946621_i1kgafibvw.css" as="style" >
+  <link rel="preload" href="//at.alicdn.com/t/font_1952792_89b4ac4k4up.css" as="style" >
+  
+  <link rel="preload" href="/js/lib/lightbox/baguetteBox.min.js" as="script">
+  <link rel="preload" href="/js/lib/lightbox/baguetteBox.min.css" as="style" >
+  
+  
+  <link rel="preload" href="/js/lib/lozad.min.js" as="script">
+  
+  
+  
+  
+  
+  
+  
+  
+<link rel="stylesheet" href="/css/main.css">
+
+  
+  
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1946621_i1kgafibvw.css">
+
+  
+  
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1952792_89b4ac4k4up.css">
+
+  
+  
+<link rel="stylesheet" href="/js/lib/lightbox/baguetteBox.min.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <div class="wrapper">
+    
+    <nav class="navbar">
+  <div class="navbar-logo">
+    <span class="navbar-logo-main">
+      
+      <img class="navbar-logo-img" src="/img/logo.png" alt="logo">
+      
+      <span class="navbar-logo-dsc">混口饭吃</span>
+    </span>
+  </div>
+  <div class="navbar-menu">
+    
+    <a href="/" class="navbar-menu-item">
+    
+    首页
+    
+    </a>
+    
+    <a href="/archives" class="navbar-menu-item">
+    
+    归档
+    
+    </a>
+    
+    <a href="/tags" class="navbar-menu-item">
+    
+    标签
+    
+    </a>
+    
+    <a href="/categories" class="navbar-menu-item">
+    
+    分类
+    
+    </a>
+    
+    <a href="/about" class="navbar-menu-item">
+    
+    关于
+    
+    </a>
+    
+    <a href="/links" class="navbar-menu-item">
+    
+    友链
+    
+    </a>
+    
+    <a class="navbar-menu-item darknavbar" id="dark"><i class="iconfont icon-weather"></i></a>
+    <a class="navbar-menu-item searchnavbar" id="search"><i class="iconfont icon-search" style="font-size: 1.2rem; font-weight: 400;"></i></a>
+  </div>
+</nav>
+    
+    <div id="local-search" style="display: none;">
+      <input class="navbar-menu-item" id="search-input" placeholder="请输入搜索内容...">
+      <div id="search-content"></div>
+    </div>
+    
+    <div class="section-wrap">
+      <div class="container">
+        <div class="columns">
+          <main class="main-column">
+<article class="card card-content">
+  <header>
+    <h1 class="post-title">
+      php基础（一）
+    </h1>
+  </header>
+  <div class="post-meta post-show-meta">
+    <time datetime="2022-01-04T12:26:48.884Z">
+      <i class="iconfont icon-calendar" style="margin-right: 2px;"></i>
+      <span>2022-01-04</span>
+    </time>
+    
+    <span class="dot"></span>
+    
+    <a href="/categories/php代码基础/" class="post-meta-link">php代码基础</a>
+    
+    
+    
+    <span class="dot"></span>
+    <span>1.4k 字</span>
+    
+  </div>
+  
+  <div class="post-meta post-show-meta" style="margin-top: -10px;">
+    <div style="display: flex; align-items: center;">
+      <i class="iconfont icon-biaoqian" style="margin-right: 2px; font-size: 1.15rem;"></i>
+      
+      
+        <a href="/tags/php代码基础/" class="post-meta-link">php代码基础</a>
+      
+    </div>
+  </div>
+  
+  </header>
+  <div id="section" class="post-content">
+    <h3 id="一：常见标记"><a href="#一：常见标记" class="headerlink" title="一：常见标记"></a>一：常见标记</h3><h5 id="1-标准标记"><a href="#1-标准标记" class="headerlink" title="1.标准标记"></a>1.标准标记</h5><p>PHP 脚本以 <strong><?php** 开始，以 **?></strong> 结束：</p>
+<pre class="highlight"><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">    <span class="keyword">echo</span> <span class="string">&#x27;Hello World&#x27;</span>;</span><br><span class="line"><span class="meta">?&gt;</span>     						<span class="comment">//标准的，所有的服务器都可用</span></span><br></pre>
+
+<h5 id="2-短标签类型"><a href="#2-短标签类型" class="headerlink" title="2.短标签类型"></a>2.短标签类型</h5><pre class="highlight"><span class="line"><span class="meta">&lt;?</span></span><br><span class="line">    <span class="keyword">echo</span> <span class="string">&#x27;Hello World&#x27;</span>;</span><br><span class="line"><span class="meta">?&gt;</span>    						<span class="comment">//短标签类型，需要配置php.ini配置文件</span></span><br></pre>
+
+<h5 id="3-短标签类型"><a href="#3-短标签类型" class="headerlink" title="3.短标签类型"></a>3.短标签类型</h5><pre class="highlight"><span class="line">&lt;%</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">&#x27;Hello World&#x27;</span>;</span><br><span class="line">%&gt;							<span class="comment">//短标签类型，需要配置php.ini配置文件，属于是asp的编写方式    </span></span><br></pre>
+
+<h5 id="4-特殊类的标记"><a href="#4-特殊类的标记" class="headerlink" title="4.特殊类的标记"></a>4.特殊类的标记</h5><pre class="highlight"><span class="line"><span class="meta">&lt;?=</span> <span class="number">123</span>;</span><br><span class="line">  	<span class="keyword">echo</span> <span class="string">&#x27;Hello World&#x27;</span>;</span><br><span class="line"><span class="meta">?&gt;</span>        					<span class="comment">//特殊类的标签，大部分网站都可以，可以尝试用来绕waf</span></span><br></pre>
+
+<h5 id="5-特殊类标记"><a href="#5-特殊类标记" class="headerlink" title="5.特殊类标记"></a>5.特殊类标记</h5><pre class="highlight"><span class="line">&lt;script language=<span class="string">&quot;php&quot;</span>&gt;</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">&#x27;Hello World&#x27;</span>;</span><br><span class="line">&lt;/script&gt;				<span class="comment">//特殊类标签，类似于html标签，可用网站比较少    </span></span><br></pre>
+
+<h5 id="6-EOF"><a href="#6-EOF" class="headerlink" title="6.EOF"></a>6.EOF</h5><p>PHP EOF(heredoc)是一种在命令行shell（如sh、csh、ksh、bash、PowerShell和zsh）和程序语言（像Perl、PHP、Python和Ruby）里定义一个字符串的方法。</p>
+<p>使用概述：</p>
+<ul>
+<li><ol>
+<li>必须后接分号，否则编译通不过。</li>
+</ol>
+</li>
+<li><ol start="2">
+<li><strong>EOF</strong> 可以用任意其它字符代替，只需保证结束标识与开始标识一致。</li>
+</ol>
+</li>
+<li><ol start="3">
+<li>结束标识必须顶格独自占一行(即必须从行首开始，前后不能衔接任何空白和字符)。**</li>
+</ol>
+</li>
+<li><ol start="4">
+<li>开始标识可以不带引号或带单双引号，不带引号与带双引号效果一致，解释内嵌的变量和转义符号，带单引号则不解释内嵌的变量和转义符号。</li>
+</ol>
+</li>
+<li><ol start="5">
+<li>当内容需要内嵌引号（单引号或双引号）时，不需要加转义符，本身对单双引号转义，此处相当与q和qq的用法。</li>
+</ol>
+</li>
+</ul>
+<pre class="highlight"><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">echo</span> <span class="string">&lt;&lt;&lt;EOF</span></span><br><span class="line"><span class="string">        &lt;h1&gt;我的第一个标题&lt;/h1&gt;</span></span><br><span class="line"><span class="string">        &lt;p&gt;我的第一个段落。&lt;/p&gt;</span></span><br><span class="line"><span class="string">EOF</span>;</span><br><span class="line"><span class="comment">// 结束需要独立一行且前后不能空格</span></span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre>
+
+
+
+<h4 id="二-变量及变量的数据类型"><a href="#二-变量及变量的数据类型" class="headerlink" title="二.变量及变量的数据类型"></a>二.变量及变量的数据类型</h4><h5 id="1-变量的概念"><a href="#1-变量的概念" class="headerlink" title="1.变量的概念"></a>1.变量的概念</h5><p>变量可以是很短的名称（如 x 和 y）或者更具描述性的名称（如 age、carname、totalvolume）。</p>
+<p>PHP 变量规则：</p>
+<ul>
+<li>变量以 $ 符号开始，后面跟着变量的名称</li>
+<li>变量名必须以字母或者下划线字符开始</li>
+<li>变量名只能包含字母、数字以及下划线（A-z、0-9 和 _ ）</li>
+<li>变量名不能包含空格</li>
+<li>变量名是区分大小写的（$y 和 $Y 是两个不同的变量）</li>
+</ul>
+<h5 id="2-变量分类"><a href="#2-变量分类" class="headerlink" title="2.变量分类"></a>2.变量分类</h5><pre class="highlight"><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$b</span> = <span class="number">1</span>;							<span class="comment">//整型  是一个没有小数的数字</span></span><br><span class="line"><span class="variable">$b</span> = <span class="number">2.2</span>;						<span class="comment">//浮点型 浮点数是带小数部分的数字，或是指数形式</span></span><br><span class="line"><span class="variable">$b</span> = <span class="string">&#x27;Hello World&#x27;</span>;				<span class="comment">//字符串  类似 &quot;Hello World&quot; 这样一条文本被称为字符串</span></span><br><span class="line"><span class="variable">$b</span> = <span class="literal">true</span>||<span class="literal">false</span> ;      		<span class="comment">//布尔型</span></span><br><span class="line"><span class="variable">$b</span> = crray(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>);  		<span class="comment">//数值数组</span></span><br><span class="line"><span class="variable">$b</span> = <span class="keyword">array</span>(<span class="string">&quot;Peter&quot;</span>=&gt;<span class="string">&quot;35&quot;</span>,<span class="string">&quot;Ben&quot;</span>=&gt;<span class="string">&quot;37&quot;</span>,<span class="string">&quot;Joe&quot;</span>=&gt;<span class="string">&quot;43&quot;</span>);		<span class="comment">//关联数组</span></span><br><span class="line"><span class="variable">$b</span> = <span class="literal">null</span> ; 					<span class="comment">//空  表示没有值</span></span><br><span class="line"><span class="variable">$b</span> = <span class="keyword">new</span> <span class="keyword">Object</span>()				<span class="comment">//对象</span></span><br><span class="line">    							<span class="comment">//资源类型  网络连接 数据库连接 打开文件...</span></span><br><span class="line"><span class="meta">?&gt;</span>    </span><br></pre>
+
+<h4 id="三-常量"><a href="#三-常量" class="headerlink" title="三:常量"></a>三:常量</h4><h5 id="1-常量概念"><a href="#1-常量概念" class="headerlink" title="1.常量概念"></a>1.常量概念</h5><p>常量是一个简单值的标识符。该值在脚本中不能改变。</p>
+<p>一个常量由英文字母、下划线、和数字组成,但数字不能作为首字母出现。 (常量名不需要加 $ 修饰符)。</p>
+<p><strong>注意：</strong> 常量在整个脚本中都可以使用</p>
+<h5 id="2-使用语法"><a href="#2-使用语法" class="headerlink" title="2.使用语法"></a>2.使用语法</h5><p>该函数有三个参数:</p>
+<ul>
+<li><strong>name：</strong>必选参数，常量名称，即标志符。</li>
+<li><strong>value：</strong>必选参数，常量的值。</li>
+<li><strong>case_insensitive</strong> ：可选参数，如果设置为 TRUE，该常量则大小写不敏感。默认是大小写敏感的</li>
+</ul>
+<pre class="highlight"><span class="line">bool define ( string $name , mixed $value [, bool $case_insensitive = false ] )</span><br></pre>
+
+<p>区分大小写的常量</p>
+<pre class="highlight"><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="comment">// 区分大小写的常量名</span></span><br><span class="line">define(<span class="string">&quot;GREETING&quot;</span>, <span class="string">&quot;欢迎访问 Runoob.com&quot;</span>);</span><br><span class="line"><span class="keyword">echo</span> GREETING;    <span class="comment">// 输出 &quot;欢迎访问 Runoob.com&quot;</span></span><br><span class="line"><span class="keyword">echo</span> <span class="string">&#x27;&lt;br&gt;&#x27;</span>;</span><br><span class="line"><span class="keyword">echo</span> greeting;   <span class="comment">// 输出 &quot;greeting&quot;，但是有警告信息，表示该常量未定义</span></span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre>
+
+<p>不区分大小写的常量</p>
+<pre class="highlight"><span class="line">&lt;?php</span><br><span class="line">// 不区分大小写的常量名</span><br><span class="line">define(&quot;GREETING&quot;, &quot;欢迎访问 Runoob.com&quot;, true);</span><br><span class="line">echo greeting;  // 输出 &quot;欢迎访问 Runoob.com&quot;</span><br><span class="line">?&gt;</span><br></pre>
+
+<h4 id="四：输出函数"><a href="#四：输出函数" class="headerlink" title="四：输出函数"></a>四：输出函数</h4><h5 id="1-常见的输出函数语句"><a href="#1-常见的输出函数语句" class="headerlink" title="1.常见的输出函数语句"></a>1.常见的输出函数语句</h5><pre class="highlight"><span class="line"><span class="keyword">echo</span> 			<span class="comment">//输出</span></span><br><span class="line"><span class="keyword">print</span>			<span class="comment">//输出</span></span><br><span class="line">var_dump		<span class="comment">//输出</span></span><br><span class="line"><span class="keyword">die</span>				<span class="comment">//结束语句并输出    </span></span><br></pre>
+
+<h4 id="五：判断循环语句"><a href="#五：判断循环语句" class="headerlink" title="五：判断循环语句"></a>五：判断循环语句</h4><h5 id="1-if…Else-语句"><a href="#1-if…Else-语句" class="headerlink" title="1.if…Else 语句"></a>1.if…Else 语句</h5><pre class="highlight"><span class="line"><span class="keyword">if</span> (条件)&#123;</span><br><span class="line">    条件成立时执行的代码;</span><br><span class="line">&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">	条件不成立时执行的代码;</span><br><span class="line">&#125;</span><br></pre>
+
+<p>实例</p>
+<pre class="highlight"><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$t</span>=date(<span class="string">&quot;H&quot;</span>);</span><br><span class="line"><span class="keyword">if</span> (<span class="variable">$t</span>&lt;<span class="string">&quot;20&quot;</span>)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">&quot;Have a good day!&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">&quot;Have a good night!&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre>
+
+<h5 id="2-Switch-语句"><a href="#2-Switch-语句" class="headerlink" title="2.Switch 语句"></a>2.Switch 语句</h5><pre class="highlight"><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">switch</span> (n)</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">case</span> label1:</span><br><span class="line">    如果 n=label1，此处代码将执行;</span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line"><span class="keyword">case</span> label2:</span><br><span class="line">    如果 n=label2，此处代码将执行;</span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line"><span class="keyword">default</span>:</span><br><span class="line">    如果 n 既不等于 label1 也不等于 label2，此处代码将执行;</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre>
+
+<p>实例</p>
+<pre class="highlight"><span class="line">&lt;?php</span><br><span class="line">$favcolor=&quot;red&quot;;</span><br><span class="line">switch ($favcolor)</span><br><span class="line">&#123;</span><br><span class="line">case &quot;red&quot;:</span><br><span class="line">    echo &quot;你喜欢的颜色是红色!&quot;;</span><br><span class="line">    break;</span><br><span class="line">case &quot;blue&quot;:</span><br><span class="line">    echo &quot;你喜欢的颜色是蓝色!&quot;;</span><br><span class="line">    break;</span><br><span class="line">case &quot;green&quot;:</span><br><span class="line">    echo &quot;你喜欢的颜色是绿色!&quot;;</span><br><span class="line">    break;</span><br><span class="line">default:</span><br><span class="line">    echo &quot;你喜欢的颜色不是 红, 蓝, 或绿色!&quot;;</span><br><span class="line">&#125;</span><br><span class="line">?&gt;</span><br></pre>
+
+<h5 id="3-while-循环"><a href="#3-while-循环" class="headerlink" title="3.while 循环"></a>3.while 循环</h5><pre class="highlight"><span class="line"><span class="keyword">while</span> (条件)</span><br><span class="line">&#123;</span><br><span class="line">    要执行的代码;</span><br><span class="line">&#125;</span><br></pre>
+
+<p>实例</p>
+<pre class="highlight"><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$i</span>=<span class="number">1</span>;</span><br><span class="line"><span class="keyword">while</span>(<span class="variable">$i</span>&lt;=<span class="number">5</span>)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">&quot;<span class="subst">$i</span> . &quot;</span>&lt;br&gt;<span class="string">&quot;;	   //输出变量<span class="subst">$i</span>的值</span></span><br><span class="line"><span class="string">    <span class="subst">$i</span>++;					//<span class="subst">$i</span> = <span class="subst">$i</span> +1</span></span><br><span class="line"><span class="string">&#125;</span></span><br><span class="line"><span class="string">?&gt;</span></span><br></pre>
+
+<h5 id="4-for-循环"><a href="#4-for-循环" class="headerlink" title="4.for 循环"></a>4.for 循环</h5><pre class="highlight"><span class="line"><span class="keyword">for</span> (初始值; 条件; 增量)</span><br><span class="line">&#123;</span><br><span class="line">    要执行的代码;</span><br><span class="line">&#125;</span><br></pre>
+
+<p>冒泡排序实例</p>
+<pre class="highlight"><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$sum</span> = <span class="keyword">array</span>(<span class="number">8</span>,<span class="number">12</span>,<span class="number">6</span>,<span class="number">20</span>,<span class="number">90</span>); 		<span class="comment">//创建数组</span></span><br><span class="line"><span class="variable">$a</span> = count(<span class="variable">$sum</span>);                   <span class="comment">//数组的长度</span></span><br><span class="line"><span class="keyword">for</span>(<span class="variable">$i</span> = <span class="number">0</span>; <span class="variable">$i</span>&lt;<span class="variable">$a</span>-<span class="number">1</span>;<span class="variable">$i</span>++)&#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="variable">$c</span> = <span class="number">0</span>; <span class="variable">$c</span>&lt;<span class="variable">$a</span>-<span class="variable">$i</span>-<span class="number">1</span>; <span class="variable">$c</span>++)&#123;</span><br><span class="line">        <span class="keyword">if</span>(<span class="variable">$sum</span>[<span class="variable">$c</span>]&gt;<span class="variable">$sum</span>[<span class="variable">$c</span>+<span class="number">1</span>])&#123;</span><br><span class="line">            <span class="variable">$l</span> = <span class="variable">$sum</span>[<span class="variable">$c</span>];</span><br><span class="line">            <span class="variable">$sum</span>[<span class="variable">$c</span>] = <span class="variable">$sum</span>[<span class="variable">$c</span>+<span class="number">1</span>];</span><br><span class="line">            <span class="variable">$sum</span>[<span class="variable">$c</span>+<span class="number">1</span> = <span class="variable">$l</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">print_r(<span class="variable">$sum</span>) ;     </span><br><span class="line"><span class="meta">?&gt;</span>                 </span><br></pre>
+
+
+  </div>
+  <div>
+  
+  <div class="post-note note-warning copyright" style="margin-top: 42px">
+    <p><span style="font-weight: bold;">作者：</span><a target="_blank" rel="nofollow noopener noreferrer" href="http://example.com/about">YiHua</a></p>
+    <p><span style="font-weight: bold;">文章链接：</span><a target="_blank" rel="nofollow noopener noreferrer" href="http://example.com/2022/01/04/php%E5%9F%BA%E7%A1%80%EF%BC%88%E4%B8%80%EF%BC%89/">http://example.com/2022/01/04/php%E5%9F%BA%E7%A1%80%EF%BC%88%E4%B8%80%EF%BC%89/</a></p>
+    <p><span style="font-weight: bold;">版权声明：</span>本博客所有文章除特别声明外，均采用<a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">CC BY-NC-SA 4.0 协议</a>。转载请注明出处！</p>
+  </div>
+  
+  </div>
+</article>
+<div class="nav">
+  
+  <div class="nav-item-prev">
+    <a href="/2022/01/05/php基础（二）/" class="nav-link">
+      <i class="iconfont icon-left nav-prev-icon"></i>
+      <div>
+        <div class="nav-label">上一篇</div>
+        
+        <div class="nav-title">php基础（二） </div>
+        
+      </div>
+    </a>
+  </div>
+  
+  
+  <div class="nav-item-next">
+    <a href="/2021/12/25/交换机路由应用/" class="nav-link">
+      <div>
+        <div class="nav-label">下一篇</div>
+        
+        <div class="nav-title">交换机/路由应用 </div>
+        
+      </div>
+      <i class="iconfont icon-right nav-next-icon"></i>
+    </a>
+  </div>
+  
+</div>
+
+<div class="card card-content toc-card" id="mobiletoc">
+  <div class="toc-header"><i class="iconfont icon-menu" style="padding-right: 2px;"></i>目录</div>
+<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%EF%BC%9A%E5%B8%B8%E8%A7%81%E6%A0%87%E8%AE%B0"><span class="toc-text">一：常见标记</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E6%A0%87%E5%87%86%E6%A0%87%E8%AE%B0"><span class="toc-text">1.标准标记</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E7%9F%AD%E6%A0%87%E7%AD%BE%E7%B1%BB%E5%9E%8B"><span class="toc-text">2.短标签类型</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-%E7%9F%AD%E6%A0%87%E7%AD%BE%E7%B1%BB%E5%9E%8B"><span class="toc-text">3.短标签类型</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-%E7%89%B9%E6%AE%8A%E7%B1%BB%E7%9A%84%E6%A0%87%E8%AE%B0"><span class="toc-text">4.特殊类的标记</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#5-%E7%89%B9%E6%AE%8A%E7%B1%BB%E6%A0%87%E8%AE%B0"><span class="toc-text">5.特殊类标记</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#6-EOF"><span class="toc-text">6.EOF</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BA%8C-%E5%8F%98%E9%87%8F%E5%8F%8A%E5%8F%98%E9%87%8F%E7%9A%84%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B"><span class="toc-text">二.变量及变量的数据类型</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E5%8F%98%E9%87%8F%E7%9A%84%E6%A6%82%E5%BF%B5"><span class="toc-text">1.变量的概念</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E5%8F%98%E9%87%8F%E5%88%86%E7%B1%BB"><span class="toc-text">2.变量分类</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%89-%E5%B8%B8%E9%87%8F"><span class="toc-text">三:常量</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E5%B8%B8%E9%87%8F%E6%A6%82%E5%BF%B5"><span class="toc-text">1.常量概念</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E4%BD%BF%E7%94%A8%E8%AF%AD%E6%B3%95"><span class="toc-text">2.使用语法</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9B%9B%EF%BC%9A%E8%BE%93%E5%87%BA%E5%87%BD%E6%95%B0"><span class="toc-text">四：输出函数</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E5%B8%B8%E8%A7%81%E7%9A%84%E8%BE%93%E5%87%BA%E5%87%BD%E6%95%B0%E8%AF%AD%E5%8F%A5"><span class="toc-text">1.常见的输出函数语句</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BA%94%EF%BC%9A%E5%88%A4%E6%96%AD%E5%BE%AA%E7%8E%AF%E8%AF%AD%E5%8F%A5"><span class="toc-text">五：判断循环语句</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-if%E2%80%A6Else-%E8%AF%AD%E5%8F%A5"><span class="toc-text">1.if…Else 语句</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-Switch-%E8%AF%AD%E5%8F%A5"><span class="toc-text">2.Switch 语句</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-while-%E5%BE%AA%E7%8E%AF"><span class="toc-text">3.while 循环</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-for-%E5%BE%AA%E7%8E%AF"><span class="toc-text">4.for 循环</span></a></li></ol></li></ol></li></ol>
+</div></main>
+          <aside class="left-column">
+            
+            <div class="card card-author">
+              
+<img src="/img/author.jpg" class="author-img">
+
+<p class="author-name">YiHua</p>
+<p class="author-description">谨言  深思  笃行</p>
+<div class="author-message">
+  <a class="author-posts-count" href="/archives">
+    <span>13</span>
+    <span>文章</span>
+  </a>
+  <a class="author-categories-count" href="/categories">
+    <span>5</span>
+    <span>分类</span>
+  </a>
+  <a class="author-tags-count" href="/tags">
+    <span>5</span>
+    <span>标签</span>
+  </a>
+</div>
+
+            </div>
+            
+            <div class="sticky-tablet">
+  
+  
+  <article class="display-when-two-columns spacer">
+    <div class="card card-content toc-card">
+      <div class="toc-header"><i class="iconfont icon-menu" style="padding-right: 2px;"></i>目录</div>
+<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%EF%BC%9A%E5%B8%B8%E8%A7%81%E6%A0%87%E8%AE%B0"><span class="toc-text">一：常见标记</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E6%A0%87%E5%87%86%E6%A0%87%E8%AE%B0"><span class="toc-text">1.标准标记</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E7%9F%AD%E6%A0%87%E7%AD%BE%E7%B1%BB%E5%9E%8B"><span class="toc-text">2.短标签类型</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-%E7%9F%AD%E6%A0%87%E7%AD%BE%E7%B1%BB%E5%9E%8B"><span class="toc-text">3.短标签类型</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-%E7%89%B9%E6%AE%8A%E7%B1%BB%E7%9A%84%E6%A0%87%E8%AE%B0"><span class="toc-text">4.特殊类的标记</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#5-%E7%89%B9%E6%AE%8A%E7%B1%BB%E6%A0%87%E8%AE%B0"><span class="toc-text">5.特殊类标记</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#6-EOF"><span class="toc-text">6.EOF</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BA%8C-%E5%8F%98%E9%87%8F%E5%8F%8A%E5%8F%98%E9%87%8F%E7%9A%84%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B"><span class="toc-text">二.变量及变量的数据类型</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E5%8F%98%E9%87%8F%E7%9A%84%E6%A6%82%E5%BF%B5"><span class="toc-text">1.变量的概念</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E5%8F%98%E9%87%8F%E5%88%86%E7%B1%BB"><span class="toc-text">2.变量分类</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%89-%E5%B8%B8%E9%87%8F"><span class="toc-text">三:常量</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E5%B8%B8%E9%87%8F%E6%A6%82%E5%BF%B5"><span class="toc-text">1.常量概念</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E4%BD%BF%E7%94%A8%E8%AF%AD%E6%B3%95"><span class="toc-text">2.使用语法</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9B%9B%EF%BC%9A%E8%BE%93%E5%87%BA%E5%87%BD%E6%95%B0"><span class="toc-text">四：输出函数</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E5%B8%B8%E8%A7%81%E7%9A%84%E8%BE%93%E5%87%BA%E5%87%BD%E6%95%B0%E8%AF%AD%E5%8F%A5"><span class="toc-text">1.常见的输出函数语句</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BA%94%EF%BC%9A%E5%88%A4%E6%96%AD%E5%BE%AA%E7%8E%AF%E8%AF%AD%E5%8F%A5"><span class="toc-text">五：判断循环语句</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-if%E2%80%A6Else-%E8%AF%AD%E5%8F%A5"><span class="toc-text">1.if…Else 语句</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-Switch-%E8%AF%AD%E5%8F%A5"><span class="toc-text">2.Switch 语句</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-while-%E5%BE%AA%E7%8E%AF"><span class="toc-text">3.while 循环</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-for-%E5%BE%AA%E7%8E%AF"><span class="toc-text">4.for 循环</span></a></li></ol></li></ol></li></ol>
+    </div>
+  </article>
+  
+  
+  <article class="card card-content categories-widget">
+    <div class="categories-card">
+  <div class="categories-header"><i class="iconfont icon-fenlei" style="padding-right: 2px;"></i>分类</div>
+  <div class="categories-list">
+    
+      <a href="/categories/CentoS-7基础/">
+        <div class="categories-list-item">
+          CentoS-7基础
+          <span class="categories-list-item-badge">4</span>
+        </div>
+      </a>
+    
+      <a href="/categories/计算机网络/">
+        <div class="categories-list-item">
+          计算机网络
+          <span class="categories-list-item-badge">4</span>
+        </div>
+      </a>
+    
+      <a href="/categories/Mysql数据库/">
+        <div class="categories-list-item">
+          Mysql数据库
+          <span class="categories-list-item-badge">1</span>
+        </div>
+      </a>
+    
+      <a href="/categories/php代码基础/">
+        <div class="categories-list-item">
+          php代码基础
+          <span class="categories-list-item-badge">3</span>
+        </div>
+      </a>
+    
+      <a href="/categories/windows-2008-R2/">
+        <div class="categories-list-item">
+          windows-2008-R2
+          <span class="categories-list-item-badge">1</span>
+        </div>
+      </a>
+    
+  </div>
+</div>
+  </article>
+  
+  <article class="card card-content tags-widget">
+    <div class="tags-card">
+  <div class="tags-header"><i class="iconfont icon-biaoqian" style="padding-right: 2px;"></i>热门标签</div>
+  <div class="tags-list">
+    
+    <a href="/tags/Linux/" title="Linux"><div class="tags-list-item">Linux</div></a>
+    
+    <a href="/tags/计算机网络/" title="计算机网络"><div class="tags-list-item">计算机网络</div></a>
+    
+    <a href="/tags/Mysql数据库/" title="Mysql数据库"><div class="tags-list-item">Mysql数据库</div></a>
+    
+    <a href="/tags/php代码基础/" title="php代码基础"><div class="tags-list-item">php代码基础</div></a>
+    
+    <a href="/tags/windows/" title="windows"><div class="tags-list-item">windows</div></a>
+    
+  </div>
+</div>
+  </article>
+  
+  
+</div>
+          </aside>
+          <aside class="right-column">
+            <div class="sticky-widescreen">
+  
+  
+  <article class="card card-content toc-card">
+    <div class="toc-header"><i class="iconfont icon-menu" style="padding-right: 2px;"></i>目录</div>
+<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%EF%BC%9A%E5%B8%B8%E8%A7%81%E6%A0%87%E8%AE%B0"><span class="toc-text">一：常见标记</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E6%A0%87%E5%87%86%E6%A0%87%E8%AE%B0"><span class="toc-text">1.标准标记</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E7%9F%AD%E6%A0%87%E7%AD%BE%E7%B1%BB%E5%9E%8B"><span class="toc-text">2.短标签类型</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-%E7%9F%AD%E6%A0%87%E7%AD%BE%E7%B1%BB%E5%9E%8B"><span class="toc-text">3.短标签类型</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-%E7%89%B9%E6%AE%8A%E7%B1%BB%E7%9A%84%E6%A0%87%E8%AE%B0"><span class="toc-text">4.特殊类的标记</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#5-%E7%89%B9%E6%AE%8A%E7%B1%BB%E6%A0%87%E8%AE%B0"><span class="toc-text">5.特殊类标记</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#6-EOF"><span class="toc-text">6.EOF</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BA%8C-%E5%8F%98%E9%87%8F%E5%8F%8A%E5%8F%98%E9%87%8F%E7%9A%84%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B"><span class="toc-text">二.变量及变量的数据类型</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E5%8F%98%E9%87%8F%E7%9A%84%E6%A6%82%E5%BF%B5"><span class="toc-text">1.变量的概念</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E5%8F%98%E9%87%8F%E5%88%86%E7%B1%BB"><span class="toc-text">2.变量分类</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%89-%E5%B8%B8%E9%87%8F"><span class="toc-text">三:常量</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E5%B8%B8%E9%87%8F%E6%A6%82%E5%BF%B5"><span class="toc-text">1.常量概念</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E4%BD%BF%E7%94%A8%E8%AF%AD%E6%B3%95"><span class="toc-text">2.使用语法</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9B%9B%EF%BC%9A%E8%BE%93%E5%87%BA%E5%87%BD%E6%95%B0"><span class="toc-text">四：输出函数</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E5%B8%B8%E8%A7%81%E7%9A%84%E8%BE%93%E5%87%BA%E5%87%BD%E6%95%B0%E8%AF%AD%E5%8F%A5"><span class="toc-text">1.常见的输出函数语句</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BA%94%EF%BC%9A%E5%88%A4%E6%96%AD%E5%BE%AA%E7%8E%AF%E8%AF%AD%E5%8F%A5"><span class="toc-text">五：判断循环语句</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-if%E2%80%A6Else-%E8%AF%AD%E5%8F%A5"><span class="toc-text">1.if…Else 语句</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-Switch-%E8%AF%AD%E5%8F%A5"><span class="toc-text">2.Switch 语句</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-while-%E5%BE%AA%E7%8E%AF"><span class="toc-text">3.while 循环</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-for-%E5%BE%AA%E7%8E%AF"><span class="toc-text">4.for 循环</span></a></li></ol></li></ol></li></ol>
+  </article>
+  
+  
+  <article class="card card-content">
+    <div class="recent-posts-card">
+  <div class="recent-posts-header"><i class="iconfont icon-wenzhang_huaban" style="padding-right: 2px;"></i>最近文章</div>
+  <div class="recent-posts-list">
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2022-01-08</div>
+        <a href="/2022/01/08/Mysql数据库/"><div class="recent-posts-item-content">Mysql数据库</div></a>
+      </div>
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2022-01-06</div>
+        <a href="/2022/01/06/php基础（三）/"><div class="recent-posts-item-content">php基础（三）</div></a>
+      </div>
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2022-01-05</div>
+        <a href="/2022/01/05/php基础（二）/"><div class="recent-posts-item-content">php基础（二）</div></a>
+      </div>
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2022-01-04</div>
+        <a href="/2022/01/04/php基础（一）/"><div class="recent-posts-item-content">php基础（一）</div></a>
+      </div>
+    
+  </div>
+</div>
+  </article>
+  
+  
+</div>
+          </aside>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <footer class="footer">
+  <div class="footer-container">
+    <div>
+      <div class="footer-dsc">
+        <span>Copyright ©
+          
+          2020 -
+          
+          2022
+        </span>
+        &nbsp;
+        <a href="/" class="footer-link">混口饭吃 </a>
+      </div>
+    </div>
+
+    
+    <div class="footer-dsc">
+      
+      Powered by
+      <a href="https://hexo.io/" class="footer-link" target="_blank" rel="nofollow noopener noreferrer">&nbsp;Hexo </a>
+      
+      
+      <span>&nbsp;|&nbsp;</span>
+      
+      
+      Theme -
+      <a href="https://github.com/theme-kaze" class="footer-link" target="_blank"
+        rel="nofollow noopener noreferrer">&nbsp;Kaze</a>
+      
+    </div>
+    
+    
+    
+    
+</footer>
+  <a role="button" id="scrollbutton" class="basebutton"  aria-label="回到顶部">
+  <i class="iconfont icon-arrowleft button-icon"></i>
+</a>
+<a role="button" id="menubutton" class="basebutton">
+  <i class="iconfont icon-menu button-icon"></i>
+</a>
+<a role="button" id="popbutton" class="basebutton" aria-label="控制中心">
+  <i class="iconfont icon-expand button-icon"></i>
+</a>
+<a role="button" id="darkbutton" class="basebutton darkwidget" aria-label="夜色模式">
+  <i class="iconfont icon-weather button-icon"></i>
+</a>
+<a role="button" id="searchbutton" class="basebutton searchwidget" aria-label="搜索">
+  <i class="iconfont icon-search button-icon"></i>
+</a>
+
+  
+  
+  
+  <script>
+  var addImgLayout = function () {
+    var img = document.querySelectorAll('.post-content img');
+    var i;
+    for (i = 0; i < img.length; i++) {
+      var wrapper = document.createElement('a');
+      wrapper.setAttribute('href', img[i].getAttribute('data-src'));
+      wrapper.setAttribute('aria-label', 'illustration');
+      wrapper.style.cssText = 'width: 100%; display: flex; justify-content: center;';
+      if (img[i].alt) wrapper.dataset.caption = img[i].alt;
+      wrapper.dataset.nolink = true;
+      img[i].before(wrapper);
+      wrapper.append(img[i]);
+      var divWrap = document.createElement('div');
+      divWrap.classList.add('gallery');
+      wrapper.before(divWrap);
+      divWrap.append(wrapper);
+    }
+    baguetteBox.run('.gallery');
+  }
+</script>
+<script>loadScript("/js/lib/lightbox/baguetteBox.min.js", addImgLayout)</script>
+  
+  
+  
+<script src="/js/main.js"></script>
+
+  
+  
+  <script>
+    var addLazyload = function () {
+      var observer = lozad('.lozad', {
+        load: function (el) {
+          el.srcset = el.getAttribute('data-src');
+        },
+        loaded: function (el) {
+          el.classList.add('loaded');
+        }
+      });
+      observer.observe();
+    }
+  </script>
+  <script>loadScript("/js/lib/lozad.min.js", addLazyload)</script>
+  
+  
+</body>
+
+</html>
